@@ -1,10 +1,11 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { WelcomeScreen } from '@/components/WelcomeScreen'
 import { LobbyScreen } from '@/components/LobbyScreen'
 import { ShopScreen } from '@/components/ShopScreen'
 import { GameCanvas } from '@/components/GameCanvas'
 import { SKINS, type WormSkin, type GameMode, type GameScreen } from '@/types/game'
+import backgroundMusic from '../music/Starlight_Arcadepremieree.mp3'
 
 interface DeathInfo {
   score: number
@@ -23,8 +24,30 @@ export function AppInner() {
   const [gameMode, setGameMode] = useState<GameMode>('ffa')
   const [seed, setSeed] = useState<number | undefined>()
   const [deathInfo, setDeathInfo] = useState<DeathInfo | null>(null)
+  const backgroundAudioRef = useRef<HTMLAudioElement | null>(null)
+
+  const startBackgroundMusic = useCallback(() => {
+    const audio = backgroundAudioRef.current
+    if (!audio) return
+    audio.play().catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    const audio = new Audio(backgroundMusic)
+    audio.loop = true
+    audio.volume = 0.35
+    audio.preload = 'auto'
+    backgroundAudioRef.current = audio
+
+    return () => {
+      audio.pause()
+      audio.currentTime = 0
+      backgroundAudioRef.current = null
+    }
+  }, [])
 
   const handlePlay = useCallback((name: string, skin: WormSkin) => {
+    startBackgroundMusic()
     setPlayerName(name)
     setPlayerSkin(skin)
     setRoomSlug(undefined)
@@ -33,46 +56,53 @@ export function AppInner() {
     setSeed(undefined)
     setScreen('playing')
     document.body.style.cursor = 'none'
-  }, [])
+  }, [startBackgroundMusic])
 
   const handleMultiplayer = useCallback(() => {
+    startBackgroundMusic()
     setScreen('lobby')
-  }, [])
+  }, [startBackgroundMusic])
 
   const handleShop = useCallback(() => {
+    startBackgroundMusic()
     setScreen('shop')
-  }, [])
+  }, [startBackgroundMusic])
 
   const handleShopApply = useCallback((skin: WormSkin) => {
+    startBackgroundMusic()
     setCustomSkin(skin)
     setPlayerSkin(skin)
     setScreen('menu')
-  }, [])
+  }, [startBackgroundMusic])
 
   const handleJoinRoom = useCallback((slug: string, id: string, mode: GameMode, roomSeed: number) => {
+    startBackgroundMusic()
     setRoomSlug(slug)
     setRoomId(id)
     setGameMode(mode)
     setSeed(roomSeed)
     setScreen('playing')
     document.body.style.cursor = 'none'
-  }, [])
+  }, [startBackgroundMusic])
 
   const handleDeath = useCallback((score: number, length: number, coins: number) => {
+    startBackgroundMusic()
     setDeathInfo({ score, length, coins })
     setScreen('dead')
     document.body.style.cursor = 'default'
-  }, [])
+  }, [startBackgroundMusic])
 
   const handleRetry = useCallback(() => {
+    startBackgroundMusic()
     setScreen('playing')
     document.body.style.cursor = 'none'
-  }, [])
+  }, [startBackgroundMusic])
 
   const handleBackToMenu = useCallback(() => {
+    startBackgroundMusic()
     setScreen('menu')
     document.body.style.cursor = 'default'
-  }, [])
+  }, [startBackgroundMusic])
 
   if (screen === 'menu') {
     return (
