@@ -291,12 +291,20 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
 
   // Eat food — use spatial grid for O(nearby) instead of O(all)
   const headR = getWormRadius(worm)
-  const eatRange = headR + 20
-  const nearby = foodGrid ? foodGrid.query(head.x, head.y, eatRange) : foods
+  const attractRange = headR + 70
+  const nearby = foodGrid ? foodGrid.query(head.x, head.y, attractRange) : foods
   for (const f of nearby) {
     const dx = head.x - f.x, dy = head.y - f.y
     const dist = Math.sqrt(dx * dx + dy * dy)
-    if (dist < headR + f.radius) {
+    if (dist < attractRange && dist > 0.001) {
+      const pull = 0.1 + (1 - dist / attractRange) * 0.22
+      f.x += dx * pull
+      f.y += dy * pull
+    }
+
+    const collectedDx = head.x - f.x, collectedDy = head.y - f.y
+    const collectedDist = Math.sqrt(collectedDx * collectedDx + collectedDy * collectedDy)
+    if (collectedDist < headR + f.radius + 10) {
       worm.score += f.value
       worm.segmentsToAdd += f.fromDeath ? 0.4 : 0.11
       if (particles.length < MAX_PARTICLES) {
