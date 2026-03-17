@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Worms Zone</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Fredoka:wght@400;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  overflow: hidden;
+  background: #0e3a5c;
+  font-family: 'Fredoka', sans-serif;
+  cursor: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+canvas {
+  display: block;
+  position: fixed;
+  top: 0; left: 0;
+  outline: none;
+}
+
+#ui-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#score-display {
+  position: fixed;
+  top: 20px; left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-family: 'Bungee', cursive;
+  font-size: 28px;
+  text-shadow: 0 3px 10px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.2);
+  z-index: 20;
+  display: none;
+  letter-spacing: 2px;
+}
+
+#coin-panel {
+  position: fixed;
+  bottom: 30px; left: 20px;
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,0,0,0.4);
+  padding: 8px 16px;
+  border-radius: 30px;
+  z-index: 20;
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,215,0,0.3);
+}
+
+#coin-icon {
+  font-size: 24px;
+}
+
+#coin-display {
+  color: #ffd700;
+  font-family: 'Bungee', cursive;
+  font-size: 20px;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+#boost-bar-container {
+  position: fixed;
+  bottom: 30px; left: 50%;
+  transform: translateX(-50%);
+  width: 200px; height: 12px;
+  background: rgba(0,0,0,0.4);
+  border-radius: 10px;
+  z-index: 20;
+  display: none;
+  border: 2px solid rgba(255,255,255,0.2);
+  overflow: hidden;
+}
+
+#boost-bar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #ff6b35, #ffd700, #7fff00);
+  border-radius: 8px;
+  transition: width 0.1s;
+}
+
+#minimap {
+  position: fixed;
+  bottom: 20px; right: 20px;
+  width: 160px; height: 160px;
+  background: rgba(0,0,0,0.5);
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 12px;
+  z-index: 20;
+  display: none;
+  backdrop-filter: blur(4px);
+}
+
+#leaderboard {
+  position: fixed;
+  top: 20px; right: 20px;
+  width: 200px;
+  background: rgba(0,0,0,0.45);
+  border-radius: 14px;
+  padding: 14px;
+  z-index: 20;
+  display: none;
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+#leaderboard h3 {
+  color: #ffd700;
+  font-family: 'Bungee', cursive;
+  font-size: 14px;
+  margin-bottom: 10px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.lb-entry {
+  display: flex;
+  justify-content: space-between;
+  color: white;
+  font-size: 13px;
+  padding: 3px 6px;
+  border-radius: 6px;
+  margin-bottom: 2px;
+}
+
+.lb-entry.me {
+  background: rgba(255,215,0,0.2);
+  color: #ffd700;
+  font-weight: 700;
+}
+
+.lb-rank { width: 24px; text-align: center; opacity: 0.6; }
+.lb-name { flex: 1; margin-left: 6px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-score { font-weight: 600; margin-left: 8px; }
+
+/* START SCREEN */
+#start-screen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  background: radial-gradient(ellipse at center, #1a5c8a 0%, #0e3a5c 60%, #082740 100%);
+}
+
+#start-screen h1 {
+  font-family: 'Bungee', cursive;
+  font-size: 64px;
+  background: linear-gradient(180deg, #ff6b35, #ff3366, #cc33ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 4px 20px rgba(255,51,102,0.5));
+  margin-bottom: 10px;
+  animation: titlePulse 2s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+#start-screen .subtitle {
+  color: rgba(255,255,255,0.5);
+  font-size: 16px;
+  margin-bottom: 40px;
+  letter-spacing: 3px;
+}
+
+#name-input {
+  width: 280px;
+  padding: 14px 20px;
+  border: 3px solid rgba(255,255,255,0.2);
+  border-radius: 50px;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-family: 'Fredoka', sans-serif;
+  font-size: 18px;
+  text-align: center;
+  outline: none;
+  margin-bottom: 20px;
+  backdrop-filter: blur(10px);
+  transition: border-color 0.3s;
+  pointer-events: all;
+}
+
+#name-input:focus {
+  border-color: #ff3366;
+}
+
+#name-input::placeholder { color: rgba(255,255,255,0.3); }
+
+.skin-selector {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.skin-option {
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid rgba(255,255,255,0.15);
+  transition: all 0.3s;
+  pointer-events: all;
+  position: relative;
+  overflow: hidden;
+}
+
+.skin-option:hover { transform: scale(1.15); }
+.skin-option.selected {
+  border-color: #ffd700;
+  box-shadow: 0 0 20px rgba(255,215,0,0.5);
+  transform: scale(1.15);
+}
+
+#play-btn {
+  padding: 16px 60px;
+  border: none;
+  border-radius: 50px;
+  font-family: 'Bungee', cursive;
+  font-size: 22px;
+  color: white;
+  background: linear-gradient(135deg, #ff3366, #ff6b35);
+  cursor: pointer;
+  pointer-events: all;
+  transition: all 0.3s;
+  box-shadow: 0 6px 30px rgba(255,51,102,0.4);
+  letter-spacing: 2px;
+}
+
+#play-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 40px rgba(255,51,102,0.6);
+}
+
+/* DEATH SCREEN */
+#death-screen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  background: rgba(8,30,50,0.85);
+  backdrop-filter: blur(8px);
+}
+
+#death-screen h2 {
+  font-family: 'Bungee', cursive;
+  font-size: 42px;
+  color: #ff3366;
+  margin-bottom: 10px;
+  text-shadow: 0 0 30px rgba(255,51,102,0.5);
+}
+
+#death-screen .final-score {
+  font-family: 'Bungee', cursive;
+  font-size: 60px;
+  color: #ffd700;
+  margin-bottom: 8px;
+}
+
+#death-screen .final-length {
+  color: rgba(255,255,255,0.6);
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+#retry-btn {
+  padding: 14px 50px;
+  border: none;
+  border-radius: 50px;
+  font-family: 'Bungee', cursive;
+  font-size: 20px;
+  color: white;
+  background: linear-gradient(135deg, #7c3aed, #06b6d4);
+  cursor: pointer;
+  pointer-events: all;
+  transition: all 0.3s;
+  box-shadow: 0 6px 25px rgba(124,58,237,0.4);
+  letter-spacing: 2px;
+}
+
+#retry-btn:hover {
+  transform: scale(1.08);
+}
+
+/* CONTROLS HINT */
+.controls-hint {
+  position: fixed;
+  bottom: 60px; left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255,255,255,0.3);
+  font-size: 13px;
+  z-index: 20;
+  display: none;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+/* Floating food particles decoration */
+.deco-particle {
+  position: fixed;
+  border-radius: 50%;
+  opacity: 0.15;
+  animation: floatUp linear infinite;
+  z-index: 1;
+}
+
+@keyframes floatUp {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  20% { opacity: 0.15; }
+  80% { opacity: 0.15; }
+  100% { transform: translateY(-100px) scale(1); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="game" tabindex="0"></canvas>
+
+<div id="score-display">Score: 0</div>
+
+<div id="coin-panel">
+  <span id="coin-icon">🪙</span>
+  <span id="coin-display">0</span>
+</div>
+
+<div id="boost-bar-container">
+  <div id="boost-bar"></div>
+</div>
+
+<canvas id="minimap"></canvas>
+
+<div id="leaderboard">
+  <h3>🏆 TOP WORMS</h3>
+  <div id="lb-entries"></div>
+</div>
+
+<div class="controls-hint" id="controls-hint">
+  Souris / ZQSD / WASD / Flèches pour diriger · Clic / Espace pour booster
+</div>
+
+<!-- START SCREEN -->
+<div id="start-screen">
+  <h1>WORMS ZONE</h1>
+  <div class="subtitle">. I O</div>
+  <input type="text" id="name-input" placeholder="Ton pseudo..." maxlength="15">
+  <div class="skin-selector" id="skin-selector"></div>
+  <button id="play-btn">JOUER</button>
+</div>
+
+<!-- DEATH SCREEN -->
+<div id="death-screen">
+  <h2>GAME OVER</h2>
+  <div class="final-score" id="final-score">0</div>
+  <div class="final-length" id="final-length">Longueur: 0</div>
+  <div class="final-length" id="final-coins">🪙 0</div>
+  <button id="retry-btn">REJOUER</button>
+</div>
+
+<script>
+// ============================================
+// WORMS ZONE - FULL GAME
+// ============================================
+
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const minimapCanvas = document.getElementById('minimap');
+const minimapCtx = minimapCanvas.getContext('2d');
+
+// Game constants
+const WORLD_SIZE = 6000;
+const FOOD_COUNT = 4000;
+const SPECIAL_FOOD_COUNT = 250;
+const AI_WORM_COUNT = 25;
+const BASE_SPEED = 2.0;
+const BOOST_SPEED = 3.8;
+const BASE_SEGMENT_GAP = 5;
+const BASE_RADIUS = 10;
+const TURN_SPEED = 0.08;
+
+// Worm skins
+const SKINS = [
+  { colors: ['#ff3366','#ff6b9d','#ff3366','#cc0044'], eye: '#fff', name: 'Rose' },
+  { colors: ['#00ccff','#0088ff','#00ccff','#0055cc'], eye: '#fff', name: 'Ocean' },
+  { colors: ['#7cff00','#44cc00','#7cff00','#228800'], eye: '#fff', name: 'Viper' },
+  { colors: ['#ff6b35','#ffaa00','#ff6b35','#cc4400'], eye: '#fff', name: 'Lava' },
+  { colors: ['#cc33ff','#8833ff','#cc33ff','#6600cc'], eye: '#fff', name: 'Mystic' },
+  { colors: ['#ffd700','#ffaa00','#ffd700','#cc8800'], eye: '#333', name: 'Gold' },
+  { colors: ['#ff1493','#ff69b4','#ff1493','#c71585'], eye: '#fff', name: 'Pink' },
+  { colors: ['#00ff88','#00cc66','#00ff88','#009944'], eye: '#fff', name: 'Emerald' },
+];
+
+const AI_SKINS = [
+  { colors: ['#e74c3c','#c0392b','#e74c3c','#962d22'] },
+  { colors: ['#3498db','#2980b9','#3498db','#1f6694'] },
+  { colors: ['#2ecc71','#27ae60','#2ecc71','#1e8449'] },
+  { colors: ['#f39c12','#e67e22','#f39c12','#ba6318'] },
+  { colors: ['#9b59b6','#8e44ad','#9b59b6','#6c3483'] },
+  { colors: ['#1abc9c','#16a085','#1abc9c','#0e7a64'] },
+  { colors: ['#e91e63','#c2185b','#e91e63','#880e4f'] },
+  { colors: ['#ff5722','#e64a19','#ff5722','#bf360c'] },
+  { colors: ['#00bcd4','#0097a7','#00bcd4','#006064'] },
+  { colors: ['#8bc34a','#689f38','#8bc34a','#33691e'] },
+  { colors: ['#ff9800','#f57c00','#ff9800','#e65100'] },
+  { colors: ['#607d8b','#455a64','#607d8b','#263238'] },
+];
+
+const AI_NAMES = [
+  'Lucas','Emma','Hugo','Léa','Louis','Chloé','Adam','Jade',
+  'Nathan','Lina','Tom','Sarah','Alex','Sofia','Max','Inès',
+  'Ethan','Camille','Noah','Alice','Raphaël','Zoé','Théo','Mia',
+  'Gabriel','Clara','Liam','Eva','Jules','Anna','Arthur','Nina',
+  'Mohamed','Stella','Sacha','Rose','Victor','Amira','Oscar','Lily',
+  'Dylan','Marie','Kevin','Laura','Sam','Elise','Leo','Nora',
+  'Matt','Yasmine','Axel','Manon','Ryan','Lucie','Karim','Hana',
+  'Enzo','Olivia','Dave','Margot','Felix','Diane','Ivan','Iris'
+];
+let usedAINames = [];
+let guestCounter = 0;
+
+// State
+let gameState = 'menu'; // menu, playing, dead
+let selectedSkin = 0;
+let playerName = '';
+let camera = { x: 0, y: 0, zoom: 1 };
+let mouse = { x: 0, y: 0 };
+let boosting = false;
+let boostEnergy = 100;
+let controlMode = 'mouse'; // 'mouse' or 'keyboard'
+let keys = { up: false, down: false, left: false, right: false };
+
+let player = null;
+let aiWorms = [];
+let foods = [];
+let particles = [];
+let deathFoods = [];
+let coins = [];
+let playerCoins = 0;
+
+// Resize
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  minimapCanvas.width = 160;
+  minimapCanvas.height = 160;
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ============================================
+// FOOD
+// ============================================
+const FOOD_EMOJIS = [
+  // Fromages
+  '🧀','🧀',
+  // Viandes & charcuterie
+  '🍖','🍗','🥩','🥓','🌭',
+  // Bonbons & sucreries
+  '🍬','🍭','🍫','🍩','🍪','🧁','🍰','🎂','🍮','🍡','🍦','🍧','🍨',
+  // Pains & viennoiseries
+  '🥖','🍞','🥐','🥯','🧇','🥞',
+  // Légumes
+  '🥕','🥦','🌽','🍅','🫑','🥬','🧅','🥒','🥔','🍆','🌶️','🧄','🫒',
+  // Fruits
+  '🍎','🍊','🍋','🍇','🍓','🍌','🍑','🍒','🥝','🍍','🫐','🥭','🍐','🥥','🍈','🍉',
+  // Plats
+  '🍕','🍔','🌮','🌯','🥗','🍟','🥚','🍳','🥘','🫕','🥙','🧆',
+  // Asiatique
+  '🍣','🍙','🍜','🥟','🍱','🍛','🍝','🍲','🥡','🍘',
+  // Boissons & extras
+  '🥤','🧃','🍿','🥜','🫘','🥨',
+];
+
+const SPECIAL_FOOD_EMOJIS = [
+  '🍖','🧀','🍕','🍔','🎂','🍗','🥩','🍰','🍩','🍍','🥐','🍣',
+  '🍉','🍳','🥘','🍱','🍝','🌯','🥓','🍦','🍧','🧇','🥞'
+];
+
+function createFood(x, y, special) {
+  const emoji = special
+    ? SPECIAL_FOOD_EMOJIS[Math.floor(Math.random()*SPECIAL_FOOD_EMOJIS.length)]
+    : FOOD_EMOJIS[Math.floor(Math.random()*FOOD_EMOJIS.length)];
+  return {
+    x: x !== undefined ? x : Math.random() * WORLD_SIZE - WORLD_SIZE/2,
+    y: y !== undefined ? y : Math.random() * WORLD_SIZE - WORLD_SIZE/2,
+    radius: special ? 12 + Math.random()*5 : 7 + Math.random()*4,
+    emoji: emoji,
+    value: special ? 5 : 1,
+    pulse: Math.random() * Math.PI * 2,
+    special: !!special,
+  };
+}
+
+function initFoods() {
+  foods = [];
+  for (let i = 0; i < FOOD_COUNT; i++) foods.push(createFood());
+  for (let i = 0; i < SPECIAL_FOOD_COUNT; i++) foods.push(createFood(undefined, undefined, true));
+}
+
+// ============================================
+// COINS
+// ============================================
+const COIN_COUNT = 200;
+
+function createCoin() {
+  return {
+    x: Math.random() * WORLD_SIZE - WORLD_SIZE/2,
+    y: Math.random() * WORLD_SIZE - WORLD_SIZE/2,
+    radius: 22,
+    pulse: Math.random() * Math.PI * 2,
+    spin: Math.random() * Math.PI * 2,
+  };
+}
+
+function initCoins() {
+  coins = [];
+  for (let i = 0; i < COIN_COUNT; i++) coins.push(createCoin());
+}
+
+// ============================================
+// WORM CLASS
+// ============================================
+function createWorm(x, y, skin, name, isPlayer) {
+  const segments = [];
+  const len = 15;
+  for (let i = 0; i < len; i++) {
+    segments.push({ x: x - i * BASE_SEGMENT_GAP, y: y });
+  }
+  return {
+    segments: segments,
+    angle: 0,
+    targetAngle: 0,
+    speed: BASE_SPEED,
+    skin: skin,
+    name: name,
+    score: 0,
+    isPlayer: !!isPlayer,
+    alive: true,
+    boosting: false,
+    boostEnergy: 100,
+    segmentsToAdd: 0,
+    // AI personality
+    aiTimer: 0,
+    aiTarget: null,
+    aiAvoidTimer: 0,
+    aiSkill: 0.35 + Math.random() * 0.55, // 0.35-0.9 dodge ability
+    aiAggression: Math.random(),           // 0=peaceful 1=killer
+    aiGreed: 0.3 + Math.random() * 0.7,   // tunnel-vision on food
+    aiDistracted: 0,                       // frames of not seeing danger
+    aiStrategy: ['hunter','farmer','explorer','camper'][Math.floor(Math.random()*4)],
+    aiDeathFood: null,                     // food from a dead worm to rush to
+    eyeBlink: 0,
+    invincible: isPlayer ? 120 : 60,
+  };
+}
+
+function getWormRadius(worm) {
+  const len = worm.segments.length;
+  // Stays thin when small, grows fat exponentially when big
+  const growth = Math.pow(len / 50, 2) * 8;
+  return BASE_RADIUS + Math.min(growth, 28);
+}
+
+function getWormSpeed(worm) {
+  const len = worm.segments.length;
+  // Only starts slowing down noticeably past ~80 segments
+  const slowdown = Math.pow(Math.max(len - 40, 0) / 80, 2) * 1.3;
+  const base = Math.max(BASE_SPEED - slowdown, 0.7);
+  return worm.boosting ? base * 1.8 : base;
+}
+
+// ============================================
+// INIT GAME
+// ============================================
+function initGame() {
+  const px = (Math.random() - 0.5) * WORLD_SIZE * 0.5;
+  const py = (Math.random() - 0.5) * WORLD_SIZE * 0.5;
+  player = createWorm(px, py, SKINS[selectedSkin], playerName, true);
+  
+  usedAINames = [];
+  aiWorms = [];
+  for (let i = 0; i < AI_WORM_COUNT; i++) {
+    spawnAIWorm();
+  }
+  
+  initFoods();
+  initCoins();
+  playerCoins = 0;
+  particles = [];
+  boostEnergy = 100;
+  camera.zoom = 1;
+}
+
+function getUniqueAIName() {
+  const available = AI_NAMES.filter(n => !usedAINames.includes(n));
+  if (available.length === 0) {
+    usedAINames = [];
+    return AI_NAMES[Math.floor(Math.random() * AI_NAMES.length)];
+  }
+  const name = available[Math.floor(Math.random() * available.length)];
+  usedAINames.push(name);
+  return name;
+}
+
+function spawnAIWorm(forceSmall) {
+  const ax = (Math.random() - 0.5) * WORLD_SIZE * 0.8;
+  const ay = (Math.random() - 0.5) * WORLD_SIZE * 0.8;
+  const skin = AI_SKINS[Math.floor(Math.random() * AI_SKINS.length)];
+  const name = getUniqueAIName();
+  const w = createWorm(ax, ay, skin, name, false);
+  // Some worms start big, some start small
+  if (!forceSmall && Math.random() > 0.45) {
+    const extraSegs = Math.floor(Math.random() * 40);
+    for (let j = 0; j < extraSegs; j++) {
+      const last = w.segments[w.segments.length - 1];
+      w.segments.push({ x: last.x, y: last.y });
+    }
+    w.score = extraSegs * 2;
+  }
+  w.angle = Math.random() * Math.PI * 2;
+  aiWorms.push(w);
+}
+
+// ============================================
+// UPDATE WORM
+// ============================================
+function updateWorm(worm, dt) {
+  if (!worm.alive) return;
+  if (worm.invincible > 0) worm.invincible--;
+
+  // Boost
+  if (worm.boosting && worm.boostEnergy > 0 && worm.segments.length > 10) {
+    worm.boostEnergy -= 0.5;
+    if (worm.boostEnergy <= 0) worm.boosting = false;
+    // Lose segments slowly while boosting
+    if (Math.random() < 0.03 && worm.segments.length > 10) {
+      const tail = worm.segments.pop();
+      foods.push(createFood(tail.x + (Math.random()-0.5)*20, tail.y + (Math.random()-0.5)*20, false));
+    }
+  } else if (!worm.boosting) {
+    worm.boostEnergy = Math.min(100, worm.boostEnergy + 0.15);
+  }
+
+  // Smooth turning
+  let angleDiff = worm.targetAngle - worm.angle;
+  while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+  while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+  const turnRate = worm.boosting ? TURN_SPEED * 0.7 : TURN_SPEED;
+  let turnMult;
+  if (worm.isPlayer) {
+    turnMult = controlMode === 'keyboard' ? 5 : 3;
+  } else {
+    turnMult = 1.8 + (worm.aiSkill || 0.5) * 1.2; // 1.8-2.9 based on skill
+  }
+  worm.angle += angleDiff * turnRate * turnMult;
+
+  // Move head
+  const speed = getWormSpeed(worm);
+  const head = worm.segments[0];
+  head.x += Math.cos(worm.angle) * speed;
+  head.y += Math.sin(worm.angle) * speed;
+
+  // World bounds
+  const half = WORLD_SIZE / 2;
+  if (head.x < -half || head.x > half || head.y < -half || head.y > half) {
+    // Push back
+    head.x = Math.max(-half + 20, Math.min(half - 20, head.x));
+    head.y = Math.max(-half + 20, Math.min(half - 20, head.y));
+    if (!worm.isPlayer) {
+      worm.targetAngle = Math.atan2(-head.y, -head.x);
+    }
+  }
+
+  // Move segments (follow the leader)
+  const gap = BASE_SEGMENT_GAP + Math.min(Math.pow(Math.max(worm.segments.length - 30, 0) / 50, 2) * 6, 10);
+  for (let i = 1; i < worm.segments.length; i++) {
+    const prev = worm.segments[i - 1];
+    const curr = worm.segments[i];
+    const dx = prev.x - curr.x;
+    const dy = prev.y - curr.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > gap) {
+      const ratio = gap / dist;
+      curr.x = prev.x - dx * ratio;
+      curr.y = prev.y - dy * ratio;
+    }
+  }
+
+  // Add queued segments
+  if (worm.segmentsToAdd >= 1) {
+    const last = worm.segments[worm.segments.length - 1];
+    worm.segments.push({ x: last.x, y: last.y });
+    worm.segmentsToAdd -= 1;
+  }
+
+  // Eat food
+  const headR = getWormRadius(worm);
+  for (let i = foods.length - 1; i >= 0; i--) {
+    const f = foods[i];
+    const dx = head.x - f.x;
+    const dy = head.y - f.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist < headR + f.radius) {
+      worm.score += f.value;
+      if (f.fromDeath) {
+        // Food from dead worm: grow a little more than regular, but not crazy
+        worm.segmentsToAdd += 0.4;
+      } else {
+        // Regular map food: grow very slowly (~1 segment per 9 foods)
+        worm.segmentsToAdd += 0.11;
+      }
+      // Particle effect
+      for (let p = 0; p < 4; p++) {
+        particles.push({
+          x: f.x, y: f.y,
+          vx: (Math.random()-0.5)*4, vy: (Math.random()-0.5)*4,
+          life: 20,
+          maxLife: 20,
+          color: ['#ffd700','#ff6b35','#ff3366','#7cff00','#00ccff','#ff69b4'][Math.floor(Math.random()*6)],
+          radius: f.radius * 0.6
+        });
+      }
+      foods.splice(i, 1);
+      // Only respawn regular map food, not food from dead worms
+      if (!f.fromDeath) {
+        foods.push(createFood(undefined, undefined, f.special));
+      }
+    }
+  }
+
+  // Collect coins (player only)
+  if (worm.isPlayer) {
+    for (let i = coins.length - 1; i >= 0; i--) {
+      const c = coins[i];
+      const dx = head.x - c.x;
+      const dy = head.y - c.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < headR + c.radius) {
+        playerCoins++;
+        // Gold sparkle particles
+        for (let p = 0; p < 6; p++) {
+          particles.push({
+            x: c.x, y: c.y,
+            vx: (Math.random()-0.5)*5, vy: (Math.random()-0.5)*5,
+            life: 25, maxLife: 25,
+            color: '#ffd700',
+            radius: 3 + Math.random()*3
+          });
+        }
+        coins.splice(i, 1);
+        // Respawn coin elsewhere
+        coins.push(createCoin());
+      }
+    }
+  }
+
+  // Eye blink
+  worm.eyeBlink = Math.max(0, worm.eyeBlink - 1);
+  if (Math.random() < 0.003) worm.eyeBlink = 8;
+}
+
+// ============================================
+// AI LOGIC
+// ============================================
+
+// Detect food hotspots (clusters of death food)
+function findFoodHotspot(x, y, range) {
+  let count = 0;
+  let totalX = 0, totalY = 0;
+  let totalValue = 0;
+  for (const f of foods) {
+    const dx = x - f.x;
+    const dy = y - f.y;
+    const d = Math.sqrt(dx*dx + dy*dy);
+    if (d < range) {
+      count++;
+      totalX += f.x;
+      totalY += f.y;
+      totalValue += f.value;
+      if (f.fromDeath) { count += 3; totalValue += 10; } // death food counts way more
+    }
+  }
+  if (count < 8) return null;
+  return { x: totalX / count, y: totalY / count, score: totalValue, count };
+}
+
+function updateAI(worm) {
+  if (!worm.alive) return;
+  worm.aiTimer--;
+  if (worm.aiDistracted > 0) worm.aiDistracted--;
+
+  const head = worm.segments[0];
+  const allWorms = [player, ...aiWorms].filter(w => w !== worm && w.alive);
+  const mySize = worm.segments.length;
+
+  // --- DANGER DETECTION ---
+  let danger = null;
+  let dangerDist = 200;
+
+  // Distraction: greedy worms eating nearby food get distracted
+  if (Math.random() < worm.aiGreed * 0.03) {
+    worm.aiDistracted = 20 + Math.floor(Math.random() * 30);
+  }
+
+  // Skill-based awareness: worse AI checks less often and misses more
+  const canSeeDanger = worm.aiDistracted <= 0 && Math.random() < worm.aiSkill;
+
+  if (canSeeDanger) {
+    for (const other of allWorms) {
+      const checkLimit = Math.min(other.segments.length, 60);
+      const step = Math.max(1, Math.floor((1 - worm.aiSkill) * 5));
+      for (let i = 0; i < checkLimit; i += step) {
+        const seg = other.segments[i];
+        const dx = head.x - seg.x;
+        const dy = head.y - seg.y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < dangerDist) {
+          danger = { x: seg.x, y: seg.y, worm: other };
+          dangerDist = d;
+        }
+      }
+    }
+  }
+
+  // --- REACTION TO DANGER ---
+  // When in food frenzy mode, bots are MORE reckless (lower reaction)
+  const inFrenzy = worm.aiFrenzy > 0;
+  const reactionDist = inFrenzy ? 30 + worm.aiSkill * 25 : 50 + worm.aiSkill * 60;
+
+  if (danger && dangerDist < reactionDist) {
+    const avoidAngle = Math.atan2(head.y - danger.y, head.x - danger.x);
+    const error = (1 - worm.aiSkill) * (Math.random() - 0.5) * 2.5;
+    // In frenzy, even bigger errors — they're not paying attention
+    const frenzyError = inFrenzy ? (Math.random() - 0.5) * 1.5 : 0;
+    worm.targetAngle = avoidAngle + error + frenzyError;
+    worm.boosting = dangerDist < 40 && worm.aiSkill > 0.6 && worm.boostEnergy > 20;
+    worm.aiTimer = 5 + Math.floor(Math.random() * 10);
+    if (inFrenzy) worm.aiFrenzy = Math.max(0, worm.aiFrenzy - 10); // snap out a bit
+    return;
+  }
+
+  // --- FOOD FRENZY: detect death food clusters and rush to them ---
+  if (worm.aiFrenzy === undefined) worm.aiFrenzy = 0;
+  if (worm.aiFrenzy > 0) worm.aiFrenzy--;
+
+  // Check for hotspots every ~60 frames
+  if (worm.aiTimer <= 0 || worm.aiFrenzy > 0) {
+    const hotspot = findFoodHotspot(head.x, head.y, 500);
+
+    if (hotspot && hotspot.count > 12) {
+      // FRENZY MODE! Rush to food cluster
+      const dx = hotspot.x - head.x;
+      const dy = hotspot.y - head.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+
+      worm.aiFrenzy = 60;
+      worm.targetAngle = Math.atan2(dy, dx);
+
+      // Boost hard toward the food — greedy and reckless
+      if (dist > 50 && worm.boostEnergy > 15) {
+        worm.boosting = true;
+        worm.aiDistracted = 10; // tunnel vision on food
+      }
+
+      // Check if competitors are also going for it — get more aggressive
+      let competitors = 0;
+      for (const other of allWorms) {
+        const oh = other.segments[0];
+        const d = Math.sqrt((hotspot.x-oh.x)**2 + (hotspot.y-oh.y)**2);
+        if (d < 300) competitors++;
+      }
+
+      // With more competitors, be more reckless and boost harder
+      if (competitors > 0) {
+        worm.boosting = worm.boostEnergy > 10;
+        worm.aiDistracted = 20 + competitors * 5;
+        // Slight angle variation so they don't all go to exact same point
+        worm.targetAngle += (Math.random() - 0.5) * 0.4;
+      }
+
+      worm.aiTimer = 5 + Math.floor(Math.random() * 8);
+      return;
+    }
+  }
+
+  // --- STRATEGY-BASED BEHAVIOR ---
+  worm.boosting = false;
+
+  // HUNTER: aggressive, chases smaller worms to cut them off
+  if (worm.aiStrategy === 'hunter' && worm.aiAggression > 0.4 && mySize > 25) {
+    for (const other of allWorms) {
+      if (other.segments.length < mySize * 0.6) {
+        const oh = other.segments[0];
+        const dx = oh.x - head.x;
+        const dy = oh.y - head.y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < 250) {
+          const predX = oh.x + Math.cos(other.angle) * 60;
+          const predY = oh.y + Math.sin(other.angle) * 60;
+          worm.targetAngle = Math.atan2(predY - head.y, predX - head.x);
+          worm.boosting = d < 150 && worm.boostEnergy > 25;
+          worm.aiTimer = 15;
+          return;
+        }
+      }
+    }
+  }
+
+  // CAMPER: circle around an area with lots of food
+  if (worm.aiStrategy === 'camper' && worm.aiTimer <= 0) {
+    worm.targetAngle += (Math.random() - 0.5) * 0.3;
+    worm.aiTimer = 20 + Math.random() * 20;
+    for (const f of foods) {
+      const dx = head.x - f.x;
+      const dy = head.y - f.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 120) {
+        worm.targetAngle = Math.atan2(f.y - head.y, f.x - head.x);
+        worm.aiTimer = 8;
+        break;
+      }
+    }
+    return;
+  }
+
+  // EXPLORER: wanders far, seeks dense food areas
+  if (worm.aiStrategy === 'explorer' && worm.aiTimer <= 0) {
+    if (Math.random() < 0.05) {
+      const rx = (Math.random() - 0.5) * WORLD_SIZE * 0.6;
+      const ry = (Math.random() - 0.5) * WORLD_SIZE * 0.6;
+      worm.targetAngle = Math.atan2(ry - head.y, rx - head.x);
+      worm.aiTimer = 40 + Math.random() * 40;
+      return;
+    }
+  }
+
+  // FARMER (and fallback): find best food nearby
+  if (worm.aiTimer <= 0) {
+    let bestFood = null;
+    let bestScore = -Infinity;
+    const searchRange = 300 + mySize * 2;
+
+    for (const f of foods) {
+      const dx = head.x - f.x;
+      const dy = head.y - f.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d > searchRange) continue;
+
+      let score = f.value * 15 - d;
+      if (f.special) score += 80;
+      if (f.fromDeath) score += 120; // death food is very attractive
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestFood = f;
+      }
+    }
+
+    if (bestFood) {
+      worm.targetAngle = Math.atan2(bestFood.y - head.y, bestFood.x - head.x);
+      // Rush to death food or special food
+      if ((bestFood.fromDeath || bestFood.special) && worm.aiGreed > 0.4 && worm.boostEnergy > 30) {
+        worm.boosting = true;
+        worm.aiDistracted = 12;
+      }
+    } else {
+      worm.targetAngle += (Math.random() - 0.5) * 0.6;
+    }
+    worm.aiTimer = 8 + Math.random() * 18;
+  }
+
+  // --- HEAD-TO-HEAD chicken game: both worms rush at each other ---
+  if (mySize > 15 && Math.random() < 0.008) {
+    for (const other of allWorms) {
+      if (!other.isPlayer) continue;
+      const oh = other.segments[0];
+      const dx = oh.x - head.x;
+      const dy = oh.y - head.y;
+      const d = Math.sqrt(dx*dx + dy*dy);
+      if (d < 400 && d > 100 && Math.random() < 0.3) {
+        worm.targetAngle = Math.atan2(dy, dx);
+        worm.aiTimer = 20 + Math.random() * 15;
+        worm.aiDistracted = 25;
+        break;
+      }
+    }
+  }
+}
+
+// ============================================
+// COLLISION DETECTION
+// ============================================
+function checkCollisions() {
+  const allWorms = [player, ...aiWorms].filter(w => w.alive);
+
+  for (const worm of allWorms) {
+    if (worm.invincible > 0) continue;
+    const head = worm.segments[0];
+    const headR = getWormRadius(worm);
+
+    for (const other of allWorms) {
+      if (other === worm || !other.alive) continue;
+
+      // Check head against other's body (skip first few segments)
+      for (let i = 4; i < other.segments.length; i++) {
+        const seg = other.segments[i];
+        const dx = head.x - seg.x;
+        const dy = head.y - seg.y;
+        const otherR = getWormRadius(other) * 0.9;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < headR + otherR - 4) {
+          killWorm(worm);
+          other.score += Math.floor(worm.score * 0.3);
+          other.segmentsToAdd += Math.floor(worm.segments.length * 0.1);
+          break;
+        }
+      }
+      if (!worm.alive) break;
+    }
+
+    // World border kill
+    const half = WORLD_SIZE / 2 - 10;
+    if (Math.abs(head.x) > half || Math.abs(head.y) > half) {
+      killWorm(worm);
+    }
+  }
+}
+
+function killWorm(worm) {
+  worm.alive = false;
+  // Drop food from dead worm
+  for (let i = 0; i < worm.segments.length; i += 2) {
+    const seg = worm.segments[i];
+    const f = createFood(
+      seg.x + (Math.random()-0.5)*30,
+      seg.y + (Math.random()-0.5)*30,
+      i % 6 === 0
+    );
+    f.radius = 5 + Math.random() * 5;
+    f.value = 3;
+    f.fromDeath = true;
+    foods.push(f);
+  }
+  // Death particles
+  for (let i = 0; i < 30; i++) {
+    particles.push({
+      x: worm.segments[0].x, y: worm.segments[0].y,
+      vx: (Math.random()-0.5)*8, vy: (Math.random()-0.5)*8,
+      life: 40, maxLife: 40,
+      color: worm.skin.colors[0],
+      radius: 4 + Math.random()*4
+    });
+  }
+
+  if (worm.isPlayer) {
+    gameState = 'dead';
+    showDeathScreen();
+  } else {
+    // Respawn AI after delay
+    setTimeout(() => {
+      const idx = aiWorms.indexOf(worm);
+      if (idx >= 0) {
+        aiWorms.splice(idx, 1);
+        spawnAIWorm(true);
+      }
+    }, 3000);
+  }
+}
+
+// ============================================
+// PARTICLES
+// ============================================
+function updateParticles() {
+  for (let i = particles.length - 1; i >= 0; i--) {
+    const p = particles[i];
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vx *= 0.95;
+    p.vy *= 0.95;
+    p.life--;
+    if (p.life <= 0) particles.splice(i, 1);
+  }
+}
+
+// ============================================
+// DRAWING
+// ============================================
+function worldToScreen(wx, wy) {
+  return {
+    x: (wx - camera.x) * camera.zoom + canvas.width / 2,
+    y: (wy - camera.y) * camera.zoom + canvas.height / 2
+  };
+}
+
+function drawBackground() {
+  // Blue carpet background
+  const grd = ctx.createRadialGradient(
+    canvas.width/2, canvas.height/2, 0,
+    canvas.width/2, canvas.height/2, canvas.width
+  );
+  grd.addColorStop(0, '#1a5c8a');
+  grd.addColorStop(1, '#0e3a5c');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Carpet texture: subtle noise dots
+  const seed = Math.floor(camera.x * 0.1) + Math.floor(camera.y * 0.1) * 1000;
+  for (let i = 0; i < 300; i++) {
+    const hash = (i * 2654435761 + seed) >>> 0;
+    const px = ((hash % canvas.width) + canvas.width) % canvas.width;
+    const py = (((hash * 31) % canvas.height) + canvas.height) % canvas.height;
+    const bright = (hash % 3 === 0) ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.04)';
+    ctx.fillStyle = bright;
+    ctx.fillRect(px, py, 1, 1);
+  }
+
+  // World border
+  const half = WORLD_SIZE / 2;
+  const tl = worldToScreen(-half, -half);
+  const br = worldToScreen(half, half);
+  ctx.strokeStyle = 'rgba(255,80,80,0.5)';
+  ctx.lineWidth = 4 * camera.zoom;
+  ctx.setLineDash([20 * camera.zoom, 10 * camera.zoom]);
+  ctx.strokeRect(tl.x, tl.y, br.x - tl.x, br.y - tl.y);
+  ctx.setLineDash([]);
+
+  // Border glow
+  const edgeDist = Math.min(
+    Math.abs(player.segments[0].x) - half,
+    Math.abs(player.segments[0].y) - half
+  );
+  if (edgeDist > -300) {
+    const alpha = Math.max(0, (300 + edgeDist) / 300) * 0.3;
+    ctx.fillStyle = `rgba(255,30,30,${alpha})`;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+function drawFood() {
+  const time = Date.now() * 0.003;
+  for (const f of foods) {
+    const p = worldToScreen(f.x, f.y);
+    if (p.x < -30 || p.x > canvas.width+30 || p.y < -30 || p.y > canvas.height+30) continue;
+
+    const r = f.radius * camera.zoom;
+    const pulse = 1 + Math.sin(time + f.pulse) * 0.1;
+    const size = r * 3.5 * pulse;
+
+    // Glow for special food
+    if (f.special) {
+      ctx.beginPath();
+      const glowGrd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 1.8);
+      glowGrd.addColorStop(0, 'rgba(255,215,0,0.3)');
+      glowGrd.addColorStop(1, 'rgba(255,215,0,0)');
+      ctx.fillStyle = glowGrd;
+      ctx.arc(p.x, p.y, size * 1.8, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // Draw emoji
+    ctx.font = `${Math.round(size)}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(f.emoji, p.x, p.y);
+  }
+}
+
+function drawCoins() {
+  const time = Date.now() * 0.004;
+  for (const c of coins) {
+    const p = worldToScreen(c.x, c.y);
+    if (p.x < -30 || p.x > canvas.width+30 || p.y < -30 || p.y > canvas.height+30) continue;
+
+    const r = c.radius * camera.zoom;
+    const pulse = 1 + Math.sin(time + c.pulse) * 0.15;
+    const size = r * pulse;
+
+    // Glow
+    ctx.beginPath();
+    const glowGrd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 2.5);
+    glowGrd.addColorStop(0, 'rgba(255,215,0,0.2)');
+    glowGrd.addColorStop(1, 'rgba(255,215,0,0)');
+    ctx.fillStyle = glowGrd;
+    ctx.arc(p.x, p.y, size * 2.5, 0, Math.PI*2);
+    ctx.fill();
+
+    // Coin body
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffd700';
+    ctx.fill();
+    ctx.strokeStyle = '#daa520';
+    ctx.lineWidth = 1.5 * camera.zoom;
+    ctx.stroke();
+
+    // Inner circle
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, size * 0.65, 0, Math.PI * 2);
+    ctx.strokeStyle = '#daa520';
+    ctx.lineWidth = 1 * camera.zoom;
+    ctx.stroke();
+
+    // $ symbol
+    ctx.font = `bold ${Math.round(size * 1.1)}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#b8860b';
+    ctx.fillText('$', p.x, p.y + 1);
+
+    // Highlight
+    ctx.beginPath();
+    ctx.arc(p.x - size*0.25, p.y - size*0.25, size*0.3, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.fill();
+  }
+}
+
+function drawWorm(worm) {
+  if (!worm.alive) return;
+  const segments = worm.segments;
+  const radius = getWormRadius(worm);
+  const colors = worm.skin.colors;
+
+  // Draw from tail to head
+  for (let i = segments.length - 1; i >= 0; i--) {
+    const seg = segments[i];
+    const p = worldToScreen(seg.x, seg.y);
+    if (p.x < -50 || p.x > canvas.width+50 || p.y < -50 || p.y > canvas.height+50) continue;
+
+    const t = i / segments.length;
+    const segR = radius * camera.zoom;
+    const colorIdx = i % colors.length;
+
+    // Body shadow
+    ctx.beginPath();
+    ctx.arc(p.x, p.y + segR * 0.3, segR * 1.05, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(0,0,0,0.2)';
+    ctx.fill();
+
+    // Body
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, segR, 0, Math.PI * 2);
+    ctx.fillStyle = colors[colorIdx];
+    ctx.fill();
+
+    // Shiny highlight on body
+    ctx.beginPath();
+    ctx.arc(p.x - segR*0.2, p.y - segR*0.25, segR*0.45, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.15)';
+    ctx.fill();
+
+    // Invincibility glow
+    if (worm.invincible > 0) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, segR + 3*camera.zoom, 0, Math.PI*2);
+      ctx.strokeStyle = `rgba(255,255,255,${0.3 * Math.sin(Date.now()*0.01)})`;
+      ctx.lineWidth = 2 * camera.zoom;
+      ctx.stroke();
+    }
+  }
+
+  // Draw head features
+  const head = segments[0];
+  const hp = worldToScreen(head.x, head.y);
+  const headR = radius * camera.zoom;
+  const angle = worm.angle;
+
+  // Eyes
+  const eyeOffset = headR * 0.35;
+  const eyeR = headR * 0.32;
+  const pupilR = eyeR * 0.55;
+
+  for (let side = -1; side <= 1; side += 2) {
+    const ex = hp.x + Math.cos(angle - side * 0.5) * eyeOffset;
+    const ey = hp.y + Math.sin(angle - side * 0.5) * eyeOffset;
+
+    // Eye white
+    ctx.beginPath();
+    ctx.arc(ex, ey, eyeR, 0, Math.PI * 2);
+    ctx.fillStyle = worm.eyeBlink > 0 ? colors[0] : '#ffffff';
+    ctx.fill();
+
+    if (worm.eyeBlink <= 0) {
+      // Pupil
+      const px = ex + Math.cos(angle) * eyeR * 0.25;
+      const py = ey + Math.sin(angle) * eyeR * 0.25;
+      ctx.beginPath();
+      ctx.arc(px, py, pupilR, 0, Math.PI * 2);
+      ctx.fillStyle = '#111';
+      ctx.fill();
+
+      // Eye shine
+      ctx.beginPath();
+      ctx.arc(px - pupilR*0.3, py - pupilR*0.3, pupilR*0.35, 0, Math.PI*2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+    }
+  }
+
+  // Boost trail
+  if (worm.boosting && worm.boostEnergy > 0) {
+    for (let i = 0; i < 3; i++) {
+      const tail = segments[segments.length - 1 - i * 2];
+      if (!tail) break;
+      const tp = worldToScreen(tail.x + (Math.random()-0.5)*10, tail.y + (Math.random()-0.5)*10);
+      ctx.beginPath();
+      ctx.arc(tp.x, tp.y, (4 - i) * camera.zoom, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,200,50,${0.6 - i*0.2})`;
+      ctx.fill();
+    }
+  }
+
+  // Name tag
+  if (!worm.isPlayer || true) {
+    const np = worldToScreen(head.x, head.y - radius - 18);
+    ctx.font = `${Math.round(13 * camera.zoom)}px Fredoka`;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.fillText(worm.name, np.x + 1, np.y + 1);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(worm.name, np.x, np.y);
+  }
+}
+
+function drawParticles() {
+  for (const p of particles) {
+    const sp = worldToScreen(p.x, p.y);
+    const alpha = p.life / p.maxLife;
+    ctx.beginPath();
+    ctx.arc(sp.x, sp.y, p.radius * camera.zoom * alpha, 0, Math.PI * 2);
+    ctx.fillStyle = p.color + Math.floor(alpha * 255).toString(16).padStart(2,'0');
+    ctx.fill();
+  }
+}
+
+function drawMinimap() {
+  const mc = minimapCtx;
+  const w = 160, h = 160;
+  mc.clearRect(0, 0, w, h);
+  mc.fillStyle = 'rgba(0,0,0,0.3)';
+  mc.fillRect(0, 0, w, h);
+
+  // Border
+  mc.strokeStyle = 'rgba(255,50,50,0.3)';
+  mc.lineWidth = 1;
+  mc.strokeRect(2, 2, w-4, h-4);
+
+  const scale = w / WORLD_SIZE;
+  const ox = w / 2;
+  const oy = h / 2;
+
+  // AI worms
+  for (const ai of aiWorms) {
+    if (!ai.alive) continue;
+    const mx = ai.segments[0].x * scale + ox;
+    const my = ai.segments[0].y * scale + oy;
+    mc.beginPath();
+    mc.arc(mx, my, 2, 0, Math.PI*2);
+    mc.fillStyle = ai.skin.colors[0] + '99';
+    mc.fill();
+  }
+
+  // Player
+  if (player && player.alive) {
+    const mx = player.segments[0].x * scale + ox;
+    const my = player.segments[0].y * scale + oy;
+    mc.beginPath();
+    mc.arc(mx, my, 4, 0, Math.PI*2);
+    mc.fillStyle = '#ffd700';
+    mc.fill();
+    mc.beginPath();
+    mc.arc(mx, my, 6, 0, Math.PI*2);
+    mc.strokeStyle = '#ffd700';
+    mc.lineWidth = 1;
+    mc.stroke();
+  }
+}
+
+function updateLeaderboard() {
+  const all = [player, ...aiWorms].filter(w => w.alive);
+  all.sort((a, b) => b.score - a.score);
+  const top = all.slice(0, 8);
+
+  const container = document.getElementById('lb-entries');
+  container.innerHTML = '';
+  top.forEach((w, i) => {
+    const div = document.createElement('div');
+    div.className = 'lb-entry' + (w.isPlayer ? ' me' : '');
+    div.innerHTML = `
+      <span class="lb-rank">${i+1}</span>
+      <span class="lb-name">${w.name}</span>
+      <span class="lb-score">${w.score}</span>
+    `;
+    container.appendChild(div);
+  });
+}
+
+// ============================================
+// CAMERA
+// ============================================
+function updateCamera() {
+  if (!player || !player.alive) return;
+  const head = player.segments[0];
+  
+  // Smooth follow
+  camera.x += (head.x - camera.x) * 0.08;
+  camera.y += (head.y - camera.y) * 0.08;
+  
+  // Zoom based on size
+  const targetZoom = Math.max(0.5, 1 - player.segments.length * 0.001);
+  camera.zoom += (targetZoom - camera.zoom) * 0.02;
+}
+
+// ============================================
+// MAIN LOOP
+// ============================================
+let lastTime = 0;
+let frameCount = 0;
+let spawnTimer = 0;
+
+function gameLoop(timestamp) {
+  requestAnimationFrame(gameLoop);
+  if (gameState !== 'playing') return;
+
+  const dt = Math.min((timestamp - lastTime) / 16.67, 3);
+  lastTime = timestamp;
+  frameCount++;
+
+  // Player input
+  if (player && player.alive) {
+    if (controlMode === 'keyboard') {
+      // Keyboard: direct angle control
+      let kx = 0, ky = 0;
+      if (keys.up) ky -= 1;
+      if (keys.down) ky += 1;
+      if (keys.left) kx -= 1;
+      if (keys.right) kx += 1;
+      if (kx !== 0 || ky !== 0) {
+        player.targetAngle = Math.atan2(ky, kx);
+      }
+    } else {
+      // Mouse: aim toward cursor
+      const head = player.segments[0];
+      const hp = worldToScreen(head.x, head.y);
+      player.targetAngle = Math.atan2(mouse.y - hp.y, mouse.x - hp.x);
+    }
+    player.boosting = boosting && boostEnergy > 0 && player.segments.length > 10;
+    boostEnergy = player.boostEnergy;
+  }
+
+  // Update
+  updateWorm(player, dt);
+  for (const ai of aiWorms) {
+    if (ai.alive) {
+      updateAI(ai);
+      updateWorm(ai, dt);
+    }
+  }
+  checkCollisions();
+  updateParticles();
+  updateCamera();
+
+  // Draw
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawBackground();
+  drawFood();
+  drawCoins();
+  drawParticles();
+
+  // Draw AI worms
+  for (const ai of aiWorms) drawWorm(ai);
+  // Draw player on top
+  if (player && player.alive) drawWorm(player);
+
+  // UI updates
+  if (frameCount % 5 === 0) {
+    document.getElementById('score-display').textContent = `Score: ${player.score}`;
+    document.getElementById('boost-bar').style.width = `${boostEnergy}%`;
+    document.getElementById('coin-display').textContent = playerCoins;
+  }
+  if (frameCount % 30 === 0) {
+    updateLeaderboard();
+    drawMinimap();
+  }
+
+  // Spawn a new bot every 2 minutes (roughly 7200 frames at 60fps)
+  spawnTimer++;
+  if (spawnTimer >= 7200) {
+    spawnTimer = 0;
+    spawnAIWorm(Math.random() < 0.5); // 50% chance small
+  }
+}
+
+// ============================================
+// INPUT HANDLING
+// ============================================
+canvas.addEventListener('mousemove', e => {
+  const dx = e.clientX - mouse.x;
+  const dy = e.clientY - mouse.y;
+  if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+    controlMode = 'mouse';
+  }
+  mouse.x = e.clientX;
+  mouse.y = e.clientY;
+});
+
+canvas.addEventListener('mousedown', e => {
+  boosting = true;
+  e.preventDefault();
+});
+
+canvas.addEventListener('mouseup', e => {
+  boosting = false;
+});
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  controlMode = 'mouse';
+  mouse.x = e.touches[0].clientX;
+  mouse.y = e.touches[0].clientY;
+}, { passive: false });
+
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  boosting = true;
+  mouse.x = e.touches[0].clientX;
+  mouse.y = e.touches[0].clientY;
+}, { passive: false });
+
+canvas.addEventListener('touchend', e => {
+  boosting = false;
+});
+
+// Prevent context menu
+canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+// Keyboard controls (WASD / Arrow keys / ZQSD for AZERTY)
+const KEY_MAP = {
+  'ArrowUp': 'up', 'ArrowDown': 'down', 'ArrowLeft': 'left', 'ArrowRight': 'right',
+  'w': 'up', 's': 'down', 'a': 'left', 'd': 'right',
+  'W': 'up', 'S': 'down', 'A': 'left', 'D': 'right',
+  'z': 'up', 'q': 'left',
+  'Z': 'up', 'Q': 'left',
+};
+
+document.addEventListener('keydown', e => {
+  if (gameState !== 'playing') return;
+  const dir = KEY_MAP[e.key];
+  if (dir) {
+    keys[dir] = true;
+    controlMode = 'keyboard';
+    e.preventDefault();
+  }
+  if (e.key === ' ' || e.key === 'Shift') {
+    boosting = true;
+    e.preventDefault();
+  }
+});
+
+document.addEventListener('keyup', e => {
+  const dir = KEY_MAP[e.key];
+  if (dir) {
+    keys[dir] = false;
+    e.preventDefault();
+  }
+  if (e.key === ' ' || e.key === 'Shift') {
+    boosting = false;
+    e.preventDefault();
+  }
+});
+
+// ============================================
+// UI / SCREENS
+// ============================================
+function setupSkinSelector() {
+  const container = document.getElementById('skin-selector');
+  SKINS.forEach((skin, i) => {
+    const div = document.createElement('div');
+    div.className = 'skin-option' + (i === 0 ? ' selected' : '');
+    div.style.background = `linear-gradient(135deg, ${skin.colors[0]}, ${skin.colors[1]})`;
+    div.addEventListener('click', () => {
+      document.querySelectorAll('.skin-option').forEach(s => s.classList.remove('selected'));
+      div.classList.add('selected');
+      selectedSkin = i;
+    });
+    container.appendChild(div);
+  });
+}
+
+function startGame() {
+  const nameInput = document.getElementById('name-input').value.trim();
+  if (nameInput) {
+    playerName = nameInput;
+  } else {
+    guestCounter++;
+    playerName = 'Guest' + guestCounter;
+  }
+  document.getElementById('name-input').blur();
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('death-screen').style.display = 'none';
+  document.getElementById('score-display').style.display = 'block';
+  document.getElementById('coin-panel').style.display = 'flex';
+  document.getElementById('boost-bar-container').style.display = 'block';
+  document.getElementById('minimap').style.display = 'block';
+  document.getElementById('leaderboard').style.display = 'block';
+  document.getElementById('controls-hint').style.display = 'block';
+  document.body.style.cursor = 'none';
+
+  // Hide hint after 5s
+  setTimeout(() => {
+    document.getElementById('controls-hint').style.display = 'none';
+  }, 5000);
+
+  initGame();
+  gameState = 'playing';
+  controlMode = 'mouse';
+  keys = { up: false, down: false, left: false, right: false };
+  lastTime = performance.now();
+  canvas.focus();
+  requestAnimationFrame(gameLoop);
+}
+
+function showDeathScreen() {
+  gameState = 'dead';
+  document.getElementById('death-screen').style.display = 'flex';
+  document.getElementById('final-score').textContent = player.score;
+  document.getElementById('final-length').textContent = `Longueur: ${player.segments.length}`;
+  document.getElementById('final-coins').textContent = `🪙 ${playerCoins}`;
+  document.body.style.cursor = 'default';
+}
+
+document.getElementById('play-btn').addEventListener('click', startGame);
+document.getElementById('retry-btn').addEventListener('click', startGame);
+
+document.getElementById('name-input').addEventListener('keypress', e => {
+  if (e.key === 'Enter') startGame();
+});
+
+// Init
+setupSkinSelector();
+
+// Decorative particles on start screen
+function createDecoParticles() {
+  for (let i = 0; i < 15; i++) {
+    const p = document.createElement('div');
+    p.className = 'deco-particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.width = p.style.height = (4 + Math.random() * 8) + 'px';
+    p.style.background = ['#ff3366','#ff6b35','#ffd700','#7cff00','#00ccff','#cc33ff','#ff69b4','#00ff88'][Math.floor(Math.random() * 8)];
+    p.style.animationDuration = (8 + Math.random() * 12) + 's';
+    p.style.animationDelay = -Math.random() * 15 + 's';
+    document.getElementById('start-screen').appendChild(p);
+  }
+}
+createDecoParticles();
+
+// Pre-init mouse to center
+mouse.x = window.innerWidth / 2;
+mouse.y = window.innerHeight / 2;
+</script>
+</body>
+</html>

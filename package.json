@@ -1,0 +1,34 @@
+{
+  "name": "worm-world",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bunx vite",
+    "build": "bunx vite build",
+    "build:crazygames": "bash scripts/build-platform.sh crazygames",
+    "build:poki": "bash scripts/build-platform.sh poki",
+    "build:newgrounds": "bash scripts/build-platform.sh newgrounds",
+    "build:itchio": "bash scripts/build-platform.sh itchio",
+    "build:steam": "bash scripts/build-platform.sh steam",
+    "build:all": "for p in crazygames poki newgrounds itchio steam; do bash scripts/build-platform.sh $p; done",
+    "postinstall": "bash scripts/patch-trystero.sh"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.97.0",
+    "effect": "^3.19.16",
+    "i18next": "^25.8.6",
+    "react": "^19",
+    "react-dom": "^19",
+    "react-i18next": "^16.5.4",
+    "trystero": "^0.22.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitejs/plugin-react": "^5",
+    "babel-plugin-react-compiler": "^1",
+    "vite": "^7",
+    "vite-plugin-javascript-obfuscator": "^3"
+  }
+}
