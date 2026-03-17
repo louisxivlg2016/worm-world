@@ -8,7 +8,7 @@ export const AI_WORM_COUNT = 25
 export const BASE_SPEED = 2.0
 export const BOOST_SPEED = 3.8
 export const BASE_SEGMENT_GAP = 5
-export const BASE_RADIUS = 10
+export const BASE_RADIUS = 14
 export const TURN_SPEED = 0.08
 export const COIN_COUNT = 200
 export const BATTLE_MAX_DEATHS = 3
@@ -21,10 +21,13 @@ export interface Segment {
   y: number
 }
 
+export type HeadType = 'default' | 'queen' | 'king'
+
 export interface WormSkin {
   colors: string[]
   eye?: string
   name?: string
+  headType?: HeadType
 }
 
 export interface Food {
@@ -98,7 +101,7 @@ export interface Camera {
 }
 
 export type GameMode = 'battle' | 'ctf' | 'ffa'
-export type GameScreen = 'menu' | 'lobby' | 'playing' | 'dead'
+export type GameScreen = 'menu' | 'lobby' | 'shop' | 'playing' | 'dead'
 
 export interface GameState {
   screen: GameScreen

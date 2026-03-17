@@ -1,19 +1,25 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { SKINS } from '@/types/game'
+import { SKINS, type WormSkin } from '@/types/game'
 
 interface WelcomeScreenProps {
-  onPlay: (name: string, skinIdx: number) => void
+  customSkin: WormSkin | null
+  onPlay: (name: string, skin: WormSkin) => void
   onMultiplayer: () => void
+  onShop: () => void
 }
 
-export function WelcomeScreen({ onPlay, onMultiplayer }: WelcomeScreenProps) {
+export function WelcomeScreen({ customSkin, onPlay, onMultiplayer, onShop }: WelcomeScreenProps) {
   const { t } = useTranslation()
   const [name, setName] = useState('')
   const [selectedSkin, setSelectedSkin] = useState(0)
 
+  // If there's a custom skin, it's shown as the last option
+  const allSkins = customSkin ? [...SKINS, customSkin] : SKINS
+  const activeSkin = allSkins[selectedSkin] ?? SKINS[0]
+
   const handlePlay = () => {
-    onPlay(name.trim() || `Guest${Math.floor(Math.random() * 999)}`, selectedSkin)
+    onPlay(name.trim() || `Guest${Math.floor(Math.random() * 999)}`, activeSkin)
   }
 
   return (
@@ -30,7 +36,7 @@ export function WelcomeScreen({ onPlay, onMultiplayer }: WelcomeScreenProps) {
         onKeyDown={(e) => { if (e.key === 'Enter') handlePlay() }}
       />
       <div style={styles.skinSelector}>
-        {SKINS.map((skin, i) => (
+        {allSkins.map((skin, i) => (
           <div
             key={i}
             style={{
@@ -41,15 +47,25 @@ export function WelcomeScreen({ onPlay, onMultiplayer }: WelcomeScreenProps) {
               transform: i === selectedSkin ? 'scale(1.15)' : 'scale(1)',
             }}
             onClick={() => setSelectedSkin(i)}
-          />
+          >
+            {/* Star icon for custom skin */}
+            {customSkin && i === allSkins.length - 1 && (
+              <span style={{ fontSize: 18, position: 'absolute', top: -6, right: -6 }}>&#11088;</span>
+            )}
+          </div>
         ))}
       </div>
       <button style={styles.playBtn} onClick={handlePlay}>
         {t('soloPlay')}
       </button>
-      <button style={styles.multiBtn} onClick={onMultiplayer}>
-        {t('multiplay')}
-      </button>
+      <div style={styles.btnRow}>
+        <button style={styles.multiBtn} onClick={onMultiplayer}>
+          {t('multiplay')}
+        </button>
+        <button style={styles.shopBtn} onClick={onShop}>
+          {t('shop')}
+        </button>
+      </div>
 
       {/* Decorative particles */}
       {Array.from({ length: 15 }).map((_, i) => (
@@ -119,6 +135,8 @@ const styles: Record<string, React.CSSProperties> = {
     display: 'flex',
     gap: 12,
     marginBottom: 30,
+    flexWrap: 'wrap' as const,
+    justifyContent: 'center',
   },
   skinOption: {
     width: 50, height: 50,
@@ -126,6 +144,7 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     border: '3px solid rgba(255,255,255,0.15)',
     transition: 'all 0.3s',
+    position: 'relative' as const,
   },
   playBtn: {
     padding: '16px 60px',
@@ -140,14 +159,30 @@ const styles: Record<string, React.CSSProperties> = {
     letterSpacing: 2,
     marginBottom: 12,
   },
+  btnRow: {
+    display: 'flex',
+    gap: 12,
+  },
   multiBtn: {
-    padding: '12px 40px',
+    padding: '12px 30px',
     border: '2px solid rgba(255,255,255,0.3)',
     borderRadius: 50,
     fontFamily: "'Bungee', cursive",
     fontSize: 16,
     color: 'white',
     background: 'rgba(255,255,255,0.1)',
+    cursor: 'pointer',
+    backdropFilter: 'blur(10px)',
+    letterSpacing: 2,
+  },
+  shopBtn: {
+    padding: '12px 30px',
+    border: '2px solid rgba(255,215,0,0.4)',
+    borderRadius: 50,
+    fontFamily: "'Bungee', cursive",
+    fontSize: 16,
+    color: '#ffd700',
+    background: 'rgba(255,215,0,0.1)',
     cursor: 'pointer',
     backdropFilter: 'blur(10px)',
     letterSpacing: 2,

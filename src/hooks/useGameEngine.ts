@@ -6,9 +6,79 @@ import {
   SKINS, AI_SKINS, AI_NAMES,
   FOOD_EMOJIS, SPECIAL_FOOD_EMOJIS,
   type Worm, type Food, type Coin, type Particle, type Camera,
-  type Segment, type WormSkin, type AIStrategy, type GameMode,
+  type Segment, type WormSkin, type AIStrategy, type GameMode, type HeadType,
 } from '@/types/game'
 import { MultiplayerService, selfId } from '@/services/MultiplayerService'
+
+// ============================================
+// HEAD IMAGE CACHE — load once
+// ============================================
+const headImageCache = new Map<string, HTMLImageElement>()
+
+function loadHeadImage(src: string): HTMLImageElement | null {
+  if (headImageCache.has(src)) return headImageCache.get(src)!
+  const img = new Image()
+  img.src = src
+  img.onload = () => { headImageCache.set(src, img) }
+  return null
+}
+
+const HEAD_IMAGES: Record<string, string> = {
+  queen: '/heads/queen.png',
+  king: '/heads/king.png',
+}
+
+// Preload
+Object.values(HEAD_IMAGES).forEach(src => loadHeadImage(src))
+
+// ============================================
+// SPATIAL GRID - O(1) food lookup instead of O(n)
+// ============================================
+const GRID_CELL = 200 // world units per cell
+const MAX_PARTICLES = 500
+
+class SpatialGrid {
+  private cells = new Map<number, Food[]>()
+  private _foods: Food[] = []
+
+  private key(x: number, y: number): number {
+    const cx = Math.floor(x / GRID_CELL) & 0xFFFF
+    const cy = Math.floor(y / GRID_CELL) & 0xFFFF
+    return (cx << 16) | cy
+  }
+
+  rebuild(foods: Food[]) {
+    this._foods = foods
+    this.cells.clear()
+    for (const f of foods) {
+      const k = this.key(f.x, f.y)
+      const cell = this.cells.get(k)
+      if (cell) cell.push(f)
+      else this.cells.set(k, [f])
+    }
+  }
+
+  /** Return foods within `range` of (x,y) */
+  query(x: number, y: number, range: number): Food[] {
+    const result: Food[] = []
+    const r = Math.ceil(range / GRID_CELL)
+    const cx0 = Math.floor(x / GRID_CELL)
+    const cy0 = Math.floor(y / GRID_CELL)
+    for (let dx = -r; dx <= r; dx++) {
+      for (let dy = -r; dy <= r; dy++) {
+        const k = this.key((cx0 + dx) * GRID_CELL, (cy0 + dy) * GRID_CELL)
+        const cell = this.cells.get(k)
+        if (cell) {
+          for (const f of cell) {
+            const fdx = f.x - x, fdy = f.y - y
+            if (fdx * fdx + fdy * fdy < range * range) result.push(f)
+          }
+        }
+      }
+    }
+    return result
+  }
+}
 
 // ============================================
 // GAME ENGINE STATE
@@ -33,6 +103,8 @@ interface EngineState {
   spawnTimer: number
   usedAINames: string[]
   guestCounter: number
+  // Spatial
+  foodGrid: SpatialGrid
   // Multiplayer
   mp: MultiplayerService | null
   roomSlug: string | null
@@ -71,7 +143,7 @@ function createCoin(): Coin {
 
 function createWorm(x: number, y: number, skin: WormSkin, name: string, isPlayer: boolean): Worm {
   const segments: Segment[] = []
-  const len = 15
+  const len = 80
   for (let i = 0; i < len; i++) {
     segments.push({ x: x - i * BASE_SEGMENT_GAP, y })
   }
@@ -106,13 +178,13 @@ function createWorm(x: number, y: number, skin: WormSkin, name: string, isPlayer
 
 function getWormRadius(worm: Worm): number {
   const len = worm.segments.length
-  const growth = Math.pow(len / 50, 2) * 8
+  const growth = Math.pow(len / 150, 2) * 8
   return BASE_RADIUS + Math.min(growth, 28)
 }
 
 function getWormSpeed(worm: Worm): number {
   const len = worm.segments.length
-  const slowdown = Math.pow(Math.max(len - 40, 0) / 80, 2) * 1.3
+  const slowdown = Math.pow(len / 80000, 2) * 1.3
   const base = Math.max(BASE_SPEED - slowdown, 0.7)
   return worm.boosting ? base * 1.8 : base
 }
@@ -150,7 +222,7 @@ function findFoodHotspot(x: number, y: number, range: number, foods: Food[]) {
 // ============================================
 // UPDATE WORM
 // ============================================
-function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], particles: Particle[], playerCoinsRef: { value: number }) {
+function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], particles: Particle[], playerCoinsRef: { value: number }, foodGrid?: SpatialGrid) {
   if (!worm.alive) return
   if (worm.invincible > 0) worm.invincible--
 
@@ -217,26 +289,32 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
     worm.segmentsToAdd -= 1
   }
 
-  // Eat food
+  // Eat food — use spatial grid for O(nearby) instead of O(all)
   const headR = getWormRadius(worm)
-  for (let i = foods.length - 1; i >= 0; i--) {
-    const f = foods[i]
+  const eatRange = headR + 20
+  const nearby = foodGrid ? foodGrid.query(head.x, head.y, eatRange) : foods
+  for (const f of nearby) {
     const dx = head.x - f.x, dy = head.y - f.y
     const dist = Math.sqrt(dx * dx + dy * dy)
     if (dist < headR + f.radius) {
       worm.score += f.value
       worm.segmentsToAdd += f.fromDeath ? 0.4 : 0.11
-      for (let p = 0; p < 4; p++) {
-        particles.push({
-          x: f.x, y: f.y,
-          vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4,
-          life: 20, maxLife: 20,
-          color: ['#ffd700', '#ff6b35', '#ff3366', '#7cff00', '#00ccff', '#ff69b4'][Math.floor(Math.random() * 6)],
-          radius: f.radius * 0.6,
-        })
+      if (particles.length < MAX_PARTICLES) {
+        for (let p = 0; p < 3; p++) {
+          particles.push({
+            x: f.x, y: f.y,
+            vx: (Math.random() - 0.5) * 4, vy: (Math.random() - 0.5) * 4,
+            life: 20, maxLife: 20,
+            color: ['#ffd700', '#ff6b35', '#ff3366', '#7cff00', '#00ccff', '#ff69b4'][Math.floor(Math.random() * 6)],
+            radius: f.radius * 0.6,
+          })
+        }
       }
-      foods.splice(i, 1)
-      if (!f.fromDeath) foods.push(createFood(undefined, undefined, f.special))
+      const idx = foods.indexOf(f)
+      if (idx >= 0) {
+        foods.splice(idx, 1)
+        if (!f.fromDeath) foods.push(createFood(undefined, undefined, f.special))
+      }
     }
   }
 
@@ -248,14 +326,16 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
       const dist = Math.sqrt(dx * dx + dy * dy)
       if (dist < headR + c.radius) {
         playerCoinsRef.value++
-        for (let p = 0; p < 6; p++) {
-          particles.push({
-            x: c.x, y: c.y,
-            vx: (Math.random() - 0.5) * 5, vy: (Math.random() - 0.5) * 5,
-            life: 25, maxLife: 25,
-            color: '#ffd700',
-            radius: 3 + Math.random() * 3,
-          })
+        if (particles.length < MAX_PARTICLES) {
+          for (let p = 0; p < 4; p++) {
+            particles.push({
+              x: c.x, y: c.y,
+              vx: (Math.random() - 0.5) * 5, vy: (Math.random() - 0.5) * 5,
+              life: 25, maxLife: 25,
+              color: '#ffd700',
+              radius: 3 + Math.random() * 3,
+            })
+          }
         }
         coins.splice(i, 1)
         coins.push(createCoin())
@@ -271,13 +351,15 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
 // ============================================
 // AI LOGIC
 // ============================================
-function updateAI(worm: Worm, allWorms: Worm[], foods: Food[]) {
+function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: SpatialGrid) {
   if (!worm.alive) return
   worm.aiTimer--
   if (worm.aiDistracted > 0) worm.aiDistracted--
 
   const head = worm.segments[0]
-  const others = allWorms.filter(w => w !== worm && w.alive)
+  // Avoid allocating a new array every call — iterate and skip inline
+  const others: Worm[] = []
+  for (const w of allWorms) { if (w !== worm && w.alive) others.push(w) }
   const mySize = worm.segments.length
 
   // Danger detection
@@ -317,34 +399,27 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[]) {
     return
   }
 
-  // Food frenzy
+  // Food frenzy — only nearby worms react, short duration, no long-range kamikaze
   if (worm.aiFrenzy === undefined) worm.aiFrenzy = 0
   if (worm.aiFrenzy > 0) worm.aiFrenzy--
 
-  if (worm.aiTimer <= 0 || worm.aiFrenzy > 0) {
-    const hotspot = findFoodHotspot(head.x, head.y, 500, foods)
+  if (worm.aiTimer <= 0 && worm.aiFrenzy <= 0) {
+    // Only search nearby (250 range, not 500) so distant worms don't converge
+    const hotspot = findFoodHotspot(head.x, head.y, 250, foods)
     if (hotspot && hotspot.count > 12) {
       const dx = hotspot.x - head.x, dy = hotspot.y - head.y
       const dist = Math.sqrt(dx * dx + dy * dy)
-      worm.aiFrenzy = 60
-      worm.targetAngle = Math.atan2(dy, dx)
-      if (dist > 50 && worm.boostEnergy > 15) {
-        worm.boosting = true
-        worm.aiDistracted = 10
+      // Only frenzy if actually close enough
+      if (dist < 300) {
+        worm.aiFrenzy = 25 // short burst, not permanent lock-on
+        worm.targetAngle = Math.atan2(dy, dx)
+        if (dist > 50 && dist < 200 && worm.boostEnergy > 30) {
+          worm.boosting = true
+          worm.aiDistracted = 8
+        }
+        worm.aiTimer = 10 + Math.floor(Math.random() * 10)
+        return
       }
-      let competitors = 0
-      for (const other of others) {
-        const oh = other.segments[0]
-        const d = Math.sqrt((hotspot.x - oh.x) ** 2 + (hotspot.y - oh.y) ** 2)
-        if (d < 300) competitors++
-      }
-      if (competitors > 0) {
-        worm.boosting = worm.boostEnergy > 10
-        worm.aiDistracted = 20 + competitors * 5
-        worm.targetAngle += (Math.random() - 0.5) * 0.4
-      }
-      worm.aiTimer = 5 + Math.floor(Math.random() * 8)
-      return
     }
   }
 
@@ -373,7 +448,8 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[]) {
   if (worm.aiStrategy === 'camper' && worm.aiTimer <= 0) {
     worm.targetAngle += (Math.random() - 0.5) * 0.3
     worm.aiTimer = 20 + Math.random() * 20
-    for (const f of foods) {
+    const nearbyFood = foodGrid ? foodGrid.query(head.x, head.y, 120) : foods
+    for (const f of nearbyFood) {
       const dx = head.x - f.x, dy = head.y - f.y
       const d = Math.sqrt(dx * dx + dy * dy)
       if (d < 120) {
@@ -400,21 +476,24 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[]) {
   if (worm.aiTimer <= 0) {
     let bestFood: Food | null = null
     let bestScore = -Infinity
-    const searchRange = 300 + mySize * 2
+    const searchRange = Math.min(300 + mySize * 2, 600)
 
-    for (const f of foods) {
+    const farmFood = foodGrid ? foodGrid.query(head.x, head.y, searchRange) : foods
+    for (const f of farmFood) {
       const dx = head.x - f.x, dy = head.y - f.y
       const d = Math.sqrt(dx * dx + dy * dy)
       if (d > searchRange) continue
       let score = f.value * 15 - d
       if (f.special) score += 80
-      if (f.fromDeath) score += 120
+      // Death food only attractive if nearby (< 200), not a long-range magnet
+      if (f.fromDeath && d < 200) score += 30
       if (score > bestScore) { bestScore = score; bestFood = f }
     }
 
     if (bestFood) {
       worm.targetAngle = Math.atan2(bestFood.y - head.y, bestFood.x - head.x)
-      if ((bestFood.fromDeath || bestFood.special) && worm.aiGreed > 0.4 && worm.boostEnergy > 30) {
+      // Only boost toward special food, not death food from across the map
+      if (bestFood.special && worm.aiGreed > 0.4 && worm.boostEnergy > 30) {
         worm.boosting = true
         worm.aiDistracted = 12
       }
@@ -460,12 +539,23 @@ function checkCollisions(
 
     for (const other of alive) {
       if (other === worm || !other.alive) continue
-      for (let i = 4; i < other.segments.length; i++) {
+      // Distance-cull: skip collision if heads are too far apart
+      // Max possible collision range = other's body length (segments * gap ~15px)
+      const otherHead = other.segments[0]
+      const hdx = head.x - otherHead.x, hdy = head.y - otherHead.y
+      const headDist2 = hdx * hdx + hdy * hdy
+      const maxBodySpread = Math.min(other.segments.length * 15, 3000)
+      if (headDist2 > (maxBodySpread + headR) * (maxBodySpread + headR)) continue
+
+      const otherR = getWormRadius(other) * 0.9
+      // Skip segments in steps for very long worms (check every 2nd segment past 200)
+      const step = other.segments.length > 200 ? 2 : 1
+      for (let i = 4; i < other.segments.length; i += step) {
         const seg = other.segments[i]
         const dx = head.x - seg.x, dy = head.y - seg.y
-        const otherR = getWormRadius(other) * 0.9
-        const dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist < headR + otherR - 4) {
+        const dist2 = dx * dx + dy * dy
+        const threshold = headR + otherR - 4
+        if (dist2 < threshold * threshold) {
           killWorm(worm, foods, particles)
           other.score += Math.floor(worm.score * 0.3)
           other.segmentsToAdd += Math.floor(worm.segments.length * 0.1)
@@ -509,14 +599,17 @@ function killWorm(worm: Worm, foods: Food[], particles: Particle[]) {
     f.fromDeath = true
     foods.push(f)
   }
-  for (let i = 0; i < 30; i++) {
-    particles.push({
-      x: worm.segments[0].x, y: worm.segments[0].y,
-      vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8,
-      life: 40, maxLife: 40,
-      color: worm.skin.colors[0],
-      radius: 4 + Math.random() * 4,
-    })
+  if (particles.length < MAX_PARTICLES) {
+    const deathParticles = Math.min(20, MAX_PARTICLES - particles.length)
+    for (let i = 0; i < deathParticles; i++) {
+      particles.push({
+        x: worm.segments[0].x, y: worm.segments[0].y,
+        vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8,
+        life: 40, maxLife: 40,
+        color: worm.skin.colors[0],
+        radius: 4 + Math.random() * 4,
+      })
+    }
   }
 }
 
@@ -530,9 +623,9 @@ function drawBackground(ctx: CanvasRenderingContext2D, camera: Camera, w: number
   ctx.fillStyle = grd
   ctx.fillRect(0, 0, w, h)
 
-  // Carpet texture
+  // Carpet texture (reduced for performance)
   const seed = Math.floor(camera.x * 0.1) + Math.floor(camera.y * 0.1) * 1000
-  for (let i = 0; i < 300; i++) {
+  for (let i = 0; i < 80; i++) {
     const hash = (i * 2654435761 + seed) >>> 0
     const px = ((hash % w) + w) % w
     const py = (((hash * 31) % h) + h) % h
@@ -569,7 +662,7 @@ function drawFood(ctx: CanvasRenderingContext2D, foods: Food[], camera: Camera, 
     const pulse = 1 + Math.sin(time + f.pulse) * 0.1
     const size = r * 3.5 * pulse
 
-    if (f.special) {
+    if (f.special && size > 6) {
       ctx.beginPath()
       const glowGrd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 1.8)
       glowGrd.addColorStop(0, 'rgba(255,215,0,0.3)')
@@ -595,38 +688,33 @@ function drawCoins(ctx: CanvasRenderingContext2D, coins: Coin[], camera: Camera,
     const pulse = 1 + Math.sin(time + c.pulse) * 0.15
     const size = r * pulse
 
-    ctx.beginPath()
-    const glowGrd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 2.5)
-    glowGrd.addColorStop(0, 'rgba(255,215,0,0.2)')
-    glowGrd.addColorStop(1, 'rgba(255,215,0,0)')
-    ctx.fillStyle = glowGrd
-    ctx.arc(p.x, p.y, size * 2.5, 0, Math.PI * 2)
-    ctx.fill()
+    // Skip glow gradient for tiny coins (expensive)
+    if (size > 5) {
+      ctx.beginPath()
+      const glowGrd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 2.5)
+      glowGrd.addColorStop(0, 'rgba(255,215,0,0.2)')
+      glowGrd.addColorStop(1, 'rgba(255,215,0,0)')
+      ctx.fillStyle = glowGrd
+      ctx.arc(p.x, p.y, size * 2.5, 0, Math.PI * 2)
+      ctx.fill()
+    }
 
     ctx.beginPath()
     ctx.arc(p.x, p.y, size, 0, Math.PI * 2)
     ctx.fillStyle = '#ffd700'
     ctx.fill()
-    ctx.strokeStyle = '#daa520'
-    ctx.lineWidth = 1.5 * camera.zoom
-    ctx.stroke()
 
-    ctx.beginPath()
-    ctx.arc(p.x, p.y, size * 0.65, 0, Math.PI * 2)
-    ctx.strokeStyle = '#daa520'
-    ctx.lineWidth = 1 * camera.zoom
-    ctx.stroke()
+    if (size > 4) {
+      ctx.strokeStyle = '#daa520'
+      ctx.lineWidth = 1.5 * camera.zoom
+      ctx.stroke()
 
-    ctx.font = `bold ${Math.round(size * 1.1)}px sans-serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillStyle = '#b8860b'
-    ctx.fillText('$', p.x, p.y + 1)
-
-    ctx.beginPath()
-    ctx.arc(p.x - size * 0.25, p.y - size * 0.25, size * 0.3, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(255,255,255,0.35)'
-    ctx.fill()
+      ctx.font = `bold ${Math.round(size * 1.1)}px sans-serif`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillStyle = '#b8860b'
+      ctx.fillText('$', p.x, p.y + 1)
+    }
   }
 }
 
@@ -635,33 +723,48 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   const segments = worm.segments
   const radius = getWormRadius(worm)
   const colors = worm.skin.colors
+  const segR = radius * camera.zoom
+
+  // Quick cull: skip worm entirely if head is way off-screen
+  // (body can extend, so use generous margin based on segment count)
+  const headP = worldToScreen(segments[0].x, segments[0].y, camera, w, h)
+  const bodyMargin = Math.min(segments.length * 6 * camera.zoom, w + h)
+  if (headP.x < -bodyMargin || headP.x > w + bodyMargin ||
+      headP.y < -bodyMargin || headP.y > h + bodyMargin) return
+
+  const invincible = worm.invincible > 0
+  const invAlpha = invincible ? 0.3 * Math.sin(Date.now() * 0.01) : 0
 
   for (let i = segments.length - 1; i >= 0; i--) {
     const seg = segments[i]
     const p = worldToScreen(seg.x, seg.y, camera, w, h)
     if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
-    const segR = radius * camera.zoom
     const colorIdx = i % colors.length
 
+    // Shadow
     ctx.beginPath()
     ctx.arc(p.x, p.y + segR * 0.3, segR * 1.05, 0, Math.PI * 2)
     ctx.fillStyle = 'rgba(0,0,0,0.2)'
     ctx.fill()
 
+    // Body
     ctx.beginPath()
     ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
     ctx.fillStyle = colors[colorIdx]
     ctx.fill()
 
-    ctx.beginPath()
-    ctx.arc(p.x - segR * 0.2, p.y - segR * 0.25, segR * 0.45, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(255,255,255,0.15)'
-    ctx.fill()
+    // Highlight — skip every other segment for perf on big worms
+    if (i % 2 === 0 || segments.length < 100) {
+      ctx.beginPath()
+      ctx.arc(p.x - segR * 0.2, p.y - segR * 0.25, segR * 0.45, 0, Math.PI * 2)
+      ctx.fillStyle = 'rgba(255,255,255,0.15)'
+      ctx.fill()
+    }
 
-    if (worm.invincible > 0) {
+    if (invincible) {
       ctx.beginPath()
       ctx.arc(p.x, p.y, segR + 3 * camera.zoom, 0, Math.PI * 2)
-      ctx.strokeStyle = `rgba(255,255,255,${0.3 * Math.sin(Date.now() * 0.01)})`
+      ctx.strokeStyle = `rgba(255,255,255,${invAlpha})`
       ctx.lineWidth = 2 * camera.zoom
       ctx.stroke()
     }
@@ -672,32 +775,48 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   const hp = worldToScreen(head.x, head.y, camera, w, h)
   const headR = radius * camera.zoom
   const angle = worm.angle
+  const headType = worm.skin.headType ?? 'default'
 
-  const eyeOffset = headR * 0.35
-  const eyeR = headR * 0.32
-  const pupilR = eyeR * 0.55
+  if (headType !== 'default' && HEAD_IMAGES[headType]) {
+    // Custom head image — draw as the worm's actual head, big and clear
+    const headImg = headImageCache.get(HEAD_IMAGES[headType])
+    if (headImg) {
+      // Always upright — no rotation
+      const aspect = headImg.naturalHeight / headImg.naturalWidth
+      const imgW = headR * 5
+      const imgH = imgW * aspect
+      // Push up so the face sits above the body, crown visible
+      ctx.drawImage(headImg, hp.x - imgW / 2, hp.y - imgH * 0.75, imgW, imgH)
+    }
+  } else {
+    // Default eyes — always upright (fixed position, no rotation)
+    const eyeR = headR * 0.32
+    const pupilR = eyeR * 0.55
+    const eyeSpacing = headR * 0.35
 
-  for (let side = -1; side <= 1; side += 2) {
-    const ex = hp.x + Math.cos(angle - side * 0.5) * eyeOffset
-    const ey = hp.y + Math.sin(angle - side * 0.5) * eyeOffset
+    for (let side = -1; side <= 1; side += 2) {
+      const ex = hp.x + side * eyeSpacing
+      const ey = hp.y - headR * 0.1
 
-    ctx.beginPath()
-    ctx.arc(ex, ey, eyeR, 0, Math.PI * 2)
-    ctx.fillStyle = worm.eyeBlink > 0 ? colors[0] : '#ffffff'
-    ctx.fill()
-
-    if (worm.eyeBlink <= 0) {
-      const px = ex + Math.cos(angle) * eyeR * 0.25
-      const py = ey + Math.sin(angle) * eyeR * 0.25
+      // Eye white
       ctx.beginPath()
-      ctx.arc(px, py, pupilR, 0, Math.PI * 2)
-      ctx.fillStyle = '#111'
+      ctx.arc(ex, ey, eyeR, 0, Math.PI * 2)
+      ctx.fillStyle = worm.eyeBlink > 0 ? colors[0] : '#ffffff'
       ctx.fill()
 
-      ctx.beginPath()
-      ctx.arc(px - pupilR * 0.3, py - pupilR * 0.3, pupilR * 0.35, 0, Math.PI * 2)
-      ctx.fillStyle = '#fff'
-      ctx.fill()
+      if (worm.eyeBlink <= 0) {
+        // Pupil
+        ctx.beginPath()
+        ctx.arc(ex, ey, pupilR, 0, Math.PI * 2)
+        ctx.fillStyle = '#111'
+        ctx.fill()
+
+        // Eye shine
+        ctx.beginPath()
+        ctx.arc(ex - pupilR * 0.3, ey - pupilR * 0.3, pupilR * 0.35, 0, Math.PI * 2)
+        ctx.fillStyle = '#fff'
+        ctx.fill()
+      }
     }
   }
 
@@ -714,8 +833,9 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
     }
   }
 
-  // Name tag
-  const np = worldToScreen(head.x, head.y - radius - 18, camera, w, h)
+  // Name tag — push higher for queen head (crown is tall)
+  const nameOffset = headType !== 'default' ? radius + 40 : radius + 18
+  const np = worldToScreen(head.x, head.y - nameOffset, camera, w, h)
   ctx.font = `${Math.round(13 * camera.zoom)}px Fredoka`
   ctx.textAlign = 'center'
   ctx.fillStyle = 'rgba(0,0,0,0.4)'
@@ -824,6 +944,7 @@ export function useGameEngine(
     spawnTimer: 0,
     usedAINames: [],
     guestCounter: 0,
+    foodGrid: new SpatialGrid(),
     mp: null,
     roomSlug: null,
     roomId: null,
@@ -868,7 +989,7 @@ export function useGameEngine(
     s.aiWorms.push(w)
   }, [getUniqueAIName])
 
-  const startGame = useCallback((playerName: string, selectedSkin: number, roomSlug?: string, roomId?: string, gameMode?: GameMode, seed?: number) => {
+  const startGame = useCallback((playerName: string, playerSkin: WormSkin, roomSlug?: string, roomId?: string, gameMode?: GameMode, seed?: number) => {
     const s = stateRef.current
     const canvas = canvasRef.current
     if (!canvas) return
@@ -878,7 +999,7 @@ export function useGameEngine(
 
     const px = (Math.random() - 0.5) * WORLD_SIZE * 0.5
     const py = (Math.random() - 0.5) * WORLD_SIZE * 0.5
-    s.player = createWorm(px, py, SKINS[selectedSkin], playerName, true)
+    s.player = createWorm(px, py, playerSkin, playerName, true)
 
     s.usedAINames = []
     s.aiWorms = []
@@ -895,6 +1016,7 @@ export function useGameEngine(
     s.particles = []
     s.boostEnergy = 100
     s.camera.zoom = 1
+    s.foodGrid = new SpatialGrid()
     s.gameRunning = true
     s.frameCount = 0
     s.spawnTimer = 0
@@ -936,14 +1058,20 @@ export function useGameEngine(
 
       const playerCoinsRef = { value: s.playerCoins }
 
-      // Update
-      updateWorm(s.player, dt, s.foods, s.coins, s.particles, playerCoinsRef)
+      // Rebuild spatial grid once per frame
+      s.foodGrid.rebuild(s.foods)
+
+      // Update — pass spatial grid for O(nearby) food lookups
+      updateWorm(s.player, dt, s.foods, s.coins, s.particles, playerCoinsRef, s.foodGrid)
       s.playerCoins = playerCoinsRef.value
+
+      // Cache allWorms array once instead of re-creating per AI
+      const allWormsForAI = [s.player, ...s.aiWorms]
 
       for (const ai of s.aiWorms) {
         if (ai.alive) {
-          updateAI(ai, [s.player, ...s.aiWorms], s.foods)
-          updateWorm(ai, dt, s.foods, s.coins, s.particles, playerCoinsRef)
+          updateAI(ai, allWormsForAI, s.foods, s.foodGrid)
+          updateWorm(ai, dt, s.foods, s.coins, s.particles, playerCoinsRef, s.foodGrid)
         }
       }
 

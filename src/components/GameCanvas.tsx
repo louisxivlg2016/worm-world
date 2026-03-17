@@ -1,11 +1,11 @@
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameEngine, type GameEngineCallbacks } from '@/hooks/useGameEngine'
-import type { GameMode } from '@/types/game'
+import type { GameMode, WormSkin } from '@/types/game'
 
 interface GameCanvasProps {
   playerName: string
-  selectedSkin: number
+  playerSkin: WormSkin
   roomSlug?: string
   roomId?: string
   gameMode?: GameMode
@@ -16,7 +16,7 @@ interface GameCanvasProps {
 
 export function GameCanvas({
   playerName,
-  selectedSkin,
+  playerSkin,
   roomSlug,
   roomId,
   gameMode,
@@ -45,7 +45,7 @@ export function GameCanvas({
   const { startGame, stopGame } = useGameEngine(canvasRef, minimapRef, callbacks)
 
   useEffect(() => {
-    startGame(playerName, selectedSkin, roomSlug, roomId, gameMode, seed)
+    startGame(playerName, playerSkin, roomSlug, roomId, gameMode, seed)
 
     const hintTimer = setTimeout(() => setShowHint(false), 5000)
 

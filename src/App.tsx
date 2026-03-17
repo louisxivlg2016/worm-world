@@ -2,8 +2,9 @@ import { useState, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { WelcomeScreen } from '@/components/WelcomeScreen'
 import { LobbyScreen } from '@/components/LobbyScreen'
+import { ShopScreen } from '@/components/ShopScreen'
 import { GameCanvas } from '@/components/GameCanvas'
-import type { GameMode, GameScreen } from '@/types/game'
+import { SKINS, type WormSkin, type GameMode, type GameScreen } from '@/types/game'
 
 interface DeathInfo {
   score: number
@@ -15,16 +16,17 @@ export function AppInner() {
   const { t } = useTranslation()
   const [screen, setScreen] = useState<GameScreen>('menu')
   const [playerName, setPlayerName] = useState('')
-  const [selectedSkin, setSelectedSkin] = useState(0)
+  const [playerSkin, setPlayerSkin] = useState<WormSkin>(SKINS[0])
+  const [customSkin, setCustomSkin] = useState<WormSkin | null>(null)
   const [roomSlug, setRoomSlug] = useState<string | undefined>()
   const [roomId, setRoomId] = useState<string | undefined>()
   const [gameMode, setGameMode] = useState<GameMode>('ffa')
   const [seed, setSeed] = useState<number | undefined>()
   const [deathInfo, setDeathInfo] = useState<DeathInfo | null>(null)
 
-  const handlePlay = useCallback((name: string, skinIdx: number) => {
+  const handlePlay = useCallback((name: string, skin: WormSkin) => {
     setPlayerName(name)
-    setSelectedSkin(skinIdx)
+    setPlayerSkin(skin)
     setRoomSlug(undefined)
     setRoomId(undefined)
     setGameMode('ffa')
@@ -35,6 +37,16 @@ export function AppInner() {
 
   const handleMultiplayer = useCallback(() => {
     setScreen('lobby')
+  }, [])
+
+  const handleShop = useCallback(() => {
+    setScreen('shop')
+  }, [])
+
+  const handleShopApply = useCallback((skin: WormSkin) => {
+    setCustomSkin(skin)
+    setPlayerSkin(skin)
+    setScreen('menu')
   }, [])
 
   const handleJoinRoom = useCallback((slug: string, id: string, mode: GameMode, roomSeed: number) => {
@@ -63,7 +75,24 @@ export function AppInner() {
   }, [])
 
   if (screen === 'menu') {
-    return <WelcomeScreen onPlay={handlePlay} onMultiplayer={handleMultiplayer} />
+    return (
+      <WelcomeScreen
+        customSkin={customSkin}
+        onPlay={handlePlay}
+        onMultiplayer={handleMultiplayer}
+        onShop={handleShop}
+      />
+    )
+  }
+
+  if (screen === 'shop') {
+    return (
+      <ShopScreen
+        currentSkin={customSkin ?? playerSkin}
+        onApply={handleShopApply}
+        onBack={handleBackToMenu}
+      />
+    )
   }
 
   if (screen === 'lobby') {
@@ -75,7 +104,7 @@ export function AppInner() {
       <GameCanvas
         key={`${roomSlug ?? 'solo'}-${Date.now()}`}
         playerName={playerName}
-        selectedSkin={selectedSkin}
+        playerSkin={playerSkin}
         roomSlug={roomSlug}
         roomId={roomId}
         gameMode={gameMode}
