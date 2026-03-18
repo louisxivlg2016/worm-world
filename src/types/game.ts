@@ -41,6 +41,7 @@ export interface Food {
   pulse: number
   special: boolean
   fromDeath?: boolean
+  spawnedAt?: number // timestamp for death food decay
 }
 
 export type PotionType = 'speed' | 'zoom' | 'magnet'

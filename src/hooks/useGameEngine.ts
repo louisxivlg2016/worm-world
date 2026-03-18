@@ -670,6 +670,7 @@ function killWorm(worm: Worm, foods: Food[], particles: Particle[]) {
     f.radius = 5 + Math.random() * 5
     f.value = 3
     f.fromDeath = true
+    f.spawnedAt = Date.now()
     foods.push(f)
   }
   if (particles.length < MAX_PARTICLES) {
@@ -786,10 +787,19 @@ function drawFood(ctx: CanvasRenderingContext2D, foods: Food[], camera: Camera, 
       ctx.fill()
     }
 
-    // Draw food image only — no emoji fallback
+    // Fade out decaying death food
+    let decayAlpha = 1
+    if (f.fromDeath && f.spawnedAt) {
+      const age = (Date.now() - f.spawnedAt) / 1000
+      if (age >= 50) decayAlpha = Math.max(0, 1 - (age - 50) / 70)
+    }
+
+    // Draw food image
     if (f.img && foodImgCache.has(f.img)) {
       const img = foodImgCache.get(f.img)!
+      if (decayAlpha < 1) ctx.globalAlpha = decayAlpha
       ctx.drawImage(img, p.x - size / 2, p.y - size / 2, size, size)
+      if (decayAlpha < 1) ctx.globalAlpha = 1
     }
   }
 }
@@ -1384,6 +1394,24 @@ export function useGameEngine(
         p.vx *= 0.95; p.vy *= 0.95
         p.life--
         if (p.life <= 0) s.particles.splice(i, 1)
+      }
+
+      // Death food decay — decompose after 50s, gone at 120s
+      if (s.frameCount % 30 === 0) {
+        const decayNow = Date.now()
+        for (let i = s.foods.length - 1; i >= 0; i--) {
+          const f = s.foods[i]
+          if (!f.fromDeath || !f.spawnedAt) continue
+          const age = (decayNow - f.spawnedAt) / 1000
+          if (age >= 120) {
+            // Fully gone
+            s.foods.splice(i, 1)
+          } else if (age >= 50) {
+            // Shrink progressively: at 50s = full size, at 120s = 0
+            const decay = 1 - (age - 50) / 70
+            f.radius = Math.max(2, f.radius * (0.995 + decay * 0.005))
+          }
+        }
       }
 
       // Camera
