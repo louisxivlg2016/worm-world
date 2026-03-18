@@ -743,13 +743,10 @@ function drawFood(ctx: CanvasRenderingContext2D, foods: Food[], camera: Camera, 
       ctx.fill()
     }
 
-    // Draw food image or emoji fallback
+    // Draw food image only — no emoji fallback
     if (f.img && foodImgCache.has(f.img)) {
       const img = foodImgCache.get(f.img)!
       ctx.drawImage(img, p.x - size / 2, p.y - size / 2, size, size)
-    } else {
-      const ec = getEmojiCanvas(f.emoji)
-      ctx.drawImage(ec, p.x - size / 2, p.y - size / 2, size, size)
     }
   }
 }
