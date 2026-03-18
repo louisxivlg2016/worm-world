@@ -266,6 +266,7 @@ function worldToScreen(wx: number, wy: number, camera: Camera, canvasW: number, 
 function findFoodHotspot(x: number, y: number, range: number, foods: Food[]) {
   let count = 0, totalX = 0, totalY = 0, totalValue = 0
   for (const f of foods) {
+    if (f.fromDeath) continue // AI ignores death food
     const dx = x - f.x, dy = y - f.y
     const d = Math.sqrt(dx * dx + dy * dy)
     if (d < range) {
@@ -359,6 +360,8 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
   const attractRange = headR + 35 + eff.magnetRange
   const nearby = foodGrid ? foodGrid.query(head.x, head.y, attractRange) : foods
   for (const f of nearby) {
+    // AI worms ignore death food — only player can eat it
+    if (f.fromDeath && !worm.isPlayer) continue
     const dx = head.x - f.x, dy = head.y - f.y
     const dist = Math.sqrt(dx * dx + dy * dy)
     if (dist < attractRange && dist > 0.001) {
@@ -558,8 +561,7 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
       if (d > searchRange) continue
       let score = f.value * 15 - d
       if (f.special) score += 80
-      // Death food only attractive if nearby (< 200), not a long-range magnet
-      if (f.fromDeath && d < 200) score += 30
+      if (f.fromDeath) continue // AI ignores death food
       if (score > bestScore) { bestScore = score; bestFood = f }
     }
 
@@ -1251,6 +1253,22 @@ export function useGameEngine(
 
     s.coins = []
     for (let i = 0; i < COIN_COUNT; i++) s.coins.push(createCoin())
+
+    // DEV: spawn a dead worm's food near player to test decay
+    const deathX = s.player!.segments[0].x + 200
+    const deathY = s.player!.segments[0].y + 100
+    for (let i = 0; i < 40; i++) {
+      const f = createFood(
+        deathX + (Math.random() - 0.5) * 150,
+        deathY + (Math.random() - 0.5) * 150,
+        i % 6 === 0,
+      )
+      f.radius = 5 + Math.random() * 5
+      f.value = 3
+      f.fromDeath = true
+      f.spawnedAt = Date.now()
+      s.foods.push(f)
+    }
 
     s.potions = []
     for (let i = 0; i < POTION_COUNT; i++) s.potions.push(createPotion())
