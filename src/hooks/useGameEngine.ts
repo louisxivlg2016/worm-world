@@ -178,6 +178,18 @@ const POTION_ICONS: Record<PotionType, string> = {
   zoom: '\uD83D\uDD0D',  // magnifying glass
   magnet: '\uD83E\uDDF2', // magnet
 }
+const POTION_IMAGES: Partial<Record<PotionType, string>> = {
+  zoom: '/potions/zoom.png',
+}
+
+// Preload potion images
+const potionImgCache = new Map<string, HTMLImageElement>()
+Object.values(POTION_IMAGES).forEach(src => {
+  if (!src) return
+  const img = new Image()
+  img.src = src
+  img.onload = () => { potionImgCache.set(src, img) }
+})
 
 function createPotion(): Potion {
   return {
@@ -793,42 +805,49 @@ function drawPotions(ctx: CanvasRenderingContext2D, potions: Potion[], camera: C
 
     // Outer glow
     ctx.beginPath()
-    const glow = ctx.createRadialGradient(p.x, p.y, size * 0.3, p.x, p.y, size * 2.5)
+    const glow = ctx.createRadialGradient(p.x, p.y, size * 0.3, p.x, p.y, size * 2.0)
     glow.addColorStop(0, color + '55')
     glow.addColorStop(1, color + '00')
     ctx.fillStyle = glow
-    ctx.arc(p.x, p.y, size * 2.5, 0, Math.PI * 2)
+    ctx.arc(p.x, p.y, size * 2.0, 0, Math.PI * 2)
     ctx.fill()
 
-    // Bottle shape
-    ctx.beginPath()
-    ctx.arc(p.x, p.y + size * 0.1, size * 0.85, 0, Math.PI * 2)
-    ctx.fillStyle = color
-    ctx.fill()
+    // Draw image if available, otherwise drawn bottle
+    const potImgSrc = POTION_IMAGES[pot.type]
+    const potImg = potImgSrc ? potionImgCache.get(potImgSrc) : null
+    if (potImg) {
+      ctx.drawImage(potImg, p.x - size, p.y - size, size * 2, size * 2)
+    } else {
+      // Bottle shape
+      ctx.beginPath()
+      ctx.arc(p.x, p.y + size * 0.1, size * 0.85, 0, Math.PI * 2)
+      ctx.fillStyle = color
+      ctx.fill()
 
-    // Bottle neck
-    ctx.beginPath()
-    ctx.roundRect(p.x - size * 0.25, p.y - size * 1.0, size * 0.5, size * 0.6, size * 0.1)
-    ctx.fillStyle = color
-    ctx.fill()
+      // Bottle neck
+      ctx.beginPath()
+      ctx.roundRect(p.x - size * 0.25, p.y - size * 1.0, size * 0.5, size * 0.6, size * 0.1)
+      ctx.fillStyle = color
+      ctx.fill()
 
-    // Cork
-    ctx.beginPath()
-    ctx.roundRect(p.x - size * 0.3, p.y - size * 1.15, size * 0.6, size * 0.25, size * 0.08)
-    ctx.fillStyle = '#daa520'
-    ctx.fill()
+      // Cork
+      ctx.beginPath()
+      ctx.roundRect(p.x - size * 0.3, p.y - size * 1.15, size * 0.6, size * 0.25, size * 0.08)
+      ctx.fillStyle = '#daa520'
+      ctx.fill()
 
-    // Highlight
-    ctx.beginPath()
-    ctx.arc(p.x - size * 0.2, p.y - size * 0.1, size * 0.3, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(255,255,255,0.4)'
-    ctx.fill()
+      // Highlight
+      ctx.beginPath()
+      ctx.arc(p.x - size * 0.2, p.y - size * 0.1, size * 0.3, 0, Math.PI * 2)
+      ctx.fillStyle = 'rgba(255,255,255,0.4)'
+      ctx.fill()
 
-    // Icon
-    ctx.font = `${Math.round(size * 0.7)}px serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText(POTION_ICONS[pot.type], p.x, p.y + size * 0.15)
+      // Icon
+      ctx.font = `${Math.round(size * 0.7)}px serif`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(POTION_ICONS[pot.type], p.x, p.y + size * 0.15)
+    }
   }
 }
 
