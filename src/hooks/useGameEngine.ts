@@ -771,22 +771,17 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
     const p = worldToScreen(seg.x, seg.y, camera, w, h)
     if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
 
-    // Shadow
-    ctx.beginPath()
-    ctx.arc(p.x, p.y + segR * 0.3, segR * 1.05, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(0,0,0,0.2)'
-    ctx.fill()
-
     if (bodyTexImg) {
-      // Textured body — clip circle, draw texture tile
+      // No shadow for textured body — goes straight to texture
+      // Textured body — draw larger to overlap and close gaps
       ctx.save()
+      const overlapR = segR * 1.35
       ctx.beginPath()
-      ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
+      ctx.arc(p.x, p.y, overlapR, 0, Math.PI * 2)
       ctx.clip()
-      // Tile the texture across the worm using segment index for offset
-      const texW = segR * 2
-      const texH = segR * 2
-      const offsetX = (i * segR * 0.8) % bodyTexImg.naturalWidth
+      const texW = overlapR * 2
+      const texH = overlapR * 2
+      const offsetX = (i * overlapR * 0.6) % bodyTexImg.naturalWidth
       ctx.drawImage(
         bodyTexImg,
         offsetX, 0, bodyTexImg.naturalWidth * 0.5, bodyTexImg.naturalHeight,
@@ -794,6 +789,12 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
       )
       ctx.restore()
     } else {
+      // Shadow (only for solid color)
+      ctx.beginPath()
+      ctx.arc(p.x, p.y + segR * 0.3, segR * 1.05, 0, Math.PI * 2)
+      ctx.fillStyle = 'rgba(0,0,0,0.2)'
+      ctx.fill()
+
       // Solid color body
       const colorIdx = i % colors.length
       ctx.beginPath()
