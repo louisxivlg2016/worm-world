@@ -775,7 +775,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
       // No shadow for textured body — goes straight to texture
       // Textured body — draw larger to overlap and close gaps
       ctx.save()
-      const overlapR = segR * 1.8
+      const overlapR = segR * 1.35
       ctx.beginPath()
       ctx.arc(p.x, p.y, overlapR, 0, Math.PI * 2)
       ctx.clip()
