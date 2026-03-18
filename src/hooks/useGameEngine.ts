@@ -5,8 +5,9 @@ import {
   BATTLE_MAX_DEATHS,
   SKINS, AI_SKINS, AI_NAMES,
   FOOD_EMOJIS, SPECIAL_FOOD_EMOJIS, FOOD_IMAGES, SPECIAL_FOOD_IMAGES,
-  type Worm, type Food, type Coin, type Particle, type Camera,
-  type Segment, type WormSkin, type AIStrategy, type GameMode, type HeadType,
+  type Worm, type Food, type Coin, type Particle, type Camera, type Potion,
+  type Segment, type WormSkin, type AIStrategy, type GameMode, type HeadType, type PotionType,
+  POTION_DURATION, POTION_COUNT,
 } from '@/types/game'
 import { MultiplayerService, selfId } from '@/services/MultiplayerService'
 
@@ -122,6 +123,9 @@ interface EngineState {
   spawnTimer: number
   usedAINames: string[]
   guestCounter: number
+  // Potions
+  potions: Potion[]
+  activeEffects: { type: PotionType; expiresAt: number }[]
   // Spatial
   foodGrid: SpatialGrid
   // Multiplayer
@@ -160,6 +164,28 @@ function createCoin(): Coin {
     radius: 22,
     pulse: Math.random() * Math.PI * 2,
     spin: Math.random() * Math.PI * 2,
+  }
+}
+
+const POTION_TYPES: PotionType[] = ['speed', 'zoom', 'magnet']
+const POTION_COLORS: Record<PotionType, string> = {
+  speed: '#ff4444',
+  zoom: '#4488ff',
+  magnet: '#aa44ff',
+}
+const POTION_ICONS: Record<PotionType, string> = {
+  speed: '\u26A1',  // lightning
+  zoom: '\uD83D\uDD0D',  // magnifying glass
+  magnet: '\uD83E\uDDF2', // magnet
+}
+
+function createPotion(): Potion {
+  return {
+    x: Math.random() * WORLD_SIZE - WORLD_SIZE / 2,
+    y: Math.random() * WORLD_SIZE - WORLD_SIZE / 2,
+    radius: 18,
+    type: POTION_TYPES[Math.floor(Math.random() * POTION_TYPES.length)],
+    pulse: Math.random() * Math.PI * 2,
   }
 }
 
@@ -244,7 +270,10 @@ function findFoodHotspot(x: number, y: number, range: number, foods: Food[]) {
 // ============================================
 // UPDATE WORM
 // ============================================
-function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], particles: Particle[], playerCoinsRef: { value: number }, foodGrid?: SpatialGrid) {
+interface EffectMods { speedMult: number; magnetRange: number }
+const NO_EFFECTS: EffectMods = { speedMult: 1, magnetRange: 0 }
+
+function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], particles: Particle[], playerCoinsRef: { value: number }, foodGrid?: SpatialGrid, effects?: EffectMods) {
   if (!worm.alive) return
   if (worm.invincible > 0) worm.invincible--
 
@@ -274,7 +303,8 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
   worm.angle += angleDiff * turnRate * turnMult
 
   // Move head
-  const speed = getWormSpeed(worm)
+  const eff = effects ?? NO_EFFECTS
+  const speed = getWormSpeed(worm) * eff.speedMult
   const head = worm.segments[0]
   head.x += Math.cos(worm.angle) * speed
   head.y += Math.sin(worm.angle) * speed
@@ -313,7 +343,7 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
 
   // Eat food — use spatial grid for O(nearby) instead of O(all)
   const headR = getWormRadius(worm)
-  const attractRange = headR + 35
+  const attractRange = headR + 35 + eff.magnetRange
   const nearby = foodGrid ? foodGrid.query(head.x, head.y, attractRange) : foods
   for (const f of nearby) {
     const dx = head.x - f.x, dy = head.y - f.y
@@ -751,6 +781,57 @@ function drawFood(ctx: CanvasRenderingContext2D, foods: Food[], camera: Camera, 
   }
 }
 
+function drawPotions(ctx: CanvasRenderingContext2D, potions: Potion[], camera: Camera, w: number, h: number) {
+  const time = Date.now() * 0.004
+  for (const pot of potions) {
+    const p = worldToScreen(pot.x, pot.y, camera, w, h)
+    if (p.x < -40 || p.x > w + 40 || p.y < -40 || p.y > h + 40) continue
+    const r = pot.radius * camera.zoom
+    const pulse = 1 + Math.sin(time + pot.pulse) * 0.2
+    const size = r * pulse
+    const color = POTION_COLORS[pot.type]
+
+    // Outer glow
+    ctx.beginPath()
+    const glow = ctx.createRadialGradient(p.x, p.y, size * 0.3, p.x, p.y, size * 2.5)
+    glow.addColorStop(0, color + '55')
+    glow.addColorStop(1, color + '00')
+    ctx.fillStyle = glow
+    ctx.arc(p.x, p.y, size * 2.5, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Bottle shape
+    ctx.beginPath()
+    ctx.arc(p.x, p.y + size * 0.1, size * 0.85, 0, Math.PI * 2)
+    ctx.fillStyle = color
+    ctx.fill()
+
+    // Bottle neck
+    ctx.beginPath()
+    ctx.roundRect(p.x - size * 0.25, p.y - size * 1.0, size * 0.5, size * 0.6, size * 0.1)
+    ctx.fillStyle = color
+    ctx.fill()
+
+    // Cork
+    ctx.beginPath()
+    ctx.roundRect(p.x - size * 0.3, p.y - size * 1.15, size * 0.6, size * 0.25, size * 0.08)
+    ctx.fillStyle = '#daa520'
+    ctx.fill()
+
+    // Highlight
+    ctx.beginPath()
+    ctx.arc(p.x - size * 0.2, p.y - size * 0.1, size * 0.3, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(255,255,255,0.4)'
+    ctx.fill()
+
+    // Icon
+    ctx.font = `${Math.round(size * 0.7)}px serif`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(POTION_ICONS[pot.type], p.x, p.y + size * 0.15)
+  }
+}
+
 function drawCoins(ctx: CanvasRenderingContext2D, coins: Coin[], camera: Camera, w: number, h: number) {
   const time = Date.now() * 0.004
   for (const c of coins) {
@@ -941,6 +1022,42 @@ function drawParticles(ctx: CanvasRenderingContext2D, particles: Particle[], cam
   }
 }
 
+function drawActiveEffects(ctx: CanvasRenderingContext2D, effects: { type: PotionType; expiresAt: number }[], w: number) {
+  const now = Date.now()
+  const active = effects.filter(e => e.expiresAt > now)
+  if (active.length === 0) return
+
+  let x = w / 2 - active.length * 35
+  const y = 60
+  for (const eff of active) {
+    const remaining = (eff.expiresAt - now) / POTION_DURATION
+    const color = POTION_COLORS[eff.type]
+    const icon = POTION_ICONS[eff.type]
+
+    // Background circle
+    ctx.beginPath()
+    ctx.arc(x, y, 22, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(0,0,0,0.5)'
+    ctx.fill()
+
+    // Progress arc
+    ctx.beginPath()
+    ctx.arc(x, y, 22, -Math.PI / 2, -Math.PI / 2 + remaining * Math.PI * 2)
+    ctx.strokeStyle = color
+    ctx.lineWidth = 3
+    ctx.stroke()
+
+    // Icon
+    ctx.font = '18px serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillStyle = 'white'
+    ctx.fillText(icon, x, y)
+
+    x += 50
+  }
+}
+
 function drawMinimap(
   mc: CanvasRenderingContext2D,
   player: Worm,
@@ -1032,6 +1149,8 @@ export function useGameEngine(
     spawnTimer: 0,
     usedAINames: [],
     guestCounter: 0,
+    potions: [],
+    activeEffects: [],
     foodGrid: new SpatialGrid(),
     mp: null,
     roomSlug: null,
@@ -1103,6 +1222,10 @@ export function useGameEngine(
     s.coins = []
     for (let i = 0; i < COIN_COUNT; i++) s.coins.push(createCoin())
 
+    s.potions = []
+    for (let i = 0; i < POTION_COUNT; i++) s.potions.push(createPotion())
+    s.activeEffects = []
+
     s.playerCoins = 0
     s.particles = []
     s.boostEnergy = 100
@@ -1160,8 +1283,18 @@ export function useGameEngine(
       // Rebuild spatial grid once per frame
       s.foodGrid.rebuild(s.foods)
 
+      // Compute active effect modifiers for player
+      const now2 = Date.now()
+      const hasSpeed = s.activeEffects.some(e => e.type === 'speed' && e.expiresAt > now2)
+      const hasMagnet = s.activeEffects.some(e => e.type === 'magnet' && e.expiresAt > now2)
+      const hasZoom = s.activeEffects.some(e => e.type === 'zoom' && e.expiresAt > now2)
+      const playerEffects: EffectMods = {
+        speedMult: hasSpeed ? 1.8 : 1,
+        magnetRange: hasMagnet ? 150 : 0,
+      }
+
       // Update — pass spatial grid for O(nearby) food lookups
-      updateWorm(s.player, dt, s.foods, s.coins, s.particles, playerCoinsRef, s.foodGrid)
+      updateWorm(s.player, dt, s.foods, s.coins, s.particles, playerCoinsRef, s.foodGrid, playerEffects)
       s.playerCoins = playerCoinsRef.value
 
       // Cache allWorms array once instead of re-creating per AI
@@ -1173,6 +1306,37 @@ export function useGameEngine(
           updateWorm(ai, dt, s.foods, s.coins, s.particles, playerCoinsRef, s.foodGrid)
         }
       }
+
+      // Potion collection (player only)
+      const now = Date.now()
+      const playerHead = s.player.segments[0]
+      const playerR = getWormRadius(s.player)
+      for (let i = s.potions.length - 1; i >= 0; i--) {
+        const pot = s.potions[i]
+        const dx = playerHead.x - pot.x, dy = playerHead.y - pot.y
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        if (dist < playerR + pot.radius) {
+          // Activate effect
+          s.activeEffects.push({ type: pot.type, expiresAt: now + POTION_DURATION })
+          // Particles
+          if (s.particles.length < MAX_PARTICLES) {
+            const color = POTION_COLORS[pot.type]
+            for (let p = 0; p < 8; p++) {
+              s.particles.push({
+                x: pot.x, y: pot.y,
+                vx: (Math.random() - 0.5) * 6, vy: (Math.random() - 0.5) * 6,
+                life: 30, maxLife: 30, color, radius: 3 + Math.random() * 3,
+              })
+            }
+          }
+          s.potions.splice(i, 1)
+          // Respawn after 10s
+          setTimeout(() => { s.potions.push(createPotion()) }, 10000)
+        }
+      }
+
+      // Clean expired effects
+      s.activeEffects = s.activeEffects.filter(e => e.expiresAt > now)
 
       checkCollisions(
         [s.player, ...s.aiWorms],
@@ -1207,8 +1371,9 @@ export function useGameEngine(
         const head = s.player.segments[0]
         s.camera.x += (head.x - s.camera.x) * 0.08
         s.camera.y += (head.y - s.camera.y) * 0.08
-        const targetZoom = Math.max(0.5, 1 - s.player.segments.length * 0.001)
-        s.camera.zoom += (targetZoom - s.camera.zoom) * 0.02
+        let targetZoom = Math.max(0.5, 1 - s.player.segments.length * 0.001)
+        if (hasZoom) targetZoom *= 0.55 // zoom out effect
+        s.camera.zoom += (targetZoom - s.camera.zoom) * 0.05
       }
 
       s.boostEnergy = s.player.boostEnergy
@@ -1219,6 +1384,7 @@ export function useGameEngine(
       drawBackground(ctx, s.camera, canvas.width, canvas.height, s.player)
       drawFood(ctx, s.foods, s.camera, canvas.width, canvas.height)
       drawCoins(ctx, s.coins, s.camera, canvas.width, canvas.height)
+      drawPotions(ctx, s.potions, s.camera, canvas.width, canvas.height)
       drawParticles(ctx, s.particles, s.camera, canvas.width, canvas.height)
 
       for (const ai of s.aiWorms) drawWorm(ctx, ai, s.camera, canvas.width, canvas.height)
@@ -1229,6 +1395,9 @@ export function useGameEngine(
       }
 
       if (s.player.alive) drawWorm(ctx, s.player, s.camera, canvas.width, canvas.height)
+
+      // Active potion effect indicators
+      drawActiveEffects(ctx, s.activeEffects, canvas.width)
 
       // UI updates
       if (s.frameCount % 5 === 0) {

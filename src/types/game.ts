@@ -43,6 +43,19 @@ export interface Food {
   fromDeath?: boolean
 }
 
+export type PotionType = 'speed' | 'zoom' | 'magnet'
+
+export interface Potion {
+  x: number
+  y: number
+  radius: number
+  type: PotionType
+  pulse: number
+}
+
+export const POTION_DURATION = 5000 // 5 seconds
+export const POTION_COUNT = 15
+
 export interface Coin {
   x: number
   y: number
