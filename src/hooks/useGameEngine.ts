@@ -766,28 +766,59 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   const bodyTexKey = worm.skin.bodyTexture
   const bodyTexImg = bodyTexKey ? bodyTextureCache.get(bodyTexKey) : null
 
+  // Textured body: draw as connected rectangles between segment pairs
+  if (bodyTexImg) {
+    const bodyWidth = segR * 2.4
+    for (let i = segments.length - 1; i >= 1; i--) {
+      const curr = segments[i]
+      const prev = segments[i - 1]
+      const p1 = worldToScreen(curr.x, curr.y, camera, w, h)
+      const p2 = worldToScreen(prev.x, prev.y, camera, w, h)
+      // Skip if both off-screen
+      if (p1.x < -60 && p2.x < -60) continue
+      if (p1.x > w + 60 && p2.x > w + 60) continue
+      if (p1.y < -60 && p2.y < -60) continue
+      if (p1.y > h + 60 && p2.y > h + 60) continue
+
+      const dx = p2.x - p1.x, dy = p2.y - p1.y
+      const segLen = Math.sqrt(dx * dx + dy * dy) + 2 // +2 to overlap
+      const ang = Math.atan2(dy, dx)
+
+      ctx.save()
+      ctx.translate(p1.x, p1.y)
+      ctx.rotate(ang)
+      // Clip to rounded rect shape
+      ctx.beginPath()
+      ctx.ellipse(segLen / 2, 0, segLen / 2 + 2, bodyWidth / 2, 0, 0, Math.PI * 2)
+      ctx.clip()
+      // Tile texture
+      const texOffX = (i * 18) % bodyTexImg.naturalWidth
+      ctx.drawImage(
+        bodyTexImg,
+        texOffX, 0, bodyTexImg.naturalWidth, bodyTexImg.naturalHeight,
+        0, -bodyWidth / 2, segLen, bodyWidth
+      )
+      ctx.restore()
+    }
+    // Draw cap on tail end
+    const tailSeg = segments[segments.length - 1]
+    const tp = worldToScreen(tailSeg.x, tailSeg.y, camera, w, h)
+    ctx.save()
+    ctx.beginPath()
+    ctx.arc(tp.x, tp.y, bodyWidth / 2, 0, Math.PI * 2)
+    ctx.clip()
+    ctx.drawImage(bodyTexImg, 0, 0, bodyTexImg.naturalWidth, bodyTexImg.naturalHeight,
+      tp.x - bodyWidth / 2, tp.y - bodyWidth / 2, bodyWidth, bodyWidth)
+    ctx.restore()
+  }
+
   for (let i = segments.length - 1; i >= 0; i--) {
     const seg = segments[i]
     const p = worldToScreen(seg.x, seg.y, camera, w, h)
     if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
 
     if (bodyTexImg) {
-      // No shadow for textured body — goes straight to texture
-      // Textured body — draw larger to overlap and close gaps
-      ctx.save()
-      const overlapR = segR * 1.35
-      ctx.beginPath()
-      ctx.arc(p.x, p.y, overlapR, 0, Math.PI * 2)
-      ctx.clip()
-      const texW = overlapR * 2
-      const texH = overlapR * 2
-      const offsetX = (i * overlapR * 0.6) % bodyTexImg.naturalWidth
-      ctx.drawImage(
-        bodyTexImg,
-        offsetX, 0, bodyTexImg.naturalWidth * 0.5, bodyTexImg.naturalHeight,
-        p.x - texW / 2, p.y - texH / 2, texW, texH
-      )
-      ctx.restore()
+      // Already drawn above — skip segment circles for textured body
     } else {
       // Shadow (only for solid color)
       ctx.beginPath()
