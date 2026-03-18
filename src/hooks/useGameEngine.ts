@@ -26,10 +26,27 @@ function loadHeadImage(src: string): HTMLImageElement | null {
 const HEAD_IMAGES: Record<string, string> = {
   queen: '/heads/queen.png',
   king: '/heads/king.png',
+  dragon: '/heads/dragon.png',
 }
 
-// Preload
+// Body texture cache
+const bodyTextureCache = new Map<string, HTMLImageElement>()
+
+function loadBodyTexture(src: string): HTMLImageElement | null {
+  if (bodyTextureCache.has(src)) return bodyTextureCache.get(src)!
+  const img = new Image()
+  img.src = src
+  img.onload = () => { bodyTextureCache.set(src, img) }
+  return null
+}
+
+const BODY_TEXTURES: Record<string, string> = {
+  dragon: '/heads/dragon-body.png',
+}
+
+// Preload all
 Object.values(HEAD_IMAGES).forEach(src => loadHeadImage(src))
+Object.values(BODY_TEXTURES).forEach(src => loadBodyTexture(src))
 
 // ============================================
 // SPATIAL GRID - O(1) food lookup instead of O(n)
@@ -745,11 +762,14 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   const invincible = worm.invincible > 0
   const invAlpha = invincible ? 0.3 * Math.sin(Date.now() * 0.01) : 0
 
+  // Check for body texture (dragon etc.)
+  const bodyTexKey = worm.skin.bodyTexture
+  const bodyTexImg = bodyTexKey ? bodyTextureCache.get(bodyTexKey) : null
+
   for (let i = segments.length - 1; i >= 0; i--) {
     const seg = segments[i]
     const p = worldToScreen(seg.x, seg.y, camera, w, h)
     if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
-    const colorIdx = i % colors.length
 
     // Shadow
     ctx.beginPath()
@@ -757,18 +777,37 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
     ctx.fillStyle = 'rgba(0,0,0,0.2)'
     ctx.fill()
 
-    // Body
-    ctx.beginPath()
-    ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
-    ctx.fillStyle = colors[colorIdx]
-    ctx.fill()
-
-    // Highlight — skip every other segment for perf on big worms
-    if (i % 2 === 0 || segments.length < 100) {
+    if (bodyTexImg) {
+      // Textured body — clip circle, draw texture tile
+      ctx.save()
       ctx.beginPath()
-      ctx.arc(p.x - segR * 0.2, p.y - segR * 0.25, segR * 0.45, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(255,255,255,0.15)'
+      ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
+      ctx.clip()
+      // Tile the texture across the worm using segment index for offset
+      const texW = segR * 2
+      const texH = segR * 2
+      const offsetX = (i * segR * 0.8) % bodyTexImg.naturalWidth
+      ctx.drawImage(
+        bodyTexImg,
+        offsetX, 0, bodyTexImg.naturalWidth * 0.5, bodyTexImg.naturalHeight,
+        p.x - texW / 2, p.y - texH / 2, texW, texH
+      )
+      ctx.restore()
+    } else {
+      // Solid color body
+      const colorIdx = i % colors.length
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
+      ctx.fillStyle = colors[colorIdx]
       ctx.fill()
+
+      // Highlight — skip every other segment for perf on big worms
+      if (i % 2 === 0 || segments.length < 100) {
+        ctx.beginPath()
+        ctx.arc(p.x - segR * 0.2, p.y - segR * 0.25, segR * 0.45, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(255,255,255,0.15)'
+        ctx.fill()
+      }
     }
 
     if (invincible) {
@@ -1012,6 +1051,9 @@ export function useGameEngine(
     const px = (Math.random() - 0.5) * WORLD_SIZE * 0.5
     const py = (Math.random() - 0.5) * WORLD_SIZE * 0.5
     s.player = createWorm(px, py, playerSkin, playerName, true)
+
+    // Preload body texture if the skin has one
+    if (playerSkin.bodyTexture) loadBodyTexture(playerSkin.bodyTexture)
 
     s.usedAINames = []
     s.aiWorms = []

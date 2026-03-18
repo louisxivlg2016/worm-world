@@ -21,13 +21,14 @@ export interface Segment {
   y: number
 }
 
-export type HeadType = 'default' | 'queen' | 'king'
+export type HeadType = 'default' | 'queen' | 'king' | 'dragon'
 
 export interface WormSkin {
   colors: string[]
   eye?: string
   name?: string
   headType?: HeadType
+  bodyTexture?: string // URL to a body texture image
 }
 
 export interface Food {

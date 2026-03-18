@@ -2,10 +2,11 @@ import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SKINS, type WormSkin, type HeadType } from '@/types/game'
 
-const HEAD_OPTIONS: { id: HeadType; label: string; preview: string }[] = [
+const HEAD_OPTIONS: { id: HeadType; label: string; preview: string; bodyTexture?: string }[] = [
   { id: 'default', label: 'Classique', preview: '' },
   { id: 'queen', label: 'Reine', preview: '/heads/queen.png' },
   { id: 'king', label: 'Roi', preview: '/heads/king.png' },
+  { id: 'dragon', label: 'Dragon', preview: '/heads/dragon.png', bodyTexture: '/heads/dragon-body.png' },
 ]
 
 // ============================================
@@ -94,14 +95,21 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
   const [activeSlot, setActiveSlot] = useState(0)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [headImgs, setHeadImgs] = useState<Record<string, HTMLImageElement>>({})
+  const [bodyImgs, setBodyImgs] = useState<Record<string, HTMLImageElement>>({})
 
-  // Load head images for preview
+  // Load head + body images for preview
   useEffect(() => {
     for (const opt of HEAD_OPTIONS) {
-      if (!opt.preview) continue
-      const img = new Image()
-      img.src = opt.preview
-      img.onload = () => setHeadImgs(prev => ({ ...prev, [opt.id]: img }))
+      if (opt.preview) {
+        const img = new Image()
+        img.src = opt.preview
+        img.onload = () => setHeadImgs(prev => ({ ...prev, [opt.id]: img }))
+      }
+      if (opt.bodyTexture) {
+        const img = new Image()
+        img.src = opt.bodyTexture
+        img.onload = () => setBodyImgs(prev => ({ ...prev, [opt.id]: img }))
+      }
     }
   }, [])
 
@@ -146,17 +154,31 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
       ctx.fillStyle = 'rgba(0,0,0,0.2)'
       ctx.fill()
 
-      // Body
-      ctx.beginPath()
-      ctx.arc(sx, sy, radius, 0, Math.PI * 2)
-      ctx.fillStyle = colors[i % colors.length]
-      ctx.fill()
+      const bImg = bodyImgs[headType]
+      if (bImg) {
+        // Textured body
+        ctx.save()
+        ctx.beginPath()
+        ctx.arc(sx, sy, radius, 0, Math.PI * 2)
+        ctx.clip()
+        const texW = radius * 2
+        const texH = radius * 2
+        const offsetX = (i * radius * 0.8) % bImg.naturalWidth
+        ctx.drawImage(bImg, offsetX, 0, bImg.naturalWidth * 0.5, bImg.naturalHeight, sx - texW / 2, sy - texH / 2, texW, texH)
+        ctx.restore()
+      } else {
+        // Solid color body
+        ctx.beginPath()
+        ctx.arc(sx, sy, radius, 0, Math.PI * 2)
+        ctx.fillStyle = colors[i % colors.length]
+        ctx.fill()
 
-      // Highlight
-      ctx.beginPath()
-      ctx.arc(sx - radius * 0.2, sy - radius * 0.25, radius * 0.45, 0, Math.PI * 2)
-      ctx.fillStyle = 'rgba(255,255,255,0.2)'
-      ctx.fill()
+        // Highlight
+        ctx.beginPath()
+        ctx.arc(sx - radius * 0.2, sy - radius * 0.25, radius * 0.45, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(255,255,255,0.2)'
+        ctx.fill()
+      }
     }
 
     // Head on first segment
@@ -184,7 +206,7 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
         ctx.fill()
       }
     }
-  }, [colors, headType, headImgs])
+  }, [colors, headType, headImgs, bodyImgs])
 
   return (
     <div style={shopStyles.container}>
@@ -295,7 +317,16 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
       <div style={{ display: 'flex', gap: 12, marginTop: 16, marginBottom: 30 }}>
         <button
           style={shopStyles.applyBtn}
-          onClick={() => onApply({ colors: [...colors], eye: '#fff', name: 'Custom', headType })}
+          onClick={() => {
+            const selectedHead = HEAD_OPTIONS.find(h => h.id === headType)
+            onApply({
+              colors: [...colors],
+              eye: '#fff',
+              name: 'Custom',
+              headType,
+              bodyTexture: selectedHead?.bodyTexture,
+            })
+          }}
         >
           {t('shopApply')}
         </button>
