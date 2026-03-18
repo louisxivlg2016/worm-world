@@ -179,6 +179,7 @@ const POTION_ICONS: Record<PotionType, string> = {
   magnet: '\uD83E\uDDF2', // magnet
 }
 const POTION_IMAGES: Partial<Record<PotionType, string>> = {
+  speed: '/potions/speed.png',
   zoom: '/potions/zoom.png',
 }
 
