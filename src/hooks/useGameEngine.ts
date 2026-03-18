@@ -766,50 +766,47 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   const bodyTexKey = worm.skin.bodyTexture
   const bodyTexImg = bodyTexKey ? bodyTextureCache.get(bodyTexKey) : null
 
-  // Textured body: draw as connected rectangles between segment pairs
+  // Textured body: draw filled joints + stretched links — zero gaps
   if (bodyTexImg) {
-    const bodyWidth = segR * 2.4
+    const bw = segR * 2.6
+
+    // Pass 1: draw a circle at every segment position (fills joints/corners)
+    for (let i = segments.length - 1; i >= 0; i--) {
+      const seg = segments[i]
+      const p = worldToScreen(seg.x, seg.y, camera, w, h)
+      if (p.x < -bw || p.x > w + bw || p.y < -bw || p.y > h + bw) continue
+      ctx.save()
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, bw / 2, 0, Math.PI * 2)
+      ctx.clip()
+      const texOff = (i * 20) % bodyTexImg.naturalWidth
+      ctx.drawImage(bodyTexImg, texOff, 0, bodyTexImg.naturalWidth, bodyTexImg.naturalHeight,
+        p.x - bw / 2, p.y - bw / 2, bw, bw)
+      ctx.restore()
+    }
+
+    // Pass 2: draw rectangles between each pair (fills straight stretches)
     for (let i = segments.length - 1; i >= 1; i--) {
-      const curr = segments[i]
-      const prev = segments[i - 1]
-      const p1 = worldToScreen(curr.x, curr.y, camera, w, h)
-      const p2 = worldToScreen(prev.x, prev.y, camera, w, h)
-      // Skip if both off-screen
-      if (p1.x < -60 && p2.x < -60) continue
-      if (p1.x > w + 60 && p2.x > w + 60) continue
-      if (p1.y < -60 && p2.y < -60) continue
-      if (p1.y > h + 60 && p2.y > h + 60) continue
+      const p1 = worldToScreen(segments[i].x, segments[i].y, camera, w, h)
+      const p2 = worldToScreen(segments[i - 1].x, segments[i - 1].y, camera, w, h)
+      if (p1.x < -bw && p2.x < -bw) continue
+      if (p1.x > w + bw && p2.x > w + bw) continue
+      if (p1.y < -bw && p2.y < -bw) continue
+      if (p1.y > h + bw && p2.y > h + bw) continue
 
       const dx = p2.x - p1.x, dy = p2.y - p1.y
-      const segLen = Math.sqrt(dx * dx + dy * dy) + 2 // +2 to overlap
+      const len = Math.sqrt(dx * dx + dy * dy)
+      if (len < 0.5) continue
       const ang = Math.atan2(dy, dx)
 
       ctx.save()
       ctx.translate(p1.x, p1.y)
       ctx.rotate(ang)
-      // Clip to rounded rect shape
-      ctx.beginPath()
-      ctx.ellipse(segLen / 2, 0, segLen / 2 + 2, bodyWidth / 2, 0, 0, Math.PI * 2)
-      ctx.clip()
-      // Tile texture
-      const texOffX = (i * 18) % bodyTexImg.naturalWidth
-      ctx.drawImage(
-        bodyTexImg,
-        texOffX, 0, bodyTexImg.naturalWidth, bodyTexImg.naturalHeight,
-        0, -bodyWidth / 2, segLen, bodyWidth
-      )
+      const texOff = (i * 20) % bodyTexImg.naturalWidth
+      ctx.drawImage(bodyTexImg, texOff, 0, bodyTexImg.naturalWidth, bodyTexImg.naturalHeight,
+        -2, -bw / 2, len + 4, bw)
       ctx.restore()
     }
-    // Draw cap on tail end
-    const tailSeg = segments[segments.length - 1]
-    const tp = worldToScreen(tailSeg.x, tailSeg.y, camera, w, h)
-    ctx.save()
-    ctx.beginPath()
-    ctx.arc(tp.x, tp.y, bodyWidth / 2, 0, Math.PI * 2)
-    ctx.clip()
-    ctx.drawImage(bodyTexImg, 0, 0, bodyTexImg.naturalWidth, bodyTexImg.naturalHeight,
-      tp.x - bodyWidth / 2, tp.y - bodyWidth / 2, bodyWidth, bodyWidth)
-    ctx.restore()
   }
 
   for (let i = segments.length - 1; i >= 0; i--) {
