@@ -680,29 +680,59 @@ function drawBackground(ctx: CanvasRenderingContext2D, camera: Camera, w: number
   }
 }
 
+// Pre-render emoji at high res for crisp cartoon-style food
+const emojiCache = new Map<string, HTMLCanvasElement>()
+const EMOJI_RENDER_SIZE = 64
+
+function getEmojiCanvas(emoji: string): HTMLCanvasElement {
+  if (emojiCache.has(emoji)) return emojiCache.get(emoji)!
+  const c = document.createElement('canvas')
+  const pad = 8
+  c.width = EMOJI_RENDER_SIZE + pad * 2
+  c.height = EMOJI_RENDER_SIZE + pad * 2
+  const cx = c.getContext('2d')!
+  cx.font = `${EMOJI_RENDER_SIZE}px serif`
+  cx.textAlign = 'center'
+  cx.textBaseline = 'middle'
+  cx.fillText(emoji, c.width / 2, c.height / 2)
+  emojiCache.set(emoji, c)
+  return c
+}
+
 function drawFood(ctx: CanvasRenderingContext2D, foods: Food[], camera: Camera, w: number, h: number) {
   const time = Date.now() * 0.003
   for (const f of foods) {
     const p = worldToScreen(f.x, f.y, camera, w, h)
-    if (p.x < -30 || p.x > w + 30 || p.y < -30 || p.y > h + 30) continue
+    if (p.x < -40 || p.x > w + 40 || p.y < -40 || p.y > h + 40) continue
     const r = f.radius * camera.zoom
     const pulse = 1 + Math.sin(time + f.pulse) * 0.1
-    const size = r * 3.5 * pulse
+    const size = r * 4.0 * pulse
 
+    // Glow for special food
     if (f.special && size > 6) {
       ctx.beginPath()
-      const glowGrd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 1.8)
-      glowGrd.addColorStop(0, 'rgba(255,215,0,0.3)')
-      glowGrd.addColorStop(1, 'rgba(255,215,0,0)')
+      const glowGrd = ctx.createRadialGradient(p.x, p.y, size * 0.3, p.x, p.y, size * 1.5)
+      glowGrd.addColorStop(0, 'rgba(255,100,200,0.35)')
+      glowGrd.addColorStop(1, 'rgba(255,100,200,0)')
       ctx.fillStyle = glowGrd
-      ctx.arc(p.x, p.y, size * 1.8, 0, Math.PI * 2)
+      ctx.arc(p.x, p.y, size * 1.5, 0, Math.PI * 2)
       ctx.fill()
     }
 
-    ctx.font = `${Math.round(size)}px serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText(f.emoji, p.x, p.y)
+    // Subtle glow for all food
+    if (size > 8) {
+      ctx.beginPath()
+      const glow = ctx.createRadialGradient(p.x, p.y, size * 0.2, p.x, p.y, size * 1.1)
+      glow.addColorStop(0, 'rgba(100,200,255,0.15)')
+      glow.addColorStop(1, 'rgba(100,200,255,0)')
+      ctx.fillStyle = glow
+      ctx.arc(p.x, p.y, size * 1.1, 0, Math.PI * 2)
+      ctx.fill()
+    }
+
+    // Draw pre-rendered emoji (crisp at any size)
+    const ec = getEmojiCanvas(f.emoji)
+    ctx.drawImage(ec, p.x - size / 2, p.y - size / 2, size, size)
   }
 }
 
