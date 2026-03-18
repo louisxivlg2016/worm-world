@@ -53,7 +53,7 @@ export interface Potion {
   pulse: number
 }
 
-export const POTION_DURATION = 5000 // 5 seconds
+export const POTION_DURATION = 10000 // 10 seconds
 export const POTION_COUNT = 30
 
 export interface Coin {
