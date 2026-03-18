@@ -95,8 +95,10 @@ interface EngineState {
   playerCoins: number
   boostEnergy: number
   boosting: boolean
-  controlMode: 'mouse' | 'keyboard'
+  controlMode: 'mouse' | 'keyboard' | 'touch'
   mouse: { x: number; y: number }
+  touchStart: { x: number; y: number } | null
+  touchVector: { x: number; y: number }
   keys: { up: boolean; down: boolean; left: boolean; right: boolean }
   frameCount: number
   lastTime: number
@@ -291,7 +293,7 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
 
   // Eat food — use spatial grid for O(nearby) instead of O(all)
   const headR = getWormRadius(worm)
-  const attractRange = headR + 70
+  const attractRange = headR + 35
   const nearby = foodGrid ? foodGrid.query(head.x, head.y, attractRange) : foods
   for (const f of nearby) {
     const dx = head.x - f.x, dy = head.y - f.y
@@ -304,7 +306,7 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
 
     const collectedDx = head.x - f.x, collectedDy = head.y - f.y
     const collectedDist = Math.sqrt(collectedDx * collectedDx + collectedDy * collectedDy)
-    if (collectedDist < headR + f.radius + 10) {
+    if (collectedDist < headR + f.radius + 4) {
       worm.score += f.value
       worm.segmentsToAdd += f.fromDeath ? 0.4 : 0.11
       if (particles.length < MAX_PARTICLES) {
@@ -946,6 +948,8 @@ export function useGameEngine(
     boosting: false,
     controlMode: 'mouse',
     mouse: { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+    touchStart: null,
+    touchVector: { x: 0, y: 0 },
     keys: { up: false, down: false, left: false, right: false },
     frameCount: 0,
     lastTime: 0,
@@ -1030,6 +1034,8 @@ export function useGameEngine(
     s.spawnTimer = 0
     s.lastTime = performance.now()
     s.controlMode = 'mouse'
+    s.touchStart = null
+    s.touchVector = { x: 0, y: 0 }
     s.keys = { up: false, down: false, left: false, right: false }
     s.roomSlug = roomSlug ?? null
     s.roomId = roomId ?? null
@@ -1057,6 +1063,12 @@ export function useGameEngine(
         if (s.keys.left) kx -= 1
         if (s.keys.right) kx += 1
         if (kx !== 0 || ky !== 0) s.player.targetAngle = Math.atan2(ky, kx)
+      } else if (s.controlMode === 'touch') {
+        const touchDeadzone = 12
+        const { x, y } = s.touchVector
+        if (Math.abs(x) > touchDeadzone || Math.abs(y) > touchDeadzone) {
+          s.player.targetAngle = Math.atan2(y, x)
+        }
       } else {
         const head = s.player.segments[0]
         const hp = worldToScreen(head.x, head.y, s.camera, canvas.width, canvas.height)
@@ -1204,20 +1216,33 @@ export function useGameEngine(
     const handleTouchMove = (e: TouchEvent) => {
       e.preventDefault()
       const s = stateRef.current
-      s.controlMode = 'mouse'
-      s.mouse.x = e.touches[0].clientX
-      s.mouse.y = e.touches[0].clientY
+      const touch = e.touches[0]
+      if (!touch) return
+      if (!s.touchStart) {
+        s.touchStart = { x: touch.clientX, y: touch.clientY }
+      }
+      s.controlMode = 'touch'
+      s.touchVector.x = touch.clientX - s.touchStart.x
+      s.touchVector.y = touch.clientY - s.touchStart.y
     }
 
     const handleTouchStart = (e: TouchEvent) => {
       e.preventDefault()
-      stateRef.current.boosting = true
-      stateRef.current.mouse.x = e.touches[0].clientX
-      stateRef.current.mouse.y = e.touches[0].clientY
+      const s = stateRef.current
+      const touch = e.touches[0]
+      if (!touch) return
+      s.boosting = true
+      s.controlMode = 'touch'
+      s.touchStart = { x: touch.clientX, y: touch.clientY }
+      s.touchVector.x = 0
+      s.touchVector.y = 0
     }
 
     const handleTouchEnd = () => {
       stateRef.current.boosting = false
+      stateRef.current.touchStart = null
+      stateRef.current.touchVector.x = 0
+      stateRef.current.touchVector.y = 0
     }
 
     const handleContextMenu = (e: Event) => e.preventDefault()
