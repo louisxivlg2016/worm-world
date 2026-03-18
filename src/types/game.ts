@@ -54,7 +54,7 @@ export interface Potion {
 }
 
 export const POTION_DURATION = 5000 // 5 seconds
-export const POTION_COUNT = 15
+export const POTION_COUNT = 30
 
 export interface Coin {
   x: number

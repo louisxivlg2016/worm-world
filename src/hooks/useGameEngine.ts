@@ -788,7 +788,7 @@ function drawPotions(ctx: CanvasRenderingContext2D, potions: Potion[], camera: C
     if (p.x < -40 || p.x > w + 40 || p.y < -40 || p.y > h + 40) continue
     const r = pot.radius * camera.zoom
     const pulse = 1 + Math.sin(time + pot.pulse) * 0.2
-    const size = r * pulse
+    const size = r * 3.0 * pulse
     const color = POTION_COLORS[pot.type]
 
     // Outer glow
