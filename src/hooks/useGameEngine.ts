@@ -4,7 +4,7 @@ import {
   BASE_SPEED, BASE_SEGMENT_GAP, BASE_RADIUS, TURN_SPEED, COIN_COUNT,
   BATTLE_MAX_DEATHS,
   SKINS, AI_SKINS, AI_NAMES,
-  FOOD_EMOJIS, SPECIAL_FOOD_EMOJIS,
+  FOOD_EMOJIS, SPECIAL_FOOD_EMOJIS, FOOD_IMAGES, SPECIAL_FOOD_IMAGES,
   type Worm, type Food, type Coin, type Particle, type Camera,
   type Segment, type WormSkin, type AIStrategy, type GameMode, type HeadType,
 } from '@/types/game'
@@ -137,6 +137,8 @@ interface EngineState {
 // HELPERS
 // ============================================
 function createFood(x?: number, y?: number, special?: boolean): Food {
+  const images = special ? SPECIAL_FOOD_IMAGES : FOOD_IMAGES
+  const img = images[Math.floor(Math.random() * images.length)]
   const emojis = special ? SPECIAL_FOOD_EMOJIS : FOOD_EMOJIS
   const emoji = emojis[Math.floor(Math.random() * emojis.length)]
   return {
@@ -144,6 +146,7 @@ function createFood(x?: number, y?: number, special?: boolean): Food {
     y: y !== undefined ? y : Math.random() * WORLD_SIZE - WORLD_SIZE / 2,
     radius: special ? 12 + Math.random() * 5 : 7 + Math.random() * 4,
     emoji,
+    img,
     value: special ? 5 : 1,
     pulse: Math.random() * Math.PI * 2,
     special: !!special,
@@ -680,21 +683,31 @@ function drawBackground(ctx: CanvasRenderingContext2D, camera: Camera, w: number
   }
 }
 
-// Pre-render emoji at high res for crisp cartoon-style food
-const emojiCache = new Map<string, HTMLCanvasElement>()
-const EMOJI_RENDER_SIZE = 64
+// Food image cache — preload all cartoon food images
+const foodImgCache = new Map<string, HTMLImageElement>()
 
+function preloadFoodImages() {
+  const allPaths = [...new Set([...FOOD_IMAGES, ...SPECIAL_FOOD_IMAGES])]
+  for (const src of allPaths) {
+    if (foodImgCache.has(src)) continue
+    const img = new Image()
+    img.src = src
+    img.onload = () => { foodImgCache.set(src, img) }
+  }
+}
+preloadFoodImages()
+
+// Emoji fallback for death food
+const emojiCache = new Map<string, HTMLCanvasElement>()
 function getEmojiCanvas(emoji: string): HTMLCanvasElement {
   if (emojiCache.has(emoji)) return emojiCache.get(emoji)!
   const c = document.createElement('canvas')
-  const pad = 8
-  c.width = EMOJI_RENDER_SIZE + pad * 2
-  c.height = EMOJI_RENDER_SIZE + pad * 2
+  c.width = 80; c.height = 80
   const cx = c.getContext('2d')!
-  cx.font = `${EMOJI_RENDER_SIZE}px serif`
+  cx.font = '64px serif'
   cx.textAlign = 'center'
   cx.textBaseline = 'middle'
-  cx.fillText(emoji, c.width / 2, c.height / 2)
+  cx.fillText(emoji, 40, 40)
   emojiCache.set(emoji, c)
   return c
 }
@@ -730,9 +743,14 @@ function drawFood(ctx: CanvasRenderingContext2D, foods: Food[], camera: Camera, 
       ctx.fill()
     }
 
-    // Draw pre-rendered emoji (crisp at any size)
-    const ec = getEmojiCanvas(f.emoji)
-    ctx.drawImage(ec, p.x - size / 2, p.y - size / 2, size, size)
+    // Draw food image or emoji fallback
+    if (f.img && foodImgCache.has(f.img)) {
+      const img = foodImgCache.get(f.img)!
+      ctx.drawImage(img, p.x - size / 2, p.y - size / 2, size, size)
+    } else {
+      const ec = getEmojiCanvas(f.emoji)
+      ctx.drawImage(ec, p.x - size / 2, p.y - size / 2, size, size)
+    }
   }
 }
 

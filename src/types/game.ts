@@ -35,7 +35,8 @@ export interface Food {
   x: number
   y: number
   radius: number
-  emoji: string
+  emoji: string  // kept for death food fallback
+  img?: string   // image path for cartoon food
   value: number
   pulse: number
   special: boolean
@@ -168,22 +169,33 @@ export const AI_NAMES = [
   'Enzo','Olivia','Dave','Margot','Felix','Diane','Ivan','Iris',
 ]
 
-export const FOOD_EMOJIS = [
-  '🧀','🧀',
-  '🍖','🍗','🥩','🥓','🌭',
-  '🍬','🍭','🍫','🍩','🍪','🧁','🍰','🎂','🍮','🍡','🍦','🍧','🍨',
-  '🥖','🍞','🥐','🥯','🧇','🥞',
-  '🥕','🥦','🌽','🍅','🫑','🥬','🧅','🥒','🥔','🍆','🌶️','🧄','🫒',
-  '🍎','🍊','🍋','🍇','🍓','🍌','🍑','🍒','🥝','🍍','🫐','🥭','🍐','🥥','🍈','🍉',
-  '🍕','🍔','🌮','🌯','🥗','🍟','🥚','🍳','🥘','🫕','🥙','🧆',
-  '🍣','🍙','🍜','🥟','🍱','🍛','🍝','🍲','🥡','🍘',
-  '🥤','🧃','🍿','🥜','🫘','🥨',
+export const FOOD_IMAGES = [
+  '/food/banane.png',
+  '/food/burger.png',
+  '/food/donut.png',
+  '/food/fraise.png',
+  '/food/gateau.png',
+  '/food/hot-dog.png',
+  '/food/muffin.png',
+  '/food/pizza.png',
+  '/food/pomme.png',
+  '/food/poulet.png',
+  '/food/susette.png',
+  '/food/sushi.png',
 ]
 
-export const SPECIAL_FOOD_EMOJIS = [
-  '🍖','🧀','🍕','🍔','🎂','🍗','🥩','🍰','🍩','🍍','🥐','🍣',
-  '🍉','🍳','🥘','🍱','🍝','🌯','🥓','🍦','🍧','🧇','🥞',
+export const SPECIAL_FOOD_IMAGES = [
+  '/food/burger.png',
+  '/food/pizza.png',
+  '/food/poulet.png',
+  '/food/donut.png',
+  '/food/gateau.png',
+  '/food/sushi.png',
 ]
+
+// Keep emojis as fallback for death food
+export const FOOD_EMOJIS = ['🍖','🍗','🍕','🍔','🍩','🍓','🍌','🍎','🍣','🌭','🧁','🍰']
+export const SPECIAL_FOOD_EMOJIS = ['🍖','🍕','🍔','🍗','🍩','🍣']
 
 // ============================================
 // MULTIPLAYER EVENT TYPES
