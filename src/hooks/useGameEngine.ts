@@ -766,58 +766,21 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   const bodyTexKey = worm.skin.bodyTexture
   const bodyTexImg = bodyTexKey ? bodyTextureCache.get(bodyTexKey) : null
 
-  // Textured body: draw filled joints + stretched links — zero gaps
-  if (bodyTexImg) {
-    const bw = segR * 2.6
-
-    // Pass 1: draw a circle at every segment position (fills joints/corners)
-    for (let i = segments.length - 1; i >= 0; i--) {
-      const seg = segments[i]
-      const p = worldToScreen(seg.x, seg.y, camera, w, h)
-      if (p.x < -bw || p.x > w + bw || p.y < -bw || p.y > h + bw) continue
-      ctx.save()
-      ctx.beginPath()
-      ctx.arc(p.x, p.y, bw / 2, 0, Math.PI * 2)
-      ctx.clip()
-      const texOff = (i * 20) % bodyTexImg.naturalWidth
-      ctx.drawImage(bodyTexImg, texOff, 0, bodyTexImg.naturalWidth, bodyTexImg.naturalHeight,
-        p.x - bw / 2, p.y - bw / 2, bw, bw)
-      ctx.restore()
-    }
-
-    // Pass 2: draw rectangles between each pair (fills straight stretches)
-    for (let i = segments.length - 1; i >= 1; i--) {
-      const p1 = worldToScreen(segments[i].x, segments[i].y, camera, w, h)
-      const p2 = worldToScreen(segments[i - 1].x, segments[i - 1].y, camera, w, h)
-      if (p1.x < -bw && p2.x < -bw) continue
-      if (p1.x > w + bw && p2.x > w + bw) continue
-      if (p1.y < -bw && p2.y < -bw) continue
-      if (p1.y > h + bw && p2.y > h + bw) continue
-
-      const dx = p2.x - p1.x, dy = p2.y - p1.y
-      const len = Math.sqrt(dx * dx + dy * dy)
-      if (len < 0.5) continue
-      const ang = Math.atan2(dy, dx)
-
-      ctx.save()
-      ctx.translate(p1.x, p1.y)
-      ctx.rotate(ang)
-      const texOff = (i * 20) % bodyTexImg.naturalWidth
-      ctx.drawImage(bodyTexImg, texOff, 0, bodyTexImg.naturalWidth, bodyTexImg.naturalHeight,
-        -2, -bw / 2, len + 4, bw)
-      ctx.restore()
-    }
-  }
-
   for (let i = segments.length - 1; i >= 0; i--) {
     const seg = segments[i]
     const p = worldToScreen(seg.x, seg.y, camera, w, h)
     if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
 
     if (bodyTexImg) {
-      // Already drawn above — skip segment circles for textured body
+      // Textured body — same circle as solid color, just filled with texture
+      ctx.save()
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
+      ctx.clip()
+      ctx.drawImage(bodyTexImg, p.x - segR, p.y - segR, segR * 2, segR * 2)
+      ctx.restore()
     } else {
-      // Shadow (only for solid color)
+      // Shadow
       ctx.beginPath()
       ctx.arc(p.x, p.y + segR * 0.3, segR * 1.05, 0, Math.PI * 2)
       ctx.fillStyle = 'rgba(0,0,0,0.2)'

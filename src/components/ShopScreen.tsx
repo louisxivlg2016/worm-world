@@ -156,15 +156,12 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
 
       const bImg = bodyImgs[headType]
       if (bImg) {
-        // Textured body
+        // Textured body — simple circle fill
         ctx.save()
         ctx.beginPath()
         ctx.arc(sx, sy, radius, 0, Math.PI * 2)
         ctx.clip()
-        const texW = radius * 2
-        const texH = radius * 2
-        const offsetX = (i * radius * 0.8) % bImg.naturalWidth
-        ctx.drawImage(bImg, offsetX, 0, bImg.naturalWidth * 0.5, bImg.naturalHeight, sx - texW / 2, sy - texH / 2, texW, texH)
+        ctx.drawImage(bImg, sx - radius, sy - radius, radius * 2, radius * 2)
         ctx.restore()
       } else {
         // Solid color body
