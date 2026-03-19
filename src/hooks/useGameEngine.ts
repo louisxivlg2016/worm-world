@@ -816,98 +816,183 @@ function preloadFoodImages() {
 }
 preloadFoodImages()
 
-// Diamond rendering for coins mode
+// Diamond rendering for coins mode — realistic brilliant cut
 const DIAMOND_COLORS = [
-  { top: '#88d8ff', mid: '#2196F3', bot: '#0D47A1', shine: '#e0f7ff' }, // blue
-  { top: '#ff88aa', mid: '#E91E63', bot: '#880E4F', shine: '#ffe0ec' }, // pink
-  { top: '#88ffaa', mid: '#4CAF50', bot: '#1B5E20', shine: '#e0ffe8' }, // green
-  { top: '#d088ff', mid: '#9C27B0', bot: '#4A148C', shine: '#f3e0ff' }, // purple
-  { top: '#ffffff', mid: '#e0e0e0', bot: '#9e9e9e', shine: '#ffffff' }, // white/diamond
-  { top: '#fff888', mid: '#FFC107', bot: '#FF6F00', shine: '#fff8e0' }, // amber
-  { top: '#ff8888', mid: '#F44336', bot: '#B71C1C', shine: '#ffe0e0' }, // red
+  { h: 210, s: 90, name: 'sapphire' },   // blue sapphire
+  { h: 340, s: 80, name: 'ruby' },        // red ruby
+  { h: 145, s: 75, name: 'emerald' },     // green emerald
+  { h: 280, s: 70, name: 'amethyst' },    // purple amethyst
+  { h: 180, s: 10, name: 'diamond' },     // clear diamond
+  { h: 45,  s: 85, name: 'topaz' },       // golden topaz
+  { h: 190, s: 95, name: 'aqua' },        // aquamarine
 ]
 
 const diamondCanvases: HTMLCanvasElement[] = []
 
+function hsl(h: number, s: number, l: number, a = 1) {
+  return `hsla(${h},${s}%,${l}%,${a})`
+}
+
 function generateDiamonds() {
-  for (const color of DIAMOND_COLORS) {
-    const size = 64
+  for (const gem of DIAMOND_COLORS) {
+    const S = 128
     const c = document.createElement('canvas')
-    c.width = size; c.height = size
+    c.width = S; c.height = S
     const ctx = c.getContext('2d')!
-    const cx = size / 2, cy = size / 2
+    const cx = S / 2, cy = S / 2
+    const { h, s } = gem
 
-    // Diamond shape points
-    const top = { x: cx, y: 6 }
-    const left = { x: 8, y: cy - 4 }
-    const right = { x: size - 8, y: cy - 4 }
-    const bottom = { x: cx, y: size - 8 }
+    // Brilliant cut proportions
+    const crownTop = S * 0.12
+    const girdle = S * 0.42
+    const pavilionBot = S * 0.88
+    const tableW = S * 0.32
+    const crownW = S * 0.48
+    const girdleW = S * 0.50
 
-    // Main body gradient
-    const grad = ctx.createLinearGradient(0, 0, 0, size)
-    grad.addColorStop(0, color.top)
-    grad.addColorStop(0.4, color.mid)
-    grad.addColorStop(1, color.bot)
-
-    // Draw diamond shape
+    // --- PAVILION (bottom triangle) ---
+    const pavGrad = ctx.createLinearGradient(0, girdle, 0, pavilionBot)
+    pavGrad.addColorStop(0, hsl(h, s, 50))
+    pavGrad.addColorStop(0.4, hsl(h, s, 30))
+    pavGrad.addColorStop(1, hsl(h, s, 15))
     ctx.beginPath()
-    ctx.moveTo(top.x, top.y)
-    ctx.lineTo(right.x, right.y)
-    ctx.lineTo(bottom.x, bottom.y)
-    ctx.lineTo(left.x, left.y)
+    ctx.moveTo(cx - girdleW, girdle)
+    ctx.lineTo(cx + girdleW, girdle)
+    ctx.lineTo(cx, pavilionBot)
     ctx.closePath()
-    ctx.fillStyle = grad
+    ctx.fillStyle = pavGrad
     ctx.fill()
 
-    // Top facet (lighter)
+    // Pavilion facets
+    const pavFacets = [
+      [cx - girdleW, girdle, cx - girdleW * 0.3, pavilionBot * 0.92, cx, pavilionBot],
+      [cx + girdleW, girdle, cx + girdleW * 0.3, pavilionBot * 0.92, cx, pavilionBot],
+      [cx - girdleW * 0.5, girdle, cx, pavilionBot, cx, girdle + (pavilionBot - girdle) * 0.5],
+      [cx + girdleW * 0.5, girdle, cx, pavilionBot, cx, girdle + (pavilionBot - girdle) * 0.5],
+    ]
+    pavFacets.forEach((f, i) => {
+      ctx.beginPath()
+      ctx.moveTo(f[0], f[1]); ctx.lineTo(f[2], f[3]); ctx.lineTo(f[4], f[5])
+      ctx.closePath()
+      ctx.fillStyle = hsl(h, s, 25 + i * 8, 0.3)
+      ctx.fill()
+    })
+
+    // --- CROWN (top trapezoid) ---
+    const crownGrad = ctx.createLinearGradient(0, crownTop, 0, girdle)
+    crownGrad.addColorStop(0, hsl(h, s, 85))
+    crownGrad.addColorStop(0.3, hsl(h, s, 70))
+    crownGrad.addColorStop(0.7, hsl(h, s, 55))
+    crownGrad.addColorStop(1, hsl(h, s, 45))
     ctx.beginPath()
-    ctx.moveTo(top.x, top.y)
-    ctx.lineTo(right.x, right.y)
-    ctx.lineTo(cx + 8, cy - 6)
-    ctx.lineTo(cx - 8, cy - 6)
-    ctx.lineTo(left.x, left.y)
+    ctx.moveTo(cx - tableW, crownTop)
+    ctx.lineTo(cx + tableW, crownTop)
+    ctx.lineTo(cx + crownW, girdle)
+    ctx.lineTo(cx - crownW, girdle)
     ctx.closePath()
-    ctx.fillStyle = color.top + 'aa'
+    ctx.fillStyle = crownGrad
     ctx.fill()
 
-    // Center facet line
-    ctx.beginPath()
-    ctx.moveTo(left.x, left.y)
-    ctx.lineTo(cx - 8, cy - 6)
-    ctx.lineTo(bottom.x, bottom.y)
-    ctx.strokeStyle = color.bot + '66'
-    ctx.lineWidth = 1
-    ctx.stroke()
+    // Crown facets — star facets + bezel facets
+    const crownFacets = [
+      // Left bezel
+      { pts: [cx - tableW, crownTop, cx - crownW, girdle, cx - crownW * 0.6, girdle], l: 65 },
+      // Right bezel
+      { pts: [cx + tableW, crownTop, cx + crownW, girdle, cx + crownW * 0.6, girdle], l: 60 },
+      // Left star
+      { pts: [cx - tableW, crownTop, cx - tableW * 0.3, crownTop + (girdle - crownTop) * 0.5, cx - crownW * 0.6, girdle], l: 75 },
+      // Right star
+      { pts: [cx + tableW, crownTop, cx + tableW * 0.3, crownTop + (girdle - crownTop) * 0.5, cx + crownW * 0.6, girdle], l: 72 },
+      // Center upper
+      { pts: [cx - tableW * 0.5, crownTop, cx + tableW * 0.5, crownTop, cx, crownTop + (girdle - crownTop) * 0.4], l: 88 },
+    ]
+    crownFacets.forEach(f => {
+      ctx.beginPath()
+      ctx.moveTo(f.pts[0], f.pts[1]); ctx.lineTo(f.pts[2], f.pts[3]); ctx.lineTo(f.pts[4], f.pts[5])
+      ctx.closePath()
+      ctx.fillStyle = hsl(h, s * 0.6, f.l, 0.35)
+      ctx.fill()
+    })
 
+    // --- TABLE (top flat face) ---
+    const tableGrad = ctx.createLinearGradient(cx - tableW, crownTop, cx + tableW, crownTop + 10)
+    tableGrad.addColorStop(0, hsl(h, s * 0.4, 92, 0.6))
+    tableGrad.addColorStop(0.5, hsl(h, s * 0.3, 85, 0.3))
+    tableGrad.addColorStop(1, hsl(h, s * 0.5, 78, 0.5))
     ctx.beginPath()
-    ctx.moveTo(right.x, right.y)
-    ctx.lineTo(cx + 8, cy - 6)
-    ctx.lineTo(bottom.x, bottom.y)
-    ctx.strokeStyle = color.bot + '66'
-    ctx.lineWidth = 1
-    ctx.stroke()
-
-    // Bright shine spot
-    ctx.beginPath()
-    ctx.arc(cx - 6, cy - 10, 5, 0, Math.PI * 2)
-    ctx.fillStyle = color.shine + 'cc'
-    ctx.fill()
-
-    // Small sparkle
-    ctx.beginPath()
-    ctx.arc(cx + 8, top.y + 8, 2.5, 0, Math.PI * 2)
-    ctx.fillStyle = '#ffffffcc'
-    ctx.fill()
-
-    // Outline
-    ctx.beginPath()
-    ctx.moveTo(top.x, top.y)
-    ctx.lineTo(right.x, right.y)
-    ctx.lineTo(bottom.x, bottom.y)
-    ctx.lineTo(left.x, left.y)
+    ctx.moveTo(cx - tableW * 0.85, crownTop + 2)
+    ctx.lineTo(cx + tableW * 0.85, crownTop + 2)
+    ctx.lineTo(cx + tableW * 0.6, crownTop + 12)
+    ctx.lineTo(cx - tableW * 0.6, crownTop + 12)
     ctx.closePath()
-    ctx.strokeStyle = color.bot + '88'
+    ctx.fillStyle = tableGrad
+    ctx.fill()
+
+    // --- GIRDLE (thin line) ---
+    ctx.beginPath()
+    ctx.moveTo(cx - girdleW, girdle)
+    ctx.lineTo(cx + girdleW, girdle)
+    ctx.strokeStyle = hsl(h, s, 40, 0.6)
     ctx.lineWidth = 1.5
+    ctx.stroke()
+
+    // --- LIGHT REFLECTIONS ---
+    // Big internal reflection
+    ctx.beginPath()
+    const refGrad = ctx.createRadialGradient(cx - S * 0.1, girdle - S * 0.08, 0, cx - S * 0.1, girdle - S * 0.08, S * 0.2)
+    refGrad.addColorStop(0, `hsla(${(h + 30) % 360},100%,95%,0.5)`)
+    refGrad.addColorStop(1, `hsla(${(h + 30) % 360},100%,95%,0)`)
+    ctx.fillStyle = refGrad
+    ctx.arc(cx - S * 0.1, girdle - S * 0.08, S * 0.2, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Rainbow dispersion flash
+    ctx.beginPath()
+    const rainGrad = ctx.createLinearGradient(cx - S * 0.15, crownTop + 5, cx + S * 0.15, crownTop + 15)
+    rainGrad.addColorStop(0, 'hsla(0,100%,80%,0.2)')
+    rainGrad.addColorStop(0.2, 'hsla(60,100%,80%,0.15)')
+    rainGrad.addColorStop(0.5, 'hsla(180,100%,80%,0.2)')
+    rainGrad.addColorStop(0.8, 'hsla(240,100%,80%,0.15)')
+    rainGrad.addColorStop(1, 'hsla(300,100%,80%,0.2)')
+    ctx.fillStyle = rainGrad
+    ctx.fillRect(cx - S * 0.2, crownTop + 3, S * 0.4, 14)
+
+    // --- SPARKLE HIGHLIGHTS ---
+    // Main bright spot (top-left)
+    ctx.beginPath()
+    const shineGrad = ctx.createRadialGradient(cx - S * 0.12, crownTop + 8, 0, cx - S * 0.12, crownTop + 8, S * 0.09)
+    shineGrad.addColorStop(0, 'rgba(255,255,255,0.95)')
+    shineGrad.addColorStop(0.5, 'rgba(255,255,255,0.4)')
+    shineGrad.addColorStop(1, 'rgba(255,255,255,0)')
+    ctx.fillStyle = shineGrad
+    ctx.arc(cx - S * 0.12, crownTop + 8, S * 0.09, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Secondary sparkle
+    ctx.beginPath()
+    ctx.arc(cx + S * 0.15, crownTop + 14, S * 0.04, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(255,255,255,0.7)'
+    ctx.fill()
+
+    // Star sparkle cross
+    const starX = cx + S * 0.08, starY = crownTop + 6
+    ctx.strokeStyle = 'rgba(255,255,255,0.8)'
+    ctx.lineWidth = 1.2
+    ctx.beginPath(); ctx.moveTo(starX - 5, starY); ctx.lineTo(starX + 5, starY); ctx.stroke()
+    ctx.beginPath(); ctx.moveTo(starX, starY - 5); ctx.lineTo(starX, starY + 5); ctx.stroke()
+
+    // --- OUTLINE ---
+    ctx.beginPath()
+    ctx.moveTo(cx - tableW, crownTop)
+    ctx.lineTo(cx + tableW, crownTop)
+    ctx.lineTo(cx + crownW, girdle)
+    ctx.lineTo(cx + girdleW, girdle)
+    ctx.lineTo(cx, pavilionBot)
+    ctx.lineTo(cx - girdleW, girdle)
+    ctx.lineTo(cx - crownW, girdle)
+    ctx.closePath()
+    ctx.strokeStyle = hsl(h, s, 25, 0.5)
+    ctx.lineWidth = 1
     ctx.stroke()
 
     diamondCanvases.push(c)
