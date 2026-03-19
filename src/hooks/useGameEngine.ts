@@ -2050,13 +2050,14 @@ export function useGameEngine(
           }
         }
 
-        // Update flying coins (screen-space animation toward coin panel)
-        for (let i = s.flyingCoins.length - 1; i >= 0; i--) {
-          const fc = s.flyingCoins[i]
-          fc.progress += fc.speed
-          if (fc.progress >= 1) {
-            s.flyingCoins.splice(i, 1)
-          }
+      }
+
+      // Update flying coins (all modes)
+      for (let i = s.flyingCoins.length - 1; i >= 0; i--) {
+        const fc = s.flyingCoins[i]
+        fc.progress += fc.speed
+        if (fc.progress >= 1) {
+          s.flyingCoins.splice(i, 1)
         }
       }
 
