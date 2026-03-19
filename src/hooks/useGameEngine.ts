@@ -411,7 +411,7 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
             nf.emoji = '💎'
             nf.img = undefined
             nf.value = 2
-            nf.radius = 8 + Math.random() * 6
+            nf.radius = 12 + Math.random() * 8
             ;(nf as any)._diamondIdx = Math.floor(Math.random() * DIAMOND_COLORS.length)
             foods.push(nf)
           } else {
@@ -946,6 +946,17 @@ function drawFood(ctx: CanvasRenderingContext2D, foods: Food[], camera: Camera, 
     // Draw diamond or food image
     const diamondIdx = (f as any)._diamondIdx as number | undefined
     if (diamondIdx !== undefined && diamondCanvases[diamondIdx]) {
+      // Diamond sparkle glow
+      if (size > 6) {
+        const dColor = DIAMOND_COLORS[diamondIdx]
+        ctx.beginPath()
+        const dGlow = ctx.createRadialGradient(p.x, p.y, size * 0.2, p.x, p.y, size * 1.8)
+        dGlow.addColorStop(0, dColor.mid + '44')
+        dGlow.addColorStop(1, dColor.mid + '00')
+        ctx.fillStyle = dGlow
+        ctx.arc(p.x, p.y, size * 1.8, 0, Math.PI * 2)
+        ctx.fill()
+      }
       if (decayAlpha < 1) ctx.globalAlpha = decayAlpha
       ctx.drawImage(diamondCanvases[diamondIdx], p.x - size / 2, p.y - size / 2, size, size)
       if (decayAlpha < 1) ctx.globalAlpha = 1
@@ -1474,7 +1485,7 @@ export function useGameEngine(
         f.emoji = '💎'
         f.img = undefined // will use diamond canvas
         f.value = 2
-        f.radius = 8 + Math.random() * 6
+        f.radius = 12 + Math.random() * 8
         ;(f as any)._diamondIdx = Math.floor(Math.random() * DIAMOND_COLORS.length)
         s.foods.push(f)
       }
