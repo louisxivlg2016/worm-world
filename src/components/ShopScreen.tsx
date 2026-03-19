@@ -1,6 +1,23 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { SKINS, type WormSkin, type HeadType } from '@/types/game'
+import ukFlagBody from '../../drapeau/angleterre.png'
+import franceFlagBody from '../../drapeau/france.png'
+import chinaFlagBody from '../../drapeau/chine.png'
+import russiaFlagBody from '../../drapeau/russie.png'
+import germanyFlagBody from '../../drapeau/allemagne.png'
+import usaFlagBody from '../../drapeau/etat unis.png'
+import spainFlagBody from '../../drapeau/espagne.png'
+
+type FlagSkin = {
+  name: string
+  flag?: string
+  preview?: string
+  colors: [string, string, string, string]
+  bodyTexture?: string
+  textureOffsetX?: number
+  textureScale?: number
+}
 
 const HEAD_OPTIONS: { id: HeadType; label: string; preview: string; bodyTexture?: string }[] = [
   { id: 'default', label: 'Classique', preview: '' },
@@ -10,17 +27,19 @@ const HEAD_OPTIONS: { id: HeadType; label: string; preview: string; bodyTexture?
   { id: 'stpatrick', label: 'St Patrick', preview: '/heads/stpatrick.png', bodyTexture: '/heads/stpatrick-body.png' },
 ]
 
+const DEFAULT_FLAG_TEXTURE_SCALE = 1.4
+
 // ============================================
 // FLAG PRESETS — colors from flags around the world
 // ============================================
-const FLAG_SKINS: { name: string; flag: string; colors: [string, string, string, string] }[] = [
+const FLAG_SKINS: FlagSkin[] = [
   // Europe
-  { name: 'France', flag: '🇫🇷', colors: ['#002395', '#FFFFFF', '#ED2939', '#002395'] },
-  { name: 'Allemagne', flag: '🇩🇪', colors: ['#000000', '#DD0000', '#FFCC00', '#000000'] },
+  { name: 'France', preview: franceFlagBody, bodyTexture: franceFlagBody, colors: ['#002395', '#FFFFFF', '#ED2939', '#002395'], textureOffsetX: 0.18, textureScale: DEFAULT_FLAG_TEXTURE_SCALE },
+  { name: 'Allemagne', preview: germanyFlagBody, bodyTexture: germanyFlagBody, colors: ['#000000', '#DD0000', '#FFCC00', '#000000'], textureOffsetX: 0.08, textureScale: DEFAULT_FLAG_TEXTURE_SCALE },
   { name: 'Italie', flag: '🇮🇹', colors: ['#008C45', '#FFFFFF', '#CD212A', '#008C45'] },
-  { name: 'Espagne', flag: '🇪🇸', colors: ['#AA151B', '#F1BF00', '#AA151B', '#F1BF00'] },
+  { name: 'Espagne', preview: spainFlagBody, bodyTexture: spainFlagBody, colors: ['#AA151B', '#F1BF00', '#AA151B', '#F1BF00'], textureScale: DEFAULT_FLAG_TEXTURE_SCALE },
   { name: 'Portugal', flag: '🇵🇹', colors: ['#006600', '#FF0000', '#FFCC00', '#006600'] },
-  { name: 'Royaume-Uni', flag: '🇬🇧', colors: ['#00247D', '#CF142B', '#FFFFFF', '#CF142B'] },
+  { name: 'Royaume-Uni', preview: ukFlagBody, bodyTexture: ukFlagBody, colors: ['#00247D', '#CF142B', '#FFFFFF', '#CF142B'], textureOffsetX: 0.08, textureScale: DEFAULT_FLAG_TEXTURE_SCALE },
   { name: 'Belgique', flag: '🇧🇪', colors: ['#000000', '#FDDA24', '#EF3340', '#000000'] },
   { name: 'Pays-Bas', flag: '🇳🇱', colors: ['#AE1C28', '#FFFFFF', '#21468B', '#AE1C28'] },
   { name: 'Suisse', flag: '🇨🇭', colors: ['#FF0000', '#FFFFFF', '#FF0000', '#FFFFFF'] },
@@ -34,10 +53,10 @@ const FLAG_SKINS: { name: string; flag: string; colors: [string, string, string,
   { name: 'Norvege', flag: '🇳🇴', colors: ['#EF2B2D', '#002868', '#FFFFFF', '#EF2B2D'] },
   { name: 'Danemark', flag: '🇩🇰', colors: ['#C60C30', '#FFFFFF', '#C60C30', '#FFFFFF'] },
   { name: 'Finlande', flag: '🇫🇮', colors: ['#FFFFFF', '#003580', '#FFFFFF', '#003580'] },
-  { name: 'Russie', flag: '🇷🇺', colors: ['#FFFFFF', '#0039A6', '#D52B1E', '#FFFFFF'] },
+  { name: 'Russie', preview: russiaFlagBody, bodyTexture: russiaFlagBody, colors: ['#FFFFFF', '#0039A6', '#D52B1E', '#FFFFFF'], textureOffsetX: 0.08, textureScale: DEFAULT_FLAG_TEXTURE_SCALE },
   { name: 'Turquie', flag: '🇹🇷', colors: ['#E30A17', '#FFFFFF', '#E30A17', '#FFFFFF'] },
   // Americas
-  { name: 'USA', flag: '🇺🇸', colors: ['#3C3B6E', '#B22234', '#FFFFFF', '#B22234'] },
+  { name: 'USA', preview: usaFlagBody, bodyTexture: usaFlagBody, colors: ['#3C3B6E', '#B22234', '#FFFFFF', '#B22234'], textureOffsetX: 0.12, textureScale: DEFAULT_FLAG_TEXTURE_SCALE },
   { name: 'Canada', flag: '🇨🇦', colors: ['#FF0000', '#FFFFFF', '#FF0000', '#FFFFFF'] },
   { name: 'Mexique', flag: '🇲🇽', colors: ['#006341', '#FFFFFF', '#CE1126', '#006341'] },
   { name: 'Bresil', flag: '🇧🇷', colors: ['#009739', '#FEDD00', '#012169', '#009739'] },
@@ -61,7 +80,7 @@ const FLAG_SKINS: { name: string; flag: string; colors: [string, string, string,
   { name: 'Ethiopie', flag: '🇪🇹', colors: ['#078930', '#FCDD09', '#DA121A', '#0F47AF'] },
   // Asia
   { name: 'Japon', flag: '🇯🇵', colors: ['#FFFFFF', '#BC002D', '#FFFFFF', '#BC002D'] },
-  { name: 'Chine', flag: '🇨🇳', colors: ['#DE2910', '#FFDE00', '#DE2910', '#FFDE00'] },
+  { name: 'Chine', preview: chinaFlagBody, bodyTexture: chinaFlagBody, colors: ['#DE2910', '#FFDE00', '#DE2910', '#FFDE00'], textureOffsetX: 0.12, textureScale: DEFAULT_FLAG_TEXTURE_SCALE },
   { name: 'Coree du Sud', flag: '🇰🇷', colors: ['#FFFFFF', '#CD2E3A', '#0047A0', '#000000'] },
   { name: 'Inde', flag: '🇮🇳', colors: ['#FF9933', '#FFFFFF', '#138808', '#000080'] },
   { name: 'Pakistan', flag: '🇵🇰', colors: ['#01411C', '#FFFFFF', '#01411C', '#FFFFFF'] },
@@ -83,6 +102,38 @@ const FLAG_SKINS: { name: string; flag: string; colors: [string, string, string,
   { name: 'Pan-Africain', flag: '✊🏿', colors: ['#FF0000', '#000000', '#009900', '#FF0000'] },
 ]
 
+const FLAG_TEXTURE_META = new Map(
+  FLAG_SKINS.filter(flag => flag.bodyTexture).map(flag => [flag.bodyTexture!, flag]),
+)
+
+function drawContainedTextureInCircle(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  x: number,
+  y: number,
+  radius: number,
+  offsetX = 0,
+  scale = 1,
+) {
+  const diameter = radius * 2
+  const aspect = img.naturalWidth / img.naturalHeight
+  let drawW = diameter
+  let drawH = diameter
+
+  if (aspect > 1) {
+    drawH = diameter / aspect
+  } else {
+    drawW = diameter * aspect
+  }
+
+  drawW *= scale
+  drawH *= scale
+
+  const dx = x - drawW / 2 + offsetX * radius
+  const dy = y - drawH / 2
+  ctx.drawImage(img, dx, dy, drawW, drawH)
+}
+
 interface ShopScreenProps {
   currentSkin: WormSkin
   onApply: (skin: WormSkin) => void
@@ -91,8 +142,12 @@ interface ShopScreenProps {
 
 export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
   const { t } = useTranslation()
+  const headBodyTextures = new Set(HEAD_OPTIONS.map(opt => opt.bodyTexture).filter(Boolean))
   const [colors, setColors] = useState<string[]>([...currentSkin.colors])
   const [headType, setHeadType] = useState<HeadType>(currentSkin.headType ?? 'default')
+  const [selectedBodyTexture, setSelectedBodyTexture] = useState<string | undefined>(
+    currentSkin.bodyTexture && !headBodyTextures.has(currentSkin.bodyTexture) ? currentSkin.bodyTexture : undefined,
+  )
   const [activeSlot, setActiveSlot] = useState(0)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [headImgs, setHeadImgs] = useState<Record<string, HTMLImageElement>>({})
@@ -112,6 +167,13 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
         img.onload = () => setBodyImgs(prev => ({ ...prev, [opt.id]: img }))
       }
     }
+
+    for (const flag of FLAG_SKINS) {
+      if (!flag.bodyTexture) continue
+      const img = new Image()
+      img.src = flag.bodyTexture
+      img.onload = () => setBodyImgs(prev => ({ ...prev, [flag.bodyTexture!]: img }))
+    }
   }, [])
 
   const setSlotColor = (slot: number, color: string) => {
@@ -122,12 +184,14 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
     })
   }
 
-  const applyFlag = (flagColors: string[]) => {
+  const applyFlag = (flagColors: string[], bodyTexture?: string) => {
     setColors([...flagColors])
+    setSelectedBodyTexture(bodyTexture)
   }
 
   const applyPreset = (skin: WormSkin) => {
     setColors([...skin.colors])
+    setSelectedBodyTexture(skin.bodyTexture)
   }
 
   // Draw worm preview
@@ -155,14 +219,18 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
       ctx.fillStyle = 'rgba(0,0,0,0.2)'
       ctx.fill()
 
-      const bImg = bodyImgs[headType]
+      const selectedHead = HEAD_OPTIONS.find(option => option.id === headType)
+      const bodyTextureKey = selectedBodyTexture ?? selectedHead?.bodyTexture
+      const bImg = bodyTextureKey ? bodyImgs[bodyTextureKey] : undefined
       if (bImg) {
-        // Textured body — simple circle fill
+        const textureMeta = bodyTextureKey ? FLAG_TEXTURE_META.get(bodyTextureKey) : undefined
         ctx.save()
         ctx.beginPath()
         ctx.arc(sx, sy, radius, 0, Math.PI * 2)
         ctx.clip()
-        ctx.drawImage(bImg, sx - radius, sy - radius, radius * 2, radius * 2)
+        ctx.fillStyle = colors[i % colors.length]
+        ctx.fillRect(sx - radius, sy - radius, radius * 2, radius * 2)
+        drawContainedTextureInCircle(ctx, bImg, sx, sy, radius, textureMeta?.textureOffsetX, textureMeta?.textureScale)
         ctx.restore()
       } else {
         // Solid color body
@@ -204,7 +272,7 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
         ctx.fill()
       }
     }
-  }, [colors, headType, headImgs, bodyImgs])
+  }, [colors, headType, headImgs, bodyImgs, selectedBodyTexture])
 
   return (
     <div style={shopStyles.container}>
@@ -301,10 +369,14 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
             <div
               key={i}
               style={shopStyles.flagItem}
-              onClick={() => applyFlag(f.colors)}
+              onClick={() => applyFlag(f.colors, f.bodyTexture)}
               title={f.name}
             >
-              <span style={{ fontSize: 22 }}>{f.flag}</span>
+              {f.preview ? (
+                <img src={f.preview} alt={f.name} style={shopStyles.flagPreview} />
+              ) : (
+                <span style={{ fontSize: 22 }}>{f.flag}</span>
+              )}
               <span style={shopStyles.flagName}>{f.name}</span>
             </div>
           ))}
@@ -322,7 +394,7 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
               eye: '#fff',
               name: 'Custom',
               headType,
-              bodyTexture: selectedHead?.bodyTexture,
+              bodyTexture: selectedBodyTexture ?? selectedHead?.bodyTexture,
             })
           }}
         >
@@ -436,6 +508,14 @@ const shopStyles: Record<string, React.CSSProperties> = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+  },
+  flagPreview: {
+    width: 28,
+    height: 20,
+    objectFit: 'cover',
+    borderRadius: 4,
+    border: '1px solid rgba(255,255,255,0.15)',
+    flexShrink: 0,
   },
   headRow: {
     display: 'flex',

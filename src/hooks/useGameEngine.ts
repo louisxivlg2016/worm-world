@@ -47,6 +47,44 @@ const BODY_TEXTURES: Record<string, string> = {
   stpatrick: '/heads/stpatrick-body.png',
 }
 
+const DEFAULT_FLAG_TEXTURE_SCALE = 1.4
+
+const BODY_TEXTURE_OFFSETS: Record<string, number> = {
+  '/assets/france.png': 0.18,
+}
+
+const BODY_TEXTURE_SCALES: Record<string, number> = {
+  '/assets/france.png': DEFAULT_FLAG_TEXTURE_SCALE,
+}
+
+function drawContainedTextureInCircle(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  x: number,
+  y: number,
+  radius: number,
+  offsetX = 0,
+  scale = 1,
+) {
+  const diameter = radius * 2
+  const aspect = img.naturalWidth / img.naturalHeight
+  let drawW = diameter
+  let drawH = diameter
+
+  if (aspect > 1) {
+    drawH = diameter / aspect
+  } else {
+    drawW = diameter * aspect
+  }
+
+  drawW *= scale
+  drawH *= scale
+
+  const dx = x - drawW / 2 + offsetX * radius
+  const dy = y - drawH / 2
+  ctx.drawImage(img, dx, dy, drawW, drawH)
+}
+
 // Preload all
 Object.values(HEAD_IMAGES).forEach(src => loadHeadImage(src))
 Object.values(BODY_TEXTURES).forEach(src => loadBodyTexture(src))
@@ -1598,7 +1636,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
 
   // Check for body texture (dragon etc.)
   const bodyTexKey = worm.skin.bodyTexture
-  const bodyTexImg = bodyTexKey ? bodyTextureCache.get(bodyTexKey) : null
+  const bodyTexImg = bodyTexKey ? (bodyTextureCache.get(bodyTexKey) ?? loadBodyTexture(bodyTexKey)) : null
 
   for (let i = segments.length - 1; i >= 0; i--) {
     const seg = segments[i]
@@ -1606,12 +1644,31 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
     if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
 
     if (bodyTexImg) {
-      // Textured body — same circle as solid color, just filled with texture
+      const textureOffsetX =
+        bodyTexKey?.includes('france') ? 0.18 :
+        bodyTexKey?.includes('allemagne') ? 0.08 :
+        bodyTexKey?.includes('angleterre') ? 0.08 :
+        bodyTexKey?.includes('russie') ? 0.08 :
+        bodyTexKey?.includes('etat unis') ? 0.12 :
+        bodyTexKey?.includes('chine') ? 0.12 :
+        BODY_TEXTURE_OFFSETS[bodyTexKey ?? ''] ?? 0
+      const textureScale =
+        bodyTexKey?.includes('france') ||
+        bodyTexKey?.includes('allemagne') ||
+        bodyTexKey?.includes('angleterre') ||
+        bodyTexKey?.includes('russie') ||
+        bodyTexKey?.includes('etat unis') ||
+        bodyTexKey?.includes('chine') ||
+        bodyTexKey?.includes('espagne')
+          ? DEFAULT_FLAG_TEXTURE_SCALE
+          : BODY_TEXTURE_SCALES[bodyTexKey ?? ''] ?? 1
       ctx.save()
       ctx.beginPath()
       ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
       ctx.clip()
-      ctx.drawImage(bodyTexImg, p.x - segR, p.y - segR, segR * 2, segR * 2)
+      ctx.fillStyle = colors[i % colors.length]
+      ctx.fillRect(p.x - segR, p.y - segR, segR * 2, segR * 2)
+      drawContainedTextureInCircle(ctx, bodyTexImg, p.x, p.y, segR, textureOffsetX, textureScale)
       ctx.restore()
     } else {
       // Shadow
