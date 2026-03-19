@@ -404,7 +404,20 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
       const idx = foods.indexOf(f)
       if (idx >= 0) {
         foods.splice(idx, 1)
-        if (!f.fromDeath) foods.push(createFood(undefined, undefined, f.special))
+        if (!f.fromDeath) {
+          // Respawn as diamond if original was diamond, otherwise regular food
+          if ((f as any)._diamondIdx !== undefined) {
+            const nf = createFood()
+            nf.emoji = '💎'
+            nf.img = undefined
+            nf.value = 2
+            nf.radius = 8 + Math.random() * 6
+            ;(nf as any)._diamondIdx = Math.floor(Math.random() * DIAMOND_COLORS.length)
+            foods.push(nf)
+          } else {
+            foods.push(createFood(undefined, undefined, f.special))
+          }
+        }
       }
     }
   }
@@ -778,6 +791,105 @@ function preloadFoodImages() {
 }
 preloadFoodImages()
 
+// Diamond rendering for coins mode
+const DIAMOND_COLORS = [
+  { top: '#88d8ff', mid: '#2196F3', bot: '#0D47A1', shine: '#e0f7ff' }, // blue
+  { top: '#ff88aa', mid: '#E91E63', bot: '#880E4F', shine: '#ffe0ec' }, // pink
+  { top: '#88ffaa', mid: '#4CAF50', bot: '#1B5E20', shine: '#e0ffe8' }, // green
+  { top: '#d088ff', mid: '#9C27B0', bot: '#4A148C', shine: '#f3e0ff' }, // purple
+  { top: '#ffffff', mid: '#e0e0e0', bot: '#9e9e9e', shine: '#ffffff' }, // white/diamond
+  { top: '#fff888', mid: '#FFC107', bot: '#FF6F00', shine: '#fff8e0' }, // amber
+  { top: '#ff8888', mid: '#F44336', bot: '#B71C1C', shine: '#ffe0e0' }, // red
+]
+
+const diamondCanvases: HTMLCanvasElement[] = []
+
+function generateDiamonds() {
+  for (const color of DIAMOND_COLORS) {
+    const size = 64
+    const c = document.createElement('canvas')
+    c.width = size; c.height = size
+    const ctx = c.getContext('2d')!
+    const cx = size / 2, cy = size / 2
+
+    // Diamond shape points
+    const top = { x: cx, y: 6 }
+    const left = { x: 8, y: cy - 4 }
+    const right = { x: size - 8, y: cy - 4 }
+    const bottom = { x: cx, y: size - 8 }
+
+    // Main body gradient
+    const grad = ctx.createLinearGradient(0, 0, 0, size)
+    grad.addColorStop(0, color.top)
+    grad.addColorStop(0.4, color.mid)
+    grad.addColorStop(1, color.bot)
+
+    // Draw diamond shape
+    ctx.beginPath()
+    ctx.moveTo(top.x, top.y)
+    ctx.lineTo(right.x, right.y)
+    ctx.lineTo(bottom.x, bottom.y)
+    ctx.lineTo(left.x, left.y)
+    ctx.closePath()
+    ctx.fillStyle = grad
+    ctx.fill()
+
+    // Top facet (lighter)
+    ctx.beginPath()
+    ctx.moveTo(top.x, top.y)
+    ctx.lineTo(right.x, right.y)
+    ctx.lineTo(cx + 8, cy - 6)
+    ctx.lineTo(cx - 8, cy - 6)
+    ctx.lineTo(left.x, left.y)
+    ctx.closePath()
+    ctx.fillStyle = color.top + 'aa'
+    ctx.fill()
+
+    // Center facet line
+    ctx.beginPath()
+    ctx.moveTo(left.x, left.y)
+    ctx.lineTo(cx - 8, cy - 6)
+    ctx.lineTo(bottom.x, bottom.y)
+    ctx.strokeStyle = color.bot + '66'
+    ctx.lineWidth = 1
+    ctx.stroke()
+
+    ctx.beginPath()
+    ctx.moveTo(right.x, right.y)
+    ctx.lineTo(cx + 8, cy - 6)
+    ctx.lineTo(bottom.x, bottom.y)
+    ctx.strokeStyle = color.bot + '66'
+    ctx.lineWidth = 1
+    ctx.stroke()
+
+    // Bright shine spot
+    ctx.beginPath()
+    ctx.arc(cx - 6, cy - 10, 5, 0, Math.PI * 2)
+    ctx.fillStyle = color.shine + 'cc'
+    ctx.fill()
+
+    // Small sparkle
+    ctx.beginPath()
+    ctx.arc(cx + 8, top.y + 8, 2.5, 0, Math.PI * 2)
+    ctx.fillStyle = '#ffffffcc'
+    ctx.fill()
+
+    // Outline
+    ctx.beginPath()
+    ctx.moveTo(top.x, top.y)
+    ctx.lineTo(right.x, right.y)
+    ctx.lineTo(bottom.x, bottom.y)
+    ctx.lineTo(left.x, left.y)
+    ctx.closePath()
+    ctx.strokeStyle = color.bot + '88'
+    ctx.lineWidth = 1.5
+    ctx.stroke()
+
+    diamondCanvases.push(c)
+  }
+}
+generateDiamonds()
+
 // Emoji fallback for death food
 const emojiCache = new Map<string, HTMLCanvasElement>()
 function getEmojiCanvas(emoji: string): HTMLCanvasElement {
@@ -831,8 +943,13 @@ function drawFood(ctx: CanvasRenderingContext2D, foods: Food[], camera: Camera, 
       if (age >= 50) decayAlpha = Math.max(0, 1 - (age - 50) / 70)
     }
 
-    // Draw food image
-    if (f.img && foodImgCache.has(f.img)) {
+    // Draw diamond or food image
+    const diamondIdx = (f as any)._diamondIdx as number | undefined
+    if (diamondIdx !== undefined && diamondCanvases[diamondIdx]) {
+      if (decayAlpha < 1) ctx.globalAlpha = decayAlpha
+      ctx.drawImage(diamondCanvases[diamondIdx], p.x - size / 2, p.y - size / 2, size, size)
+      if (decayAlpha < 1) ctx.globalAlpha = 1
+    } else if (f.img && foodImgCache.has(f.img)) {
       const img = foodImgCache.get(f.img)!
       if (decayAlpha < 1) ctx.globalAlpha = decayAlpha
       ctx.drawImage(img, p.x - size / 2, p.y - size / 2, size, size)
@@ -1347,12 +1464,21 @@ export function useGameEngine(
 
     s.usedAINames = []
     s.aiWorms = []
-    if (!isCoinsMode) {
-      for (let i = 0; i < AI_WORM_COUNT; i++) spawnAIWorm()
-    }
+    for (let i = 0; i < AI_WORM_COUNT; i++) spawnAIWorm()
 
     s.foods = []
-    if (!isCoinsMode) {
+    if (isCoinsMode) {
+      // Diamonds instead of food in coins mode
+      for (let i = 0; i < 500; i++) {
+        const f = createFood()
+        f.emoji = '💎'
+        f.img = undefined // will use diamond canvas
+        f.value = 2
+        f.radius = 8 + Math.random() * 6
+        ;(f as any)._diamondIdx = Math.floor(Math.random() * DIAMOND_COLORS.length)
+        s.foods.push(f)
+      }
+    } else {
       for (let i = 0; i < FOOD_COUNT; i++) s.foods.push(createFood())
       for (let i = 0; i < SPECIAL_FOOD_COUNT; i++) s.foods.push(createFood(undefined, undefined, true))
     }
@@ -1578,27 +1704,28 @@ export function useGameEngine(
       // Clean expired effects
       s.activeEffects = s.activeEffects.filter(e => e.expiresAt > now)
 
-      // No collisions in coins mode
-      if (s.gameMode !== 'coins') {
-        checkCollisions(
-          [s.player, ...s.aiWorms],
-          s.foods,
-          s.particles,
-          () => {
-            s.gameRunning = false
-            callbacksRef.current.onDeath(s.player!.score, s.player!.segments.length, s.playerCoins)
-          },
-          (_worm, _idx) => {
-            setTimeout(() => {
-              const idx = s.aiWorms.indexOf(_worm)
-              if (idx >= 0) {
-                s.aiWorms.splice(idx, 1)
-                spawnAIWorm(true)
-              }
-            }, 3000)
-          },
-        )
-      }
+      // In coins mode: player is invincible, AI can still die
+      if (s.gameMode === 'coins') s.player.invincible = 999
+
+      checkCollisions(
+        [s.player, ...s.aiWorms],
+        s.foods,
+        s.particles,
+        () => {
+          if (s.gameMode === 'coins') return // player can't die in coins mode
+          s.gameRunning = false
+          callbacksRef.current.onDeath(s.player!.score, s.player!.segments.length, s.playerCoins)
+        },
+        (_worm, _idx) => {
+          setTimeout(() => {
+            const idx = s.aiWorms.indexOf(_worm)
+            if (idx >= 0) {
+              s.aiWorms.splice(idx, 1)
+              spawnAIWorm(true)
+            }
+          }, 3000)
+        },
+      )
 
       // Update particles
       for (let i = s.particles.length - 1; i >= 0; i--) {
@@ -1681,12 +1808,10 @@ export function useGameEngine(
       }
 
       // Spawn timer
-      if (s.gameMode !== 'coins') {
-        s.spawnTimer++
-        if (s.spawnTimer >= 7200) {
-          s.spawnTimer = 0
-          spawnAIWorm(Math.random() < 0.5)
-        }
+      s.spawnTimer++
+      if (s.spawnTimer >= 7200) {
+        s.spawnTimer = 0
+        spawnAIWorm(Math.random() < 0.5)
       }
     }
 
