@@ -1576,13 +1576,24 @@ export function useGameEngine(
     // Smarter AI: higher base skill
     w.aiSkill = 0.45 + Math.random() * 0.5 // 0.45-0.95 (was 0.35-0.9)
 
-    if (!forceSmall && Math.random() > 0.45) {
-      const extraSegs = Math.floor(Math.random() * 40)
+    if (!forceSmall) {
+      // Varied sizes: 30% tiny, 30% medium, 25% large, 15% massive
+      const roll = Math.random()
+      let extraSegs: number
+      if (roll < 0.30) {
+        extraSegs = 0 // tiny — just the base 80 segments
+      } else if (roll < 0.60) {
+        extraSegs = 20 + Math.floor(Math.random() * 60) // medium
+      } else if (roll < 0.85) {
+        extraSegs = 100 + Math.floor(Math.random() * 200) // large
+      } else {
+        extraSegs = 400 + Math.floor(Math.random() * 600) // massive (8000+ score)
+      }
       for (let j = 0; j < extraSegs; j++) {
         const last = w.segments[w.segments.length - 1]
         w.segments.push({ x: last.x, y: last.y })
       }
-      w.score = extraSegs * 2
+      w.score = extraSegs * 8
     }
     w.angle = Math.random() * Math.PI * 2
     s.aiWorms.push(w)
