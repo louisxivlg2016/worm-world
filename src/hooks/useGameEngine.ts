@@ -955,6 +955,55 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
       }
     }
   }
+
+  // === GLOBAL SAFETY CHECK ===
+  // After ANY strategy sets targetAngle, verify the path is clear.
+  // If we're about to crash into someone, override with a safe angle.
+  if (worm.aiDistracted <= 0) {
+    const safeCheckDist = 50 + worm.aiSkill * 50
+    const futX = head.x + Math.cos(worm.targetAngle) * safeCheckDist
+    const futY = head.y + Math.sin(worm.targetAngle) * safeCheckDist
+    let aboutToCrash = false
+    let crashSegX = 0, crashSegY = 0
+    for (const other of others) {
+      const checkSegs = Math.min(other.segments.length, 100)
+      for (let si = 0; si < checkSegs; si += 3) {
+        const seg = other.segments[si]
+        const sdx = futX - seg.x, sdy = futY - seg.y
+        if (sdx * sdx + sdy * sdy < 45 * 45) {
+          aboutToCrash = true
+          crashSegX = seg.x
+          crashSegY = seg.y
+          break
+        }
+      }
+      if (aboutToCrash) break
+    }
+
+    if (aboutToCrash) {
+      // Find safest direction away from the obstacle
+      const awayFromCrash = Math.atan2(head.y - crashSegY, head.x - crashSegX)
+      // Test 3 angles: away, left of away, right of away — pick clearest
+      let bestSafe = awayFromCrash
+      let bestSafeDist = 0
+      for (let t = -1; t <= 1; t++) {
+        const tryAngle = awayFromCrash + t * 0.6
+        const tx = head.x + Math.cos(tryAngle) * 80
+        const ty = head.y + Math.sin(tryAngle) * 80
+        let minD = Infinity
+        for (const other of others) {
+          for (let si = 0; si < Math.min(other.segments.length, 60); si += 4) {
+            const seg = other.segments[si]
+            const dd = (tx - seg.x) ** 2 + (ty - seg.y) ** 2
+            if (dd < minD) minD = dd
+          }
+        }
+        if (minD > bestSafeDist) { bestSafeDist = minD; bestSafe = tryAngle }
+      }
+      worm.targetAngle = bestSafe
+      worm.boosting = false
+    }
+  }
 }
 
 // ============================================
