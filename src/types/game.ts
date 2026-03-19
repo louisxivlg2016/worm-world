@@ -129,6 +129,7 @@ export interface Worm {
   // Visual
   eyeBlink: number
   invincible: number
+  trappedSince: number // timestamp when started being surrounded, 0 = not trapped
   // Multiplayer
   peerId?: string
   battleDeaths?: number

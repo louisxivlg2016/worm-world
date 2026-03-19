@@ -250,6 +250,7 @@ function createWorm(x: number, y: number, skin: WormSkin, name: string, isPlayer
     aiFrenzy: 0,
     eyeBlink: 0,
     invincible: isPlayer ? 120 : 60,
+    trappedSince: 0,
     battleDeaths: 0,
   }
 }
@@ -559,19 +560,39 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
 
   if (dangers.length > 0 && closestDangerDist < reactionDist) {
     if (dangers.length >= 4 && worm.aiSkill > 0.4) {
-      // SURROUNDED — circle tightly to find a gap
-      let avgDx = 0, avgDy = 0
-      for (const d of dangers) {
-        const weight = 1 / (d.dist + 1) // closer dangers weigh more
-        avgDx += (d.x - head.x) * weight
-        avgDy += (d.y - head.y) * weight
+      // SURROUNDED — circle tightly to survive
+      const now = Date.now()
+
+      // Start trapped timer if not already set
+      if (worm.trappedSince === 0) worm.trappedSince = now
+
+      const trappedSeconds = (now - worm.trappedSince) / 1000
+
+      if (trappedSeconds < 34) {
+        // SURVIVE MODE — circle tightly, don't give up
+        let avgDx = 0, avgDy = 0
+        for (const d of dangers) {
+          const weight = 1 / (d.dist + 1)
+          avgDx += (d.x - head.x) * weight
+          avgDy += (d.y - head.y) * weight
+        }
+        const awayAngle = Math.atan2(-avgDy, -avgDx)
+        const circleDir = Math.sin(worm.angle - awayAngle) > 0 ? 1 : -1
+        // Tight circle — stay compact
+        worm.targetAngle = awayAngle + circleDir * Math.PI * 0.45
+        worm.boosting = false // don't boost when trapped — save energy and stay tight
+        worm.aiTimer = 4
+      } else {
+        // EXHAUSTED — been trapped 34+ seconds, desperately try to break out
+        // Pick a random direction and boost through (will likely die)
+        worm.targetAngle = Math.random() * Math.PI * 2
+        worm.boosting = worm.boostEnergy > 5
+        worm.aiTimer = 15
+        worm.trappedSince = 0 // reset for next time
       }
-      const awayAngle = Math.atan2(-avgDy, -avgDx)
-      const circleDir = Math.sin(worm.angle - awayAngle) > 0 ? 1 : -1
-      worm.targetAngle = awayAngle + circleDir * Math.PI * 0.4
-      worm.boosting = closestDangerDist < 40 && worm.boostEnergy > 15
-      worm.aiTimer = 6 + Math.floor(Math.random() * 6)
     } else if (dangers.length >= 2) {
+      // Not fully surrounded — reset trapped timer
+      worm.trappedSince = 0
       // MULTIPLE DANGERS — find the safest escape direction
       // Try 8 directions, pick the one furthest from all dangers
       let bestAngle = worm.angle
@@ -596,6 +617,7 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
       worm.aiTimer = 5 + Math.floor(Math.random() * 8)
     } else {
       // SINGLE DANGER — flee smartly
+      worm.trappedSince = 0
       const closest = dangers.reduce((a, b) => a.dist < b.dist ? a : b)
       const avoidAngle = Math.atan2(head.y - closest.y, head.x - closest.x)
       const error = (1 - worm.aiSkill) * (Math.random() - 0.5) * 0.8
@@ -606,6 +628,9 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
     if (inFrenzy) worm.aiFrenzy = Math.max(0, worm.aiFrenzy - 10)
     return
   }
+
+  // Not in danger — reset trapped timer
+  worm.trappedSince = 0
 
   // --- DEATH FOOD RUSH — AI eats nearby death food ---
   if (worm.aiTimer <= 0) {
