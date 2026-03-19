@@ -892,6 +892,12 @@ function drawPotions(ctx: CanvasRenderingContext2D, potions: Potion[], camera: C
   }
 }
 
+// Coin image
+let coinImg: HTMLImageElement | null = null
+const _coinImg = new Image()
+_coinImg.src = '/ui/coin.png'
+_coinImg.onload = () => { coinImg = _coinImg }
+
 function drawCoins(ctx: CanvasRenderingContext2D, coins: Coin[], camera: Camera, w: number, h: number) {
   const time = Date.now() * 0.004
   for (const c of coins) {
@@ -901,7 +907,7 @@ function drawCoins(ctx: CanvasRenderingContext2D, coins: Coin[], camera: Camera,
     const pulse = 1 + Math.sin(time + c.pulse) * 0.15
     const size = r * pulse
 
-    // Skip glow gradient for tiny coins (expensive)
+    // Glow
     if (size > 5) {
       ctx.beginPath()
       const glowGrd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 2.5)
@@ -912,21 +918,14 @@ function drawCoins(ctx: CanvasRenderingContext2D, coins: Coin[], camera: Camera,
       ctx.fill()
     }
 
-    ctx.beginPath()
-    ctx.arc(p.x, p.y, size, 0, Math.PI * 2)
-    ctx.fillStyle = '#ffd700'
-    ctx.fill()
-
-    if (size > 4) {
-      ctx.strokeStyle = '#daa520'
-      ctx.lineWidth = 1.5 * camera.zoom
-      ctx.stroke()
-
-      ctx.font = `bold ${Math.round(size * 1.1)}px sans-serif`
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.fillStyle = '#b8860b'
-      ctx.fillText('$', p.x, p.y + 1)
+    // Draw coin image
+    if (coinImg) {
+      ctx.drawImage(coinImg, p.x - size, p.y - size, size * 2, size * 2)
+    } else {
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, size, 0, Math.PI * 2)
+      ctx.fillStyle = '#ffd700'
+      ctx.fill()
     }
   }
 }
@@ -1011,23 +1010,16 @@ function drawFlyingCoins(ctx: CanvasRenderingContext2D, flyingCoins: FlyingCoin[
     // Curved path (arc toward target)
     const cx = fc.x + (fc.targetX - fc.x) * t
     const cy = fc.y + (fc.targetY - fc.y) * t - Math.sin(t * Math.PI) * 80
-    const size = 8 * (1 - t * 0.5)
+    const size = 12 * (1 - t * 0.4)
 
-    // Gold coin
-    ctx.beginPath()
-    ctx.arc(cx, cy, size, 0, Math.PI * 2)
-    ctx.fillStyle = '#ffd700'
-    ctx.fill()
-    ctx.strokeStyle = '#daa520'
-    ctx.lineWidth = 1.5
-    ctx.stroke()
-
-    // $ symbol
-    ctx.font = `bold ${Math.round(size)}px sans-serif`
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillStyle = '#b8860b'
-    ctx.fillText('$', cx, cy + 0.5)
+    if (coinImg) {
+      ctx.drawImage(coinImg, cx - size, cy - size, size * 2, size * 2)
+    } else {
+      ctx.beginPath()
+      ctx.arc(cx, cy, size, 0, Math.PI * 2)
+      ctx.fillStyle = '#ffd700'
+      ctx.fill()
+    }
   }
 }
 
@@ -1518,7 +1510,7 @@ export function useGameEngine(
             // Explode 16 coins outward
             for (let ci = 0; ci < 16; ci++) {
               const angle = (ci / 16) * Math.PI * 2 + (Math.random() - 0.5) * 0.4
-              const force = 3 + Math.random() * 4
+              const force = 8 + Math.random() * 10
               s.coins.push({
                 x: ch.x,
                 y: ch.y,
@@ -1528,7 +1520,7 @@ export function useGameEngine(
                 vx: Math.cos(angle) * force,
                 vy: Math.sin(angle) * force,
                 fromChest: true,
-                friction: 0.96,
+                friction: 0.985,
               })
             }
             // Gold particles
