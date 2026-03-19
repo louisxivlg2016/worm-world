@@ -431,13 +431,26 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
       const c = coins[i]
       const dx = head.x - c.x, dy = head.y - c.y
       const dist = Math.sqrt(dx * dx + dy * dy)
-      // Magnet: pull coins toward player
+      // Magnet: pull coins toward player head
       if (eff.magnetRange > 0 && dist < coinAttractRange && dist > 0.001) {
         const pull = 0.12 + (1 - dist / coinAttractRange) * 0.25
         c.x += dx * pull
         c.y += dy * pull
       }
-      if (dist < headR + c.radius) {
+      // Check head OR any body segment (so coins on body get collected)
+      let touching = dist < headR + c.radius
+      if (!touching) {
+        // Check every 4th segment for perf
+        for (let si = 0; si < worm.segments.length; si += 4) {
+          const seg = worm.segments[si]
+          const sdx = seg.x - c.x, sdy = seg.y - c.y
+          if (sdx * sdx + sdy * sdy < (headR + c.radius) * (headR + c.radius)) {
+            touching = true
+            break
+          }
+        }
+      }
+      if (touching) {
         playerCoinsRef.value++
         // Spawn flying coin animation toward the coin panel (bottom-left)
         if (flyingCoins && camera && canvasW && canvasH) {
