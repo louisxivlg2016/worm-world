@@ -1061,8 +1061,8 @@ function drawFood(ctx: CanvasRenderingContext2D, foods: Food[], camera: Camera, 
         const dColor = DIAMOND_COLORS[diamondIdx]
         ctx.beginPath()
         const dGlow = ctx.createRadialGradient(p.x, p.y, size * 0.2, p.x, p.y, size * 1.8)
-        dGlow.addColorStop(0, dColor.mid + '44')
-        dGlow.addColorStop(1, dColor.mid + '00')
+        dGlow.addColorStop(0, hsl(dColor.h, dColor.s, 60, 0.25))
+        dGlow.addColorStop(1, hsl(dColor.h, dColor.s, 60, 0))
         ctx.fillStyle = dGlow
         ctx.arc(p.x, p.y, size * 1.8, 0, Math.PI * 2)
         ctx.fill()
