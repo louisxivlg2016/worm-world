@@ -637,6 +637,47 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
       const dx = oh.x - head.x, dy = oh.y - head.y
       const d = Math.sqrt(dx * dx + dy * dy)
       if (d < 400 && d > 30) {
+
+        // CRITICAL: Is the target heading TOWARD us? If yes, DODGE immediately
+        const targetToMe = Math.atan2(head.y - oh.y, head.x - oh.x)
+        let angleDiffToMe = other.angle - targetToMe
+        while (angleDiffToMe > Math.PI) angleDiffToMe -= Math.PI * 2
+        while (angleDiffToMe < -Math.PI) angleDiffToMe += Math.PI * 2
+        const targetComingAtMe = Math.abs(angleDiffToMe) < 0.6 && d < 200
+
+        if (targetComingAtMe) {
+          // Target reversed or is heading right at us — DODGE perpendicular immediately
+          const escapeDir = worm.name.charCodeAt(0) % 2 === 0 ? 1 : -1
+          worm.targetAngle = targetToMe + Math.PI + escapeDir * Math.PI * 0.5
+          worm.boosting = worm.boostEnergy > 10
+          worm.aiTimer = 5
+          return
+        }
+
+        // Also check: am I about to hit the TARGET's body? (not just other worms)
+        const lookDist = 60
+        const myFutX = head.x + Math.cos(worm.angle) * lookDist
+        const myFutY = head.y + Math.sin(worm.angle) * lookDist
+        let aboutToHitTarget = false
+        const targetCheckLimit = Math.min(other.segments.length, 100)
+        for (let si = 4; si < targetCheckLimit; si += 3) {
+          const seg = other.segments[si]
+          const sdx = myFutX - seg.x, sdy = myFutY - seg.y
+          if (sdx * sdx + sdy * sdy < 50 * 50) {
+            aboutToHitTarget = true
+            break
+          }
+        }
+        if (aboutToHitTarget) {
+          // About to crash into the target we're circling — swerve away
+          const awayFromTarget = Math.atan2(head.y - oh.y, head.x - oh.x)
+          const swerveDir = worm.name.charCodeAt(0) % 2 === 0 ? 1 : -1
+          worm.targetAngle = awayFromTarget + swerveDir * 0.5
+          worm.boosting = false // don't boost into them
+          worm.aiTimer = 4
+          return
+        }
+
         // Check if another big worm is already encircling this target
         let competitorCloser = false
         for (const rival of others) {
