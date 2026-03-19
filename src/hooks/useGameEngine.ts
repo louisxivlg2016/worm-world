@@ -453,12 +453,11 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
       if (touching) {
         playerCoinsRef.value++
         // Spawn flying coin animation toward the coin panel (bottom-left)
-        if (flyingCoins && camera && canvasW && canvasH) {
-          const screenPos = worldToScreen(c.x, c.y, camera, canvasW, canvasH)
+        if (flyingCoins && canvasH) {
           flyingCoins.push({
-            x: screenPos.x,
-            y: screenPos.y,
-            targetX: 50, // coin panel is bottom-left
+            wx: c.x,
+            wy: c.y,
+            targetX: 50,
             targetY: canvasH - 30,
             progress: 0,
             speed: 0.06 + Math.random() * 0.04,
@@ -1389,13 +1388,14 @@ function drawChests(ctx: CanvasRenderingContext2D, chests: Chest[], camera: Came
   }
 }
 
-function drawFlyingCoins(ctx: CanvasRenderingContext2D, flyingCoins: FlyingCoin[]) {
+function drawFlyingCoins(ctx: CanvasRenderingContext2D, flyingCoins: FlyingCoin[], camera: Camera, w: number, h: number) {
   for (const fc of flyingCoins) {
     const t = fc.progress
-    // Fast ease-out curve so coin zooms to panel quickly
     const eased = 1 - Math.pow(1 - t, 3)
-    const cx = fc.x + (fc.targetX - fc.x) * eased
-    const cy = fc.y + (fc.targetY - fc.y) * eased - Math.sin(eased * Math.PI) * 40
+    // Convert world origin to current screen position each frame
+    const startScreen = worldToScreen(fc.wx, fc.wy, camera, w, h)
+    const cx = startScreen.x + (fc.targetX - startScreen.x) * eased
+    const cy = startScreen.y + (fc.targetY - startScreen.y) * eased - Math.sin(eased * Math.PI) * 40
     const size = 10 * (1 - eased * 0.6)
 
     if (coinImg) {
@@ -2105,7 +2105,7 @@ export function useGameEngine(
 
       // Active potion effect indicators
       drawActiveEffects(ctx, s.activeEffects, canvas.width)
-      drawFlyingCoins(ctx, s.flyingCoins)
+      drawFlyingCoins(ctx, s.flyingCoins, s.camera, canvas.width, canvas.height)
 
       // UI updates
       if (s.frameCount % 5 === 0) {

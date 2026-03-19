@@ -81,10 +81,10 @@ export interface Chest {
 export const CHEST_COUNT = 60
 
 export interface FlyingCoin {
-  x: number
-  y: number
-  targetX: number
-  targetY: number
+  wx: number // world X (where the coin was collected)
+  wy: number // world Y
+  targetX: number // screen X target (coin panel)
+  targetY: number // screen Y target
   progress: number // 0-1
   speed: number
 }
