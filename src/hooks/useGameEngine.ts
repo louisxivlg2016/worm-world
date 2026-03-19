@@ -489,30 +489,53 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
   const mySize = worm.segments.length
 
   // --- SMART DANGER DETECTION ---
+  // Skilled worms see further and check more segments
+  const visionRange = 120 + worm.aiSkill * 180 // 120-300 range based on skill
   const dangers: { x: number; y: number; dist: number; angle: number }[] = []
-  let closestDangerDist = 200
+  let closestDangerDist = visionRange
 
-  if (Math.random() < worm.aiGreed * 0.03) worm.aiDistracted = 20 + Math.floor(Math.random() * 30)
+  if (Math.random() < worm.aiGreed * 0.02) worm.aiDistracted = 15 + Math.floor(Math.random() * 20)
 
-  const canSeeDanger = worm.aiDistracted <= 0 && Math.random() < worm.aiSkill
+  const canSeeDanger = worm.aiDistracted <= 0 && Math.random() < (0.5 + worm.aiSkill * 0.5)
   if (canSeeDanger) {
     for (const other of others) {
-      const checkLimit = Math.min(other.segments.length, 60)
-      const step = Math.max(1, Math.floor((1 - worm.aiSkill) * 5))
+      // Check MORE segments — skilled worms scan the full body
+      const checkLimit = Math.min(other.segments.length, 40 + Math.floor(worm.aiSkill * 160))
+      const step = Math.max(1, Math.floor((1 - worm.aiSkill) * 4))
       for (let i = 0; i < checkLimit; i += step) {
         const seg = other.segments[i]
         const dx = head.x - seg.x, dy = head.y - seg.y
         const d = Math.sqrt(dx * dx + dy * dy)
-        if (d < 200) {
+        if (d < visionRange) {
           dangers.push({ x: seg.x, y: seg.y, dist: d, angle: Math.atan2(dy, dx) })
           if (d < closestDangerDist) closestDangerDist = d
         }
       }
     }
 
-    // Also detect walls as danger
+    // LOOK AHEAD — predict where we'll be in ~20 frames and check for danger there
+    const lookAheadDist = 60 + worm.aiSkill * 80
+    const futureX = head.x + Math.cos(worm.angle) * lookAheadDist
+    const futureY = head.y + Math.sin(worm.angle) * lookAheadDist
+    for (const other of others) {
+      const checkLimit = Math.min(other.segments.length, 60 + Math.floor(worm.aiSkill * 140))
+      const step = Math.max(1, Math.floor((1 - worm.aiSkill) * 5))
+      for (let i = 0; i < checkLimit; i += step) {
+        const seg = other.segments[i]
+        const dx = futureX - seg.x, dy = futureY - seg.y
+        const d = Math.sqrt(dx * dx + dy * dy)
+        if (d < 60 + worm.aiSkill * 40) {
+          // Danger ahead! Treat it as closer than it really is to trigger early avoidance
+          const urgency = d * 0.5
+          dangers.push({ x: seg.x, y: seg.y, dist: urgency, angle: Math.atan2(head.y - seg.y, head.x - seg.x) })
+          if (urgency < closestDangerDist) closestDangerDist = urgency
+        }
+      }
+    }
+
+    // Detect walls as danger
     const half = WORLD_SIZE / 2
-    const wallDist = 150
+    const wallDist = 100 + worm.aiSkill * 100
     if (head.x < -half + wallDist) dangers.push({ x: -half, y: head.y, dist: head.x + half, angle: Math.PI })
     if (head.x > half - wallDist) dangers.push({ x: half, y: head.y, dist: half - head.x, angle: 0 })
     if (head.y < -half + wallDist) dangers.push({ x: head.x, y: -half, dist: head.y + half, angle: Math.PI / 2 })
@@ -520,31 +543,53 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
   }
 
   const inFrenzy = (worm.aiFrenzy ?? 0) > 0
-  const reactionDist = inFrenzy ? 30 + worm.aiSkill * 25 : 50 + worm.aiSkill * 60
+  const reactionDist = inFrenzy ? 40 + worm.aiSkill * 30 : 60 + worm.aiSkill * 80
 
   if (dangers.length > 0 && closestDangerDist < reactionDist) {
-    if (dangers.length >= 3 && worm.aiSkill > 0.4) {
-      // SURROUNDED — circle tightly to avoid dying
-      // Find the average danger direction, then go perpendicular (circle)
+    if (dangers.length >= 4 && worm.aiSkill > 0.4) {
+      // SURROUNDED — circle tightly to find a gap
       let avgDx = 0, avgDy = 0
       for (const d of dangers) {
-        avgDx += d.x - head.x
-        avgDy += d.y - head.y
+        const weight = 1 / (d.dist + 1) // closer dangers weigh more
+        avgDx += (d.x - head.x) * weight
+        avgDy += (d.y - head.y) * weight
       }
       const awayAngle = Math.atan2(-avgDy, -avgDx)
-      // Circle: go perpendicular to the escape direction (clockwise or counter based on current angle)
       const circleDir = Math.sin(worm.angle - awayAngle) > 0 ? 1 : -1
-      worm.targetAngle = awayAngle + circleDir * Math.PI * 0.45
-      worm.boosting = closestDangerDist < 50 && worm.boostEnergy > 15
-      worm.aiTimer = 8 + Math.floor(Math.random() * 8)
+      worm.targetAngle = awayAngle + circleDir * Math.PI * 0.4
+      worm.boosting = closestDangerDist < 40 && worm.boostEnergy > 15
+      worm.aiTimer = 6 + Math.floor(Math.random() * 6)
+    } else if (dangers.length >= 2) {
+      // MULTIPLE DANGERS — find the safest escape direction
+      // Try 8 directions, pick the one furthest from all dangers
+      let bestAngle = worm.angle
+      let bestMinDist = 0
+      for (let a = 0; a < 8; a++) {
+        const testAngle = (a / 8) * Math.PI * 2
+        const testX = head.x + Math.cos(testAngle) * 80
+        const testY = head.y + Math.sin(testAngle) * 80
+        let minDist = Infinity
+        for (const d of dangers) {
+          const dx = testX - d.x, dy = testY - d.y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < minDist) minDist = dist
+        }
+        if (minDist > bestMinDist) {
+          bestMinDist = minDist
+          bestAngle = testAngle
+        }
+      }
+      worm.targetAngle = bestAngle
+      worm.boosting = closestDangerDist < 50 && worm.aiSkill > 0.5 && worm.boostEnergy > 20
+      worm.aiTimer = 5 + Math.floor(Math.random() * 8)
     } else {
-      // Normal avoidance — flee from closest danger
+      // SINGLE DANGER — flee smartly
       const closest = dangers.reduce((a, b) => a.dist < b.dist ? a : b)
       const avoidAngle = Math.atan2(head.y - closest.y, head.x - closest.x)
-      const error = (1 - worm.aiSkill) * (Math.random() - 0.5) * 1.5
+      const error = (1 - worm.aiSkill) * (Math.random() - 0.5) * 0.8
       worm.targetAngle = avoidAngle + error
       worm.boosting = closestDangerDist < 40 && worm.aiSkill > 0.5 && worm.boostEnergy > 20
-      worm.aiTimer = 5 + Math.floor(Math.random() * 10)
+      worm.aiTimer = 4 + Math.floor(Math.random() * 8)
     }
     if (inFrenzy) worm.aiFrenzy = Math.max(0, worm.aiFrenzy - 10)
     return
