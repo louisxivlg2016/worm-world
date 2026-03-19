@@ -5,9 +5,9 @@ import {
   BATTLE_MAX_DEATHS,
   SKINS, AI_SKINS, AI_NAMES,
   FOOD_EMOJIS, SPECIAL_FOOD_EMOJIS, FOOD_IMAGES, SPECIAL_FOOD_IMAGES,
-  type Worm, type Food, type Coin, type Particle, type Camera, type Potion,
+  type Worm, type Food, type Coin, type Particle, type Camera, type Potion, type Chest, type FlyingCoin,
   type Segment, type WormSkin, type AIStrategy, type GameMode, type HeadType, type PotionType,
-  POTION_DURATION, POTION_COUNT,
+  POTION_DURATION, POTION_COUNT, CHEST_COUNT,
 } from '@/types/game'
 import { MultiplayerService, selfId } from '@/services/MultiplayerService'
 
@@ -123,6 +123,9 @@ interface EngineState {
   spawnTimer: number
   usedAINames: string[]
   guestCounter: number
+  // Chests & flying coins
+  chests: Chest[]
+  flyingCoins: FlyingCoin[]
   // Potions
   potions: Potion[]
   activeEffects: { type: PotionType; expiresAt: number }[]
@@ -200,6 +203,17 @@ function createPotion(): Potion {
     radius: 18,
     type: POTION_TYPES[Math.floor(Math.random() * POTION_TYPES.length)],
     pulse: Math.random() * Math.PI * 2,
+  }
+}
+
+function createChest(): Chest {
+  return {
+    x: Math.random() * WORLD_SIZE - WORLD_SIZE / 2,
+    y: Math.random() * WORLD_SIZE - WORLD_SIZE / 2,
+    radius: 30,
+    pulse: Math.random() * Math.PI * 2,
+    opened: false,
+    openAnim: 0,
   }
 }
 
@@ -288,7 +302,7 @@ function findFoodHotspot(x: number, y: number, range: number, foods: Food[]) {
 interface EffectMods { speedMult: number; magnetRange: number }
 const NO_EFFECTS: EffectMods = { speedMult: 1, magnetRange: 0 }
 
-function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], particles: Particle[], playerCoinsRef: { value: number }, foodGrid?: SpatialGrid, effects?: EffectMods) {
+function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], particles: Particle[], playerCoinsRef: { value: number }, foodGrid?: SpatialGrid, effects?: EffectMods, flyingCoins?: FlyingCoin[], camera?: Camera, canvasW?: number, canvasH?: number) {
   if (!worm.alive) return
   if (worm.invincible > 0) worm.invincible--
 
@@ -403,19 +417,32 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
       const dist = Math.sqrt(dx * dx + dy * dy)
       if (dist < headR + c.radius) {
         playerCoinsRef.value++
+        // Spawn flying coin animation toward the coin panel (bottom-left)
+        if (flyingCoins && camera && canvasW && canvasH) {
+          const screenPos = worldToScreen(c.x, c.y, camera, canvasW, canvasH)
+          flyingCoins.push({
+            x: screenPos.x,
+            y: screenPos.y,
+            targetX: 50, // coin panel is bottom-left
+            targetY: canvasH - 30,
+            progress: 0,
+            speed: 0.025 + Math.random() * 0.015,
+          })
+        }
         if (particles.length < MAX_PARTICLES) {
-          for (let p = 0; p < 4; p++) {
+          for (let p = 0; p < 3; p++) {
             particles.push({
               x: c.x, y: c.y,
               vx: (Math.random() - 0.5) * 5, vy: (Math.random() - 0.5) * 5,
-              life: 25, maxLife: 25,
+              life: 20, maxLife: 20,
               color: '#ffd700',
-              radius: 3 + Math.random() * 3,
+              radius: 2 + Math.random() * 2,
             })
           }
         }
         coins.splice(i, 1)
-        coins.push(createCoin())
+        // Only respawn loose coins (not chest coins)
+        if (!c.fromChest) coins.push(createCoin())
       }
     }
   }
@@ -904,6 +931,106 @@ function drawCoins(ctx: CanvasRenderingContext2D, coins: Coin[], camera: Camera,
   }
 }
 
+function drawChests(ctx: CanvasRenderingContext2D, chests: Chest[], camera: Camera, w: number, h: number) {
+  const time = Date.now() * 0.003
+  for (const ch of chests) {
+    if (ch.opened && ch.openAnim >= 1) continue // fully opened and done
+    const p = worldToScreen(ch.x, ch.y, camera, w, h)
+    if (p.x < -60 || p.x > w + 60 || p.y < -60 || p.y > h + 60) continue
+    const r = ch.radius * camera.zoom
+    const pulse = ch.opened ? 1 : 1 + Math.sin(time + ch.pulse) * 0.1
+    const size = r * 2.2 * pulse
+
+    // Glow
+    if (!ch.opened) {
+      ctx.beginPath()
+      const glow = ctx.createRadialGradient(p.x, p.y, size * 0.2, p.x, p.y, size * 2)
+      glow.addColorStop(0, 'rgba(255,215,0,0.25)')
+      glow.addColorStop(1, 'rgba(255,215,0,0)')
+      ctx.fillStyle = glow
+      ctx.arc(p.x, p.y, size * 2, 0, Math.PI * 2)
+      ctx.fill()
+    }
+
+    const alpha = ch.opened ? Math.max(0, 1 - ch.openAnim) : 1
+    if (alpha <= 0) continue
+    ctx.globalAlpha = alpha
+
+    // Chest body
+    const bx = p.x - size * 0.5, by = p.y - size * 0.2
+    const bw = size, bh = size * 0.6
+
+    // Bottom half (brown box)
+    ctx.fillStyle = '#8B4513'
+    ctx.beginPath()
+    ctx.roundRect(bx, by, bw, bh, size * 0.08)
+    ctx.fill()
+
+    // Dark band
+    ctx.fillStyle = '#5C2E00'
+    ctx.fillRect(bx, by + bh * 0.35, bw, bh * 0.12)
+
+    // Gold lock/clasp
+    ctx.fillStyle = '#ffd700'
+    ctx.beginPath()
+    ctx.arc(p.x, by + bh * 0.41, size * 0.1, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = '#b8860b'
+    ctx.beginPath()
+    ctx.arc(p.x, by + bh * 0.41, size * 0.055, 0, Math.PI * 2)
+    ctx.fill()
+
+    // Lid (top half)
+    const lidOpen = ch.opened ? Math.min(ch.openAnim * 0.5, 0.3) : 0
+    ctx.fillStyle = '#A0522D'
+    ctx.beginPath()
+    ctx.roundRect(bx - size * 0.02, by - bh * 0.45 - lidOpen * size, bw + size * 0.04, bh * 0.5, size * 0.08)
+    ctx.fill()
+
+    // Lid band
+    ctx.fillStyle = '#6B3410'
+    ctx.fillRect(bx, by - bh * 0.2 - lidOpen * size, bw, bh * 0.08)
+
+    // Gold trim on lid
+    ctx.fillStyle = '#ffd700'
+    ctx.fillRect(bx + size * 0.1, by - bh * 0.38 - lidOpen * size, bw - size * 0.2, bh * 0.06)
+
+    // Highlight
+    ctx.beginPath()
+    ctx.arc(bx + size * 0.25, by - bh * 0.3 - lidOpen * size, size * 0.08, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(255,255,255,0.3)'
+    ctx.fill()
+
+    ctx.globalAlpha = 1
+  }
+}
+
+function drawFlyingCoins(ctx: CanvasRenderingContext2D, flyingCoins: FlyingCoin[]) {
+  for (const fc of flyingCoins) {
+    const t = fc.progress
+    // Curved path (arc toward target)
+    const cx = fc.x + (fc.targetX - fc.x) * t
+    const cy = fc.y + (fc.targetY - fc.y) * t - Math.sin(t * Math.PI) * 80
+    const size = 8 * (1 - t * 0.5)
+
+    // Gold coin
+    ctx.beginPath()
+    ctx.arc(cx, cy, size, 0, Math.PI * 2)
+    ctx.fillStyle = '#ffd700'
+    ctx.fill()
+    ctx.strokeStyle = '#daa520'
+    ctx.lineWidth = 1.5
+    ctx.stroke()
+
+    // $ symbol
+    ctx.font = `bold ${Math.round(size)}px sans-serif`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillStyle = '#b8860b'
+    ctx.fillText('$', cx, cy + 0.5)
+  }
+}
+
 function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: number, h: number) {
   if (!worm.alive) return
   const segments = worm.segments
@@ -1182,6 +1309,8 @@ export function useGameEngine(
     spawnTimer: 0,
     usedAINames: [],
     guestCounter: 0,
+    chests: [],
+    flyingCoins: [],
     potions: [],
     activeEffects: [],
     foodGrid: new SpatialGrid(),
@@ -1259,8 +1388,15 @@ export function useGameEngine(
     }
 
     s.coins = []
-    const coinCount = isCoinsMode ? 800 : COIN_COUNT
-    for (let i = 0; i < coinCount; i++) s.coins.push(createCoin())
+    s.chests = []
+    s.flyingCoins = []
+    if (isCoinsMode) {
+      // Coins mode: mostly chests, some loose coins
+      for (let i = 0; i < CHEST_COUNT; i++) s.chests.push(createChest())
+      for (let i = 0; i < 100; i++) s.coins.push(createCoin()) // some loose coins
+    } else {
+      for (let i = 0; i < COIN_COUNT; i++) s.coins.push(createCoin())
+    }
 
     // DEV: spawn a dead worm's food near player to test decay
     const deathX = s.player!.segments[0].x + 200
@@ -1350,7 +1486,7 @@ export function useGameEngine(
       }
 
       // Update — pass spatial grid for O(nearby) food lookups
-      updateWorm(s.player, dt, s.foods, s.coins, s.particles, playerCoinsRef, s.foodGrid, playerEffects)
+      updateWorm(s.player, dt, s.foods, s.coins, s.particles, playerCoinsRef, s.foodGrid, playerEffects, s.flyingCoins, s.camera, canvas.width, canvas.height)
       s.playerCoins = playerCoinsRef.value
 
       // Cache allWorms array once instead of re-creating per AI
@@ -1360,6 +1496,84 @@ export function useGameEngine(
         if (ai.alive) {
           updateAI(ai, allWormsForAI, s.foods, s.foodGrid)
           updateWorm(ai, dt, s.foods, s.coins, s.particles, playerCoinsRef, s.foodGrid)
+        }
+      }
+
+      // Chest opening (coins mode)
+      if (s.gameMode === 'coins') {
+        const pHead = s.player.segments[0]
+        const pR = getWormRadius(s.player)
+        for (const ch of s.chests) {
+          if (ch.opened) {
+            // Animate open
+            if (ch.openAnim < 1) ch.openAnim += 0.02
+            continue
+          }
+          const dx = pHead.x - ch.x, dy = pHead.y - ch.y
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          if (dist < pR + ch.radius) {
+            // Open chest!
+            ch.opened = true
+            ch.openAnim = 0
+            // Explode 16 coins outward
+            for (let ci = 0; ci < 16; ci++) {
+              const angle = (ci / 16) * Math.PI * 2 + (Math.random() - 0.5) * 0.4
+              const force = 3 + Math.random() * 4
+              s.coins.push({
+                x: ch.x,
+                y: ch.y,
+                radius: 16,
+                pulse: Math.random() * Math.PI * 2,
+                spin: Math.random() * Math.PI * 2,
+                vx: Math.cos(angle) * force,
+                vy: Math.sin(angle) * force,
+                fromChest: true,
+                friction: 0.96,
+              })
+            }
+            // Gold particles
+            if (s.particles.length < MAX_PARTICLES) {
+              for (let pi = 0; pi < 12; pi++) {
+                s.particles.push({
+                  x: ch.x, y: ch.y,
+                  vx: (Math.random() - 0.5) * 8, vy: (Math.random() - 0.5) * 8,
+                  life: 35, maxLife: 35,
+                  color: '#ffd700', radius: 2 + Math.random() * 4,
+                })
+              }
+            }
+            // Respawn chest after 15s
+            setTimeout(() => {
+              const idx = s.chests.indexOf(ch)
+              if (idx >= 0) {
+                s.chests[idx] = createChest()
+              }
+            }, 15000)
+          }
+        }
+
+        // Move exploding coins (apply velocity + friction)
+        for (const c of s.coins) {
+          if (c.vx !== undefined && c.vy !== undefined) {
+            c.x += c.vx
+            c.y += c.vy
+            c.vx *= c.friction ?? 0.96
+            c.vy *= c.friction ?? 0.96
+            // Stop when slow enough
+            if (Math.abs(c.vx) < 0.05 && Math.abs(c.vy) < 0.05) {
+              c.vx = undefined
+              c.vy = undefined
+            }
+          }
+        }
+
+        // Update flying coins (screen-space animation toward coin panel)
+        for (let i = s.flyingCoins.length - 1; i >= 0; i--) {
+          const fc = s.flyingCoins[i]
+          fc.progress += fc.speed
+          if (fc.progress >= 1) {
+            s.flyingCoins.splice(i, 1)
+          }
         }
       }
 
@@ -1460,6 +1674,7 @@ export function useGameEngine(
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       drawBackground(ctx, s.camera, canvas.width, canvas.height, s.player)
       drawFood(ctx, s.foods, s.camera, canvas.width, canvas.height)
+      drawChests(ctx, s.chests, s.camera, canvas.width, canvas.height)
       drawCoins(ctx, s.coins, s.camera, canvas.width, canvas.height)
       drawPotions(ctx, s.potions, s.camera, canvas.width, canvas.height)
       drawParticles(ctx, s.particles, s.camera, canvas.width, canvas.height)
@@ -1475,6 +1690,7 @@ export function useGameEngine(
 
       // Active potion effect indicators
       drawActiveEffects(ctx, s.activeEffects, canvas.width)
+      drawFlyingCoins(ctx, s.flyingCoins)
 
       // UI updates
       if (s.frameCount % 5 === 0) {

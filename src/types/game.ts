@@ -63,6 +63,30 @@ export interface Coin {
   radius: number
   pulse: number
   spin: number
+  vx?: number // velocity for exploding coins
+  vy?: number
+  fromChest?: boolean // coins spawned from chest
+  friction?: number
+}
+
+export interface Chest {
+  x: number
+  y: number
+  radius: number
+  pulse: number
+  opened: boolean
+  openAnim: number // 0-1 open animation progress
+}
+
+export const CHEST_COUNT = 60
+
+export interface FlyingCoin {
+  x: number
+  y: number
+  targetX: number
+  targetY: number
+  progress: number // 0-1
+  speed: number
 }
 
 export interface Particle {
