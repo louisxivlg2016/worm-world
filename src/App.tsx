@@ -58,6 +58,18 @@ export function AppInner() {
     document.body.style.cursor = 'none'
   }, [startBackgroundMusic])
 
+  const handlePlayCoins = useCallback((name: string, skin: WormSkin) => {
+    startBackgroundMusic()
+    setPlayerName(name)
+    setPlayerSkin(skin)
+    setRoomSlug(undefined)
+    setRoomId(undefined)
+    setGameMode('coins')
+    setSeed(undefined)
+    setScreen('playing')
+    document.body.style.cursor = 'none'
+  }, [startBackgroundMusic])
+
   const handleMultiplayer = useCallback(() => {
     startBackgroundMusic()
     setScreen('lobby')
@@ -109,6 +121,7 @@ export function AppInner() {
       <WelcomeScreen
         customSkin={customSkin}
         onPlay={handlePlay}
+        onPlayCoins={handlePlayCoins}
         onMultiplayer={handleMultiplayer}
         onShop={handleShop}
       />

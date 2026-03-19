@@ -116,7 +116,7 @@ export interface Camera {
   zoom: number
 }
 
-export type GameMode = 'battle' | 'ctf' | 'ffa'
+export type GameMode = 'battle' | 'ctf' | 'ffa' | 'coins'
 export type GameScreen = 'menu' | 'lobby' | 'shop' | 'playing' | 'dead'
 
 export interface GameState {

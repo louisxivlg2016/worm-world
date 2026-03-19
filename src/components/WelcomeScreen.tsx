@@ -5,11 +5,12 @@ import { SKINS, type WormSkin } from '@/types/game'
 interface WelcomeScreenProps {
   customSkin: WormSkin | null
   onPlay: (name: string, skin: WormSkin) => void
+  onPlayCoins: (name: string, skin: WormSkin) => void
   onMultiplayer: () => void
   onShop: () => void
 }
 
-export function WelcomeScreen({ customSkin, onPlay, onMultiplayer, onShop }: WelcomeScreenProps) {
+export function WelcomeScreen({ customSkin, onPlay, onPlayCoins, onMultiplayer, onShop }: WelcomeScreenProps) {
   const { t } = useTranslation()
   const [name, setName] = useState('')
   const [selectedSkin, setSelectedSkin] = useState(0)
@@ -57,6 +58,9 @@ export function WelcomeScreen({ customSkin, onPlay, onMultiplayer, onShop }: Wel
       </div>
       <button style={styles.playBtn} onClick={handlePlay}>
         {t('soloPlay')}
+      </button>
+      <button style={styles.coinsBtn} onClick={() => onPlayCoins(name.trim() || `Guest${Math.floor(Math.random() * 999)}`, activeSkin)}>
+        {t('coinsMode')}
       </button>
       <div style={styles.btnRow}>
         <button style={styles.multiBtn} onClick={onMultiplayer}>
@@ -156,6 +160,19 @@ const styles: Record<string, React.CSSProperties> = {
     background: 'linear-gradient(135deg, #ff3366, #ff6b35)',
     cursor: 'pointer',
     boxShadow: '0 6px 30px rgba(255,51,102,0.4)',
+    letterSpacing: 2,
+    marginBottom: 12,
+  },
+  coinsBtn: {
+    padding: '12px 40px',
+    border: 'none',
+    borderRadius: 50,
+    fontFamily: "'Bungee', cursive",
+    fontSize: 16,
+    color: '#ffd700',
+    background: 'linear-gradient(135deg, #b8860b, #daa520)',
+    cursor: 'pointer',
+    boxShadow: '0 6px 25px rgba(218,165,32,0.4)',
     letterSpacing: 2,
     marginBottom: 12,
   },

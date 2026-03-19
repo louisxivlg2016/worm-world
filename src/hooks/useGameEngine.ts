@@ -1243,16 +1243,23 @@ export function useGameEngine(
     // Preload body texture if the skin has one
     if (playerSkin.bodyTexture) loadBodyTexture(playerSkin.bodyTexture)
 
+    const isCoinsMode = (gameMode ?? 'ffa') === 'coins'
+
     s.usedAINames = []
     s.aiWorms = []
-    for (let i = 0; i < AI_WORM_COUNT; i++) spawnAIWorm()
+    if (!isCoinsMode) {
+      for (let i = 0; i < AI_WORM_COUNT; i++) spawnAIWorm()
+    }
 
     s.foods = []
-    for (let i = 0; i < FOOD_COUNT; i++) s.foods.push(createFood())
-    for (let i = 0; i < SPECIAL_FOOD_COUNT; i++) s.foods.push(createFood(undefined, undefined, true))
+    if (!isCoinsMode) {
+      for (let i = 0; i < FOOD_COUNT; i++) s.foods.push(createFood())
+      for (let i = 0; i < SPECIAL_FOOD_COUNT; i++) s.foods.push(createFood(undefined, undefined, true))
+    }
 
     s.coins = []
-    for (let i = 0; i < COIN_COUNT; i++) s.coins.push(createCoin())
+    const coinCount = isCoinsMode ? 800 : COIN_COUNT
+    for (let i = 0; i < coinCount; i++) s.coins.push(createCoin())
 
     // DEV: spawn a dead worm's food near player to test decay
     const deathX = s.player!.segments[0].x + 200
@@ -1386,24 +1393,27 @@ export function useGameEngine(
       // Clean expired effects
       s.activeEffects = s.activeEffects.filter(e => e.expiresAt > now)
 
-      checkCollisions(
-        [s.player, ...s.aiWorms],
-        s.foods,
-        s.particles,
-        () => {
-          s.gameRunning = false
-          callbacksRef.current.onDeath(s.player!.score, s.player!.segments.length, s.playerCoins)
-        },
-        (_worm, _idx) => {
-          setTimeout(() => {
-            const idx = s.aiWorms.indexOf(_worm)
-            if (idx >= 0) {
-              s.aiWorms.splice(idx, 1)
-              spawnAIWorm(true)
-            }
-          }, 3000)
-        },
-      )
+      // No collisions in coins mode
+      if (s.gameMode !== 'coins') {
+        checkCollisions(
+          [s.player, ...s.aiWorms],
+          s.foods,
+          s.particles,
+          () => {
+            s.gameRunning = false
+            callbacksRef.current.onDeath(s.player!.score, s.player!.segments.length, s.playerCoins)
+          },
+          (_worm, _idx) => {
+            setTimeout(() => {
+              const idx = s.aiWorms.indexOf(_worm)
+              if (idx >= 0) {
+                s.aiWorms.splice(idx, 1)
+                spawnAIWorm(true)
+              }
+            }, 3000)
+          },
+        )
+      }
 
       // Update particles
       for (let i = s.particles.length - 1; i >= 0; i--) {
@@ -1467,7 +1477,7 @@ export function useGameEngine(
 
       // UI updates
       if (s.frameCount % 5 === 0) {
-        callbacksRef.current.onScoreUpdate(s.player.score)
+        callbacksRef.current.onScoreUpdate(s.gameMode === 'coins' ? s.playerCoins : s.player.score)
         callbacksRef.current.onBoostUpdate(s.boostEnergy)
         callbacksRef.current.onCoinsUpdate(s.playerCoins)
       }
@@ -1484,10 +1494,12 @@ export function useGameEngine(
       }
 
       // Spawn timer
-      s.spawnTimer++
-      if (s.spawnTimer >= 7200) {
-        s.spawnTimer = 0
-        spawnAIWorm(Math.random() < 0.5)
+      if (s.gameMode !== 'coins') {
+        s.spawnTimer++
+        if (s.spawnTimer >= 7200) {
+          s.spawnTimer = 0
+          spawnAIWorm(Math.random() < 0.5)
+        }
       }
     }
 
