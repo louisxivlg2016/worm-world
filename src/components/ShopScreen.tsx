@@ -7,6 +7,7 @@ const HEAD_OPTIONS: { id: HeadType; label: string; preview: string; bodyTexture?
   { id: 'queen', label: 'Reine', preview: '/heads/queen.png' },
   { id: 'king', label: 'Roi', preview: '/heads/king.png' },
   { id: 'dragon', label: 'Dragon', preview: '/heads/dragon.png', bodyTexture: '/heads/dragon-body.png' },
+  { id: 'stpatrick', label: 'St Patrick', preview: '/heads/stpatrick.png', bodyTexture: '/heads/stpatrick-body.png' },
 ]
 
 // ============================================

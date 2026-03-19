@@ -21,7 +21,7 @@ export interface Segment {
   y: number
 }
 
-export type HeadType = 'default' | 'queen' | 'king' | 'dragon'
+export type HeadType = 'default' | 'queen' | 'king' | 'dragon' | 'stpatrick'
 
 export interface WormSkin {
   colors: string[]

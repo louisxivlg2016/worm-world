@@ -28,6 +28,7 @@ const HEAD_IMAGES: Record<string, string> = {
   queen: '/heads/queen.png',
   king: '/heads/king.png',
   dragon: '/heads/dragon.png',
+  stpatrick: '/heads/stpatrick.png',
 }
 
 // Body texture cache
@@ -43,6 +44,7 @@ function loadBodyTexture(src: string): HTMLImageElement | null {
 
 const BODY_TEXTURES: Record<string, string> = {
   dragon: '/heads/dragon-body.png',
+  stpatrick: '/heads/stpatrick-body.png',
 }
 
 // Preload all
@@ -1551,6 +1553,7 @@ export function useGameEngine(
     { headType: 'queen' },
     { headType: 'king' },
     { headType: 'dragon', bodyTexture: '/heads/dragon-body.png' },
+    { headType: 'stpatrick', bodyTexture: '/heads/stpatrick-body.png' },
   ]
 
   const spawnAIWorm = useCallback((forceSmall?: boolean) => {
