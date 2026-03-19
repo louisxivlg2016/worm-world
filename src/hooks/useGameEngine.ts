@@ -1715,15 +1715,11 @@ export function useGameEngine(
       // Clean expired effects
       s.activeEffects = s.activeEffects.filter(e => e.expiresAt > now)
 
-      // In coins mode: player is invincible, AI can still die
-      if (s.gameMode === 'coins') s.player.invincible = 999
-
       checkCollisions(
         [s.player, ...s.aiWorms],
         s.foods,
         s.particles,
         () => {
-          if (s.gameMode === 'coins') return // player can't die in coins mode
           s.gameRunning = false
           callbacksRef.current.onDeath(s.player!.score, s.player!.segments.length, s.playerCoins)
         },
