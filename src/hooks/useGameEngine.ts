@@ -461,7 +461,7 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
             targetX: 50, // coin panel is bottom-left
             targetY: canvasH - 30,
             progress: 0,
-            speed: 0.025 + Math.random() * 0.015,
+            speed: 0.06 + Math.random() * 0.04,
           })
         }
         if (particles.length < MAX_PARTICLES) {
@@ -1354,10 +1354,11 @@ function drawChests(ctx: CanvasRenderingContext2D, chests: Chest[], camera: Came
 function drawFlyingCoins(ctx: CanvasRenderingContext2D, flyingCoins: FlyingCoin[]) {
   for (const fc of flyingCoins) {
     const t = fc.progress
-    // Curved path (arc toward target)
-    const cx = fc.x + (fc.targetX - fc.x) * t
-    const cy = fc.y + (fc.targetY - fc.y) * t - Math.sin(t * Math.PI) * 80
-    const size = 12 * (1 - t * 0.4)
+    // Fast ease-out curve so coin zooms to panel quickly
+    const eased = 1 - Math.pow(1 - t, 3)
+    const cx = fc.x + (fc.targetX - fc.x) * eased
+    const cy = fc.y + (fc.targetY - fc.y) * eased - Math.sin(eased * Math.PI) * 40
+    const size = 10 * (1 - eased * 0.6)
 
     if (coinImg) {
       ctx.drawImage(coinImg, cx - size, cy - size, size * 2, size * 2)
