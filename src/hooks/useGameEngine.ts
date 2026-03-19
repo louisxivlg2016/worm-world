@@ -181,6 +181,7 @@ const POTION_ICONS: Record<PotionType, string> = {
 const POTION_IMAGES: Partial<Record<PotionType, string>> = {
   speed: '/potions/speed.png',
   zoom: '/potions/zoom.png',
+  magnet: '/potions/magnet.png',
 }
 
 // Preload potion images
