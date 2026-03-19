@@ -637,14 +637,38 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
       const dx = oh.x - head.x, dy = oh.y - head.y
       const d = Math.sqrt(dx * dx + dy * dy)
       if (d < 400 && d > 30) {
+        // Check if another big worm is already encircling this target
+        let competitorCloser = false
+        for (const rival of others) {
+          if (rival === worm) continue
+          if (rival.segments.length < 150) continue
+          const rdx = oh.x - rival.segments[0].x
+          const rdy = oh.y - rival.segments[0].y
+          const rivalDist = Math.sqrt(rdx * rdx + rdy * rdy)
+          if (rivalDist < d && rivalDist < 200) {
+            // A rival is closer and already encircling — go to opposite side
+            competitorCloser = true
+            break
+          }
+        }
+
         const toTarget = Math.atan2(dy, dx)
         const orbitDir = worm.name.charCodeAt(0) % 2 === 0 ? 1 : -1
 
         let desiredAngle: number
-        if (d > 150) {
-          desiredAngle = toTarget + orbitDir * 0.3
+        if (competitorCloser) {
+          // Rival is closer — approach from the OPPOSITE side and boost to get there first
+          desiredAngle = toTarget + Math.PI + orbitDir * 0.4
+          worm.boosting = worm.boostEnergy > 15
+          worm.aiTimer = 6
+        } else if (d > 150) {
+          // Approach fast — boost to close in before others
+          desiredAngle = toTarget + orbitDir * 0.25
+          worm.boosting = worm.boostEnergy > 20
         } else {
+          // Orbiting — go perpendicular, boost to close the trap
           desiredAngle = toTarget + orbitDir * Math.PI * 0.5
+          worm.boosting = worm.boostEnergy > 10
         }
 
         // CHECK PATH — look ahead at multiple distances for obstacles
