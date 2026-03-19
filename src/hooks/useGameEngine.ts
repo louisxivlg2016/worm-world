@@ -930,15 +930,25 @@ function drawCoins(ctx: CanvasRenderingContext2D, coins: Coin[], camera: Camera,
   }
 }
 
+// Chest images
+let chestClosedImg: HTMLImageElement | null = null
+let chestOpenImg: HTMLImageElement | null = null
+const _chestClosed = new Image()
+_chestClosed.src = '/ui/chest-closed.png'
+_chestClosed.onload = () => { chestClosedImg = _chestClosed }
+const _chestOpen = new Image()
+_chestOpen.src = '/ui/chest-open.png'
+_chestOpen.onload = () => { chestOpenImg = _chestOpen }
+
 function drawChests(ctx: CanvasRenderingContext2D, chests: Chest[], camera: Camera, w: number, h: number) {
   const time = Date.now() * 0.003
   for (const ch of chests) {
-    if (ch.opened && ch.openAnim >= 1) continue // fully opened and done
+    if (ch.opened && ch.openAnim >= 1) continue
     const p = worldToScreen(ch.x, ch.y, camera, w, h)
-    if (p.x < -60 || p.x > w + 60 || p.y < -60 || p.y > h + 60) continue
+    if (p.x < -80 || p.x > w + 80 || p.y < -80 || p.y > h + 80) continue
     const r = ch.radius * camera.zoom
     const pulse = ch.opened ? 1 : 1 + Math.sin(time + ch.pulse) * 0.1
-    const size = r * 2.2 * pulse
+    const size = r * 2.5 * pulse
 
     // Glow
     if (!ch.opened) {
@@ -955,50 +965,11 @@ function drawChests(ctx: CanvasRenderingContext2D, chests: Chest[], camera: Came
     if (alpha <= 0) continue
     ctx.globalAlpha = alpha
 
-    // Chest body
-    const bx = p.x - size * 0.5, by = p.y - size * 0.2
-    const bw = size, bh = size * 0.6
-
-    // Bottom half (brown box)
-    ctx.fillStyle = '#8B4513'
-    ctx.beginPath()
-    ctx.roundRect(bx, by, bw, bh, size * 0.08)
-    ctx.fill()
-
-    // Dark band
-    ctx.fillStyle = '#5C2E00'
-    ctx.fillRect(bx, by + bh * 0.35, bw, bh * 0.12)
-
-    // Gold lock/clasp
-    ctx.fillStyle = '#ffd700'
-    ctx.beginPath()
-    ctx.arc(p.x, by + bh * 0.41, size * 0.1, 0, Math.PI * 2)
-    ctx.fill()
-    ctx.fillStyle = '#b8860b'
-    ctx.beginPath()
-    ctx.arc(p.x, by + bh * 0.41, size * 0.055, 0, Math.PI * 2)
-    ctx.fill()
-
-    // Lid (top half)
-    const lidOpen = ch.opened ? Math.min(ch.openAnim * 0.5, 0.3) : 0
-    ctx.fillStyle = '#A0522D'
-    ctx.beginPath()
-    ctx.roundRect(bx - size * 0.02, by - bh * 0.45 - lidOpen * size, bw + size * 0.04, bh * 0.5, size * 0.08)
-    ctx.fill()
-
-    // Lid band
-    ctx.fillStyle = '#6B3410'
-    ctx.fillRect(bx, by - bh * 0.2 - lidOpen * size, bw, bh * 0.08)
-
-    // Gold trim on lid
-    ctx.fillStyle = '#ffd700'
-    ctx.fillRect(bx + size * 0.1, by - bh * 0.38 - lidOpen * size, bw - size * 0.2, bh * 0.06)
-
-    // Highlight
-    ctx.beginPath()
-    ctx.arc(bx + size * 0.25, by - bh * 0.3 - lidOpen * size, size * 0.08, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(255,255,255,0.3)'
-    ctx.fill()
+    // Draw chest image
+    const img = ch.opened ? chestOpenImg : chestClosedImg
+    if (img) {
+      ctx.drawImage(img, p.x - size, p.y - size, size * 2, size * 2)
+    }
 
     ctx.globalAlpha = 1
   }
