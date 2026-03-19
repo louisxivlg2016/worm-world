@@ -569,19 +569,50 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
       const trappedSeconds = (now - worm.trappedSince) / 1000
 
       if (trappedSeconds < 34) {
-        // SURVIVE MODE — circle tightly, don't give up
-        let avgDx = 0, avgDy = 0
-        for (const d of dangers) {
-          const weight = 1 / (d.dist + 1)
-          avgDx += (d.x - head.x) * weight
-          avgDy += (d.y - head.y) * weight
+        // LOOK FOR A GAP — test 12 directions, find the clearest escape route
+        let bestGapAngle = -1
+        let bestGapClearance = 0
+        const escapeCheckDist = 120
+        for (let a = 0; a < 12; a++) {
+          const testAngle = (a / 12) * Math.PI * 2
+          const testX = head.x + Math.cos(testAngle) * escapeCheckDist
+          const testY = head.y + Math.sin(testAngle) * escapeCheckDist
+          // Also check a second point further out to confirm the gap is real
+          const testX2 = head.x + Math.cos(testAngle) * escapeCheckDist * 2
+          const testY2 = head.y + Math.sin(testAngle) * escapeCheckDist * 2
+          let minDist = Infinity
+          for (const d of dangers) {
+            const dd1 = (testX - d.x) ** 2 + (testY - d.y) ** 2
+            const dd2 = (testX2 - d.x) ** 2 + (testY2 - d.y) ** 2
+            const dd = Math.min(dd1, dd2)
+            if (dd < minDist) minDist = dd
+          }
+          if (minDist > bestGapClearance) {
+            bestGapClearance = minDist
+            bestGapAngle = testAngle
+          }
         }
-        const awayAngle = Math.atan2(-avgDy, -avgDx)
-        const circleDir = Math.sin(worm.angle - awayAngle) > 0 ? 1 : -1
-        // Tight circle — stay compact
-        worm.targetAngle = awayAngle + circleDir * Math.PI * 0.45
-        worm.boosting = false // don't boost when trapped — save energy and stay tight
-        worm.aiTimer = 4
+
+        // If there's a clear gap (clearance > 80^2 = 6400), DASH for it!
+        if (bestGapClearance > 6400 && bestGapAngle >= 0) {
+          worm.targetAngle = bestGapAngle
+          worm.boosting = worm.boostEnergy > 10 // boost through the gap
+          worm.aiTimer = 6
+          worm.trappedSince = 0 // escaping!
+        } else {
+          // No gap found — circle tightly and wait
+          let avgDx = 0, avgDy = 0
+          for (const d of dangers) {
+            const weight = 1 / (d.dist + 1)
+            avgDx += (d.x - head.x) * weight
+            avgDy += (d.y - head.y) * weight
+          }
+          const awayAngle = Math.atan2(-avgDy, -avgDx)
+          const circleDir = Math.sin(worm.angle - awayAngle) > 0 ? 1 : -1
+          worm.targetAngle = awayAngle + circleDir * Math.PI * 0.45
+          worm.boosting = false
+          worm.aiTimer = 4
+        }
       } else {
         // EXHAUSTED — been trapped 34+ seconds, desperately try to break out
         // Pick a random direction and boost through (will likely die)
