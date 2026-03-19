@@ -486,9 +486,9 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
   for (const w of allWorms) { if (w !== worm && w.alive) others.push(w) }
   const mySize = worm.segments.length
 
-  // Danger detection
-  let danger: { x: number; y: number; worm: Worm } | null = null
-  let dangerDist = 200
+  // --- SMART DANGER DETECTION ---
+  const dangers: { x: number; y: number; dist: number; angle: number }[] = []
+  let closestDangerDist = 200
 
   if (Math.random() < worm.aiGreed * 0.03) worm.aiDistracted = 20 + Math.floor(Math.random() * 30)
 
@@ -501,24 +501,49 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
         const seg = other.segments[i]
         const dx = head.x - seg.x, dy = head.y - seg.y
         const d = Math.sqrt(dx * dx + dy * dy)
-        if (d < dangerDist) {
-          danger = { x: seg.x, y: seg.y, worm: other }
-          dangerDist = d
+        if (d < 200) {
+          dangers.push({ x: seg.x, y: seg.y, dist: d, angle: Math.atan2(dy, dx) })
+          if (d < closestDangerDist) closestDangerDist = d
         }
       }
     }
+
+    // Also detect walls as danger
+    const half = WORLD_SIZE / 2
+    const wallDist = 150
+    if (head.x < -half + wallDist) dangers.push({ x: -half, y: head.y, dist: head.x + half, angle: Math.PI })
+    if (head.x > half - wallDist) dangers.push({ x: half, y: head.y, dist: half - head.x, angle: 0 })
+    if (head.y < -half + wallDist) dangers.push({ x: head.x, y: -half, dist: head.y + half, angle: Math.PI / 2 })
+    if (head.y > half - wallDist) dangers.push({ x: head.x, y: half, dist: half - head.y, angle: -Math.PI / 2 })
   }
 
   const inFrenzy = (worm.aiFrenzy ?? 0) > 0
   const reactionDist = inFrenzy ? 30 + worm.aiSkill * 25 : 50 + worm.aiSkill * 60
 
-  if (danger && dangerDist < reactionDist) {
-    const avoidAngle = Math.atan2(head.y - danger.y, head.x - danger.x)
-    const error = (1 - worm.aiSkill) * (Math.random() - 0.5) * 2.5
-    const frenzyError = inFrenzy ? (Math.random() - 0.5) * 1.5 : 0
-    worm.targetAngle = avoidAngle + error + frenzyError
-    worm.boosting = dangerDist < 40 && worm.aiSkill > 0.6 && worm.boostEnergy > 20
-    worm.aiTimer = 5 + Math.floor(Math.random() * 10)
+  if (dangers.length > 0 && closestDangerDist < reactionDist) {
+    if (dangers.length >= 3 && worm.aiSkill > 0.4) {
+      // SURROUNDED — circle tightly to avoid dying
+      // Find the average danger direction, then go perpendicular (circle)
+      let avgDx = 0, avgDy = 0
+      for (const d of dangers) {
+        avgDx += d.x - head.x
+        avgDy += d.y - head.y
+      }
+      const awayAngle = Math.atan2(-avgDy, -avgDx)
+      // Circle: go perpendicular to the escape direction (clockwise or counter based on current angle)
+      const circleDir = Math.sin(worm.angle - awayAngle) > 0 ? 1 : -1
+      worm.targetAngle = awayAngle + circleDir * Math.PI * 0.45
+      worm.boosting = closestDangerDist < 50 && worm.boostEnergy > 15
+      worm.aiTimer = 8 + Math.floor(Math.random() * 8)
+    } else {
+      // Normal avoidance — flee from closest danger
+      const closest = dangers.reduce((a, b) => a.dist < b.dist ? a : b)
+      const avoidAngle = Math.atan2(head.y - closest.y, head.x - closest.x)
+      const error = (1 - worm.aiSkill) * (Math.random() - 0.5) * 1.5
+      worm.targetAngle = avoidAngle + error
+      worm.boosting = closestDangerDist < 40 && worm.aiSkill > 0.5 && worm.boostEnergy > 20
+      worm.aiTimer = 5 + Math.floor(Math.random() * 10)
+    }
     if (inFrenzy) worm.aiFrenzy = Math.max(0, worm.aiFrenzy - 10)
     return
   }
@@ -1436,13 +1461,32 @@ export function useGameEngine(
     return name
   }, [])
 
+  // AI costume options (30% chance to get a costume)
+  const AI_COSTUMES: { headType: HeadType; bodyTexture?: string }[] = [
+    { headType: 'queen' },
+    { headType: 'king' },
+    { headType: 'dragon', bodyTexture: '/heads/dragon-body.png' },
+  ]
+
   const spawnAIWorm = useCallback((forceSmall?: boolean) => {
     const s = stateRef.current
     const ax = (Math.random() - 0.5) * WORLD_SIZE * 0.8
     const ay = (Math.random() - 0.5) * WORLD_SIZE * 0.8
-    const skin = AI_SKINS[Math.floor(Math.random() * AI_SKINS.length)]
+    const baseSkin = AI_SKINS[Math.floor(Math.random() * AI_SKINS.length)]
     const name = getUniqueAIName()
+
+    // 30% chance to get a shop costume
+    let skin: WormSkin = { ...baseSkin }
+    if (Math.random() < 0.3) {
+      const costume = AI_COSTUMES[Math.floor(Math.random() * AI_COSTUMES.length)]
+      skin.headType = costume.headType
+      if (costume.bodyTexture) skin.bodyTexture = costume.bodyTexture
+    }
+
     const w = createWorm(ax, ay, skin, name, false)
+
+    // Smarter AI: higher base skill
+    w.aiSkill = 0.45 + Math.random() * 0.5 // 0.45-0.95 (was 0.35-0.9)
 
     if (!forceSmall && Math.random() > 0.45) {
       const extraSegs = Math.floor(Math.random() * 40)
