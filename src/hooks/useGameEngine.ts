@@ -648,33 +648,71 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
           desiredAngle = toTarget + orbitDir * Math.PI * 0.5
         }
 
-        // CHECK PATH — look ahead on the desired angle for obstacles
-        const checkDist = 80
-        const futX = head.x + Math.cos(desiredAngle) * checkDist
-        const futY = head.y + Math.sin(desiredAngle) * checkDist
+        // CHECK PATH — look ahead at multiple distances for obstacles
+        // Also check own body to avoid self-collision while circling
         let pathBlocked = false
-        for (const o of others) {
-          if (o === other) continue // ignore the target we're circling
-          const cl = Math.min(o.segments.length, 80)
-          for (let si = 0; si < cl; si += 3) {
-            const seg = o.segments[si]
-            const sdx = futX - seg.x, sdy = futY - seg.y
-            if (sdx * sdx + sdy * sdy < 50 * 50) {
-              pathBlocked = true
-              break
+        let blockAngle = 0
+        for (let checkDist = 40; checkDist <= 140; checkDist += 50) {
+          const futX = head.x + Math.cos(desiredAngle) * checkDist
+          const futY = head.y + Math.sin(desiredAngle) * checkDist
+          // Check other worms
+          for (const o of others) {
+            if (o === other) continue
+            const cl = Math.min(o.segments.length, 120)
+            for (let si = 0; si < cl; si += 3) {
+              const seg = o.segments[si]
+              const sdx = futX - seg.x, sdy = futY - seg.y
+              if (sdx * sdx + sdy * sdy < 60 * 60) {
+                pathBlocked = true
+                blockAngle = Math.atan2(head.y - seg.y, head.x - seg.x)
+                break
+              }
+            }
+            if (pathBlocked) break
+          }
+          // Check own body (skip first 20 segments — that's the head area)
+          if (!pathBlocked) {
+            for (let si = 20; si < worm.segments.length; si += 3) {
+              const seg = worm.segments[si]
+              const sdx = futX - seg.x, sdy = futY - seg.y
+              if (sdx * sdx + sdy * sdy < 40 * 40) {
+                pathBlocked = true
+                blockAngle = Math.atan2(head.y - seg.y, head.x - seg.x)
+                break
+              }
             }
           }
           if (pathBlocked) break
         }
 
         if (pathBlocked) {
-          // Dodge — shift orbit angle to avoid the obstacle, keep circling
-          desiredAngle += orbitDir * 0.6
+          // Dodge — try multiple escape angles, pick the clearest one
+          let bestDodge = desiredAngle + orbitDir * 0.8
+          let bestClear = 0
+          for (let try_a = 0; try_a < 6; try_a++) {
+            const tryAngle = blockAngle + (try_a - 3) * 0.4
+            const tryX = head.x + Math.cos(tryAngle) * 100
+            const tryY = head.y + Math.sin(tryAngle) * 100
+            let minObstDist = Infinity
+            for (const o of others) {
+              if (o === other) continue
+              for (let si = 0; si < Math.min(o.segments.length, 60); si += 4) {
+                const seg = o.segments[si]
+                const dd = (tryX - seg.x) ** 2 + (tryY - seg.y) ** 2
+                if (dd < minObstDist) minObstDist = dd
+              }
+            }
+            if (minObstDist > bestClear) {
+              bestClear = minObstDist
+              bestDodge = tryAngle
+            }
+          }
+          desiredAngle = bestDodge
         }
 
         worm.targetAngle = desiredAngle
         worm.boosting = !pathBlocked && worm.boostEnergy > 20
-        worm.aiTimer = pathBlocked ? 4 : 10 + Math.floor(Math.random() * 8)
+        worm.aiTimer = pathBlocked ? 3 : 8 + Math.floor(Math.random() * 6)
         return
       }
     }
