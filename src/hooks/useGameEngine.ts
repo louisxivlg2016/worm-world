@@ -608,19 +608,67 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
     return
   }
 
+  // --- DEATH FOOD RUSH — AI eats nearby death food ---
+  if (worm.aiTimer <= 0) {
+    let bestDeathFood: Food | null = null
+    let bestDeathDist = 300
+    for (const f of foods) {
+      if (!f.fromDeath) continue
+      const dx = head.x - f.x, dy = head.y - f.y
+      const d = Math.sqrt(dx * dx + dy * dy)
+      if (d < bestDeathDist) {
+        bestDeathDist = d
+        bestDeathFood = f
+      }
+    }
+    if (bestDeathFood) {
+      worm.targetAngle = Math.atan2(bestDeathFood.y - head.y, bestDeathFood.x - head.x)
+      worm.boosting = bestDeathDist > 50 && worm.boostEnergy > 20
+      worm.aiTimer = 8 + Math.floor(Math.random() * 6)
+      return
+    }
+  }
+
+  // --- ENCIRCLE — big worms try to surround smaller players ---
+  if (mySize > 150 && worm.aiSkill > 0.5) {
+    for (const other of others) {
+      if (!other.isPlayer && Math.random() > 0.3) continue // mostly target the player
+      if (other.segments.length >= mySize * 0.7) continue // only encircle smaller worms
+      const oh = other.segments[0]
+      const dx = oh.x - head.x, dy = oh.y - head.y
+      const d = Math.sqrt(dx * dx + dy * dy)
+      if (d < 400 && d > 30) {
+        // Circle around the target — aim perpendicular to the direction toward them
+        const toTarget = Math.atan2(dy, dx)
+        // Orbit direction: consistent per worm (based on name hash)
+        const orbitDir = worm.name.charCodeAt(0) % 2 === 0 ? 1 : -1
+        // Get closer first if far, then orbit
+        if (d > 150) {
+          // Approach at an angle (spiral in)
+          worm.targetAngle = toTarget + orbitDir * 0.3
+          worm.boosting = worm.boostEnergy > 30
+        } else {
+          // Orbit — go perpendicular
+          worm.targetAngle = toTarget + orbitDir * Math.PI * 0.5
+          worm.boosting = worm.boostEnergy > 20
+        }
+        worm.aiTimer = 10 + Math.floor(Math.random() * 8)
+        return
+      }
+    }
+  }
+
   // Food frenzy — only nearby worms react, short duration, no long-range kamikaze
   if (worm.aiFrenzy === undefined) worm.aiFrenzy = 0
   if (worm.aiFrenzy > 0) worm.aiFrenzy--
 
   if (worm.aiTimer <= 0 && worm.aiFrenzy <= 0) {
-    // Only search nearby (250 range, not 500) so distant worms don't converge
     const hotspot = findFoodHotspot(head.x, head.y, 250, foods)
     if (hotspot && hotspot.count > 12) {
       const dx = hotspot.x - head.x, dy = hotspot.y - head.y
       const dist = Math.sqrt(dx * dx + dy * dy)
-      // Only frenzy if actually close enough
       if (dist < 300) {
-        worm.aiFrenzy = 25 // short burst, not permanent lock-on
+        worm.aiFrenzy = 25
         worm.targetAngle = Math.atan2(dy, dx)
         if (dist > 50 && dist < 200 && worm.boostEnergy > 30) {
           worm.boosting = true
@@ -634,19 +682,20 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
 
   worm.boosting = false
 
-  // Hunter
+  // Hunter — chase smaller worms to cut them off
   if (worm.aiStrategy === 'hunter' && worm.aiAggression > 0.4 && mySize > 25) {
     for (const other of others) {
       if (other.segments.length < mySize * 0.6) {
         const oh = other.segments[0]
         const dx = oh.x - head.x, dy = oh.y - head.y
         const d = Math.sqrt(dx * dx + dy * dy)
-        if (d < 250) {
-          const predX = oh.x + Math.cos(other.angle) * 60
-          const predY = oh.y + Math.sin(other.angle) * 60
+        if (d < 300) {
+          // Predict where the target will be
+          const predX = oh.x + Math.cos(other.angle) * 80
+          const predY = oh.y + Math.sin(other.angle) * 80
           worm.targetAngle = Math.atan2(predY - head.y, predX - head.x)
-          worm.boosting = d < 150 && worm.boostEnergy > 25
-          worm.aiTimer = 15
+          worm.boosting = d < 200 && worm.boostEnergy > 20
+          worm.aiTimer = 12
           return
         }
       }
