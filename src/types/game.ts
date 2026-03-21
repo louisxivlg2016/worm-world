@@ -29,6 +29,7 @@ export interface WormSkin {
   name?: string
   headType?: HeadType
   bodyTexture?: string // URL to a body texture image
+  isFlag?: boolean // true for flag skins (continuous body texture)
 }
 
 export interface Food {

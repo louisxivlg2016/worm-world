@@ -1638,30 +1638,70 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   const bodyTexKey = worm.skin.bodyTexture
   const bodyTexImg = bodyTexKey ? (bodyTextureCache.get(bodyTexKey) ?? loadBodyTexture(bodyTexKey)) : null
 
+  // For flag textures: draw all segments as one combined shape, then texture
+  const isFlag = bodyTexImg && worm.skin.isFlag
+
+  if (isFlag && bodyTexImg) {
+
+    // 1) Build one combined path of all segment circles & track bounding box
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+    ctx.save()
+    ctx.beginPath()
+    for (let i = segments.length - 1; i >= 0; i--) {
+      const seg = segments[i]
+      const p = worldToScreen(seg.x, seg.y, camera, w, h)
+      if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
+      ctx.moveTo(p.x + segR, p.y)
+      ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
+      if (p.x - segR < minX) minX = p.x - segR
+      if (p.y - segR < minY) minY = p.y - segR
+      if (p.x + segR > maxX) maxX = p.x + segR
+      if (p.y + segR > maxY) maxY = p.y + segR
+    }
+    ctx.clip()
+
+    // 2) Draw one single texture stretched over the entire worm body
+    if (minX < Infinity) {
+      const bw = maxX - minX
+      const bh = maxY - minY
+      const aspect = bodyTexImg.naturalWidth / bodyTexImg.naturalHeight
+      // Cover the bounding box while preserving aspect ratio
+      let drawW = bw
+      let drawH = bw / aspect
+      if (drawH < bh) {
+        drawH = bh
+        drawW = bh * aspect
+      }
+      const dx = minX + (bw - drawW) / 2
+      const dy = minY + (bh - drawH) / 2
+      ctx.drawImage(bodyTexImg, dx, dy, drawW, drawH)
+    }
+    ctx.restore()
+
+    // Invincible overlay for flag worms
+    if (invincible) {
+      for (let i = segments.length - 1; i >= 0; i--) {
+        const seg = segments[i]
+        const p = worldToScreen(seg.x, seg.y, camera, w, h)
+        if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, segR + 3 * camera.zoom, 0, Math.PI * 2)
+        ctx.strokeStyle = `rgba(255,255,255,${invAlpha})`
+        ctx.lineWidth = 2 * camera.zoom
+        ctx.stroke()
+      }
+    }
+  }
+
   for (let i = segments.length - 1; i >= 0; i--) {
+    if (isFlag) break // already drawn above
     const seg = segments[i]
     const p = worldToScreen(seg.x, seg.y, camera, w, h)
     if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
 
     if (bodyTexImg) {
-      const textureOffsetX =
-        bodyTexKey?.includes('france') ? 0.18 :
-        bodyTexKey?.includes('allemagne') ? 0.08 :
-        bodyTexKey?.includes('angleterre') ? 0.08 :
-        bodyTexKey?.includes('russie') ? 0.08 :
-        bodyTexKey?.includes('etat unis') ? 0.12 :
-        bodyTexKey?.includes('chine') ? 0.12 :
-        BODY_TEXTURE_OFFSETS[bodyTexKey ?? ''] ?? 0
-      const textureScale =
-        bodyTexKey?.includes('france') ||
-        bodyTexKey?.includes('allemagne') ||
-        bodyTexKey?.includes('angleterre') ||
-        bodyTexKey?.includes('russie') ||
-        bodyTexKey?.includes('etat unis') ||
-        bodyTexKey?.includes('chine') ||
-        bodyTexKey?.includes('espagne')
-          ? DEFAULT_FLAG_TEXTURE_SCALE
-          : BODY_TEXTURE_SCALES[bodyTexKey ?? ''] ?? 1
+      const textureOffsetX = BODY_TEXTURE_OFFSETS[bodyTexKey ?? ''] ?? 0
+      const textureScale = BODY_TEXTURE_SCALES[bodyTexKey ?? ''] ?? 1
       ctx.save()
       ctx.beginPath()
       ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)

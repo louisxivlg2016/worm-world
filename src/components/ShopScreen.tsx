@@ -8,15 +8,63 @@ import russiaFlagBody from '../../drapeau/russie.png'
 import germanyFlagBody from '../../drapeau/allemagne.png'
 import usaFlagBody from '../../drapeau/etat unis.png'
 import spainFlagBody from '../../drapeau/espagne.png'
+import italyFlagBody from '../../drapeau/italie.png'
+import portugalFlagBody from '../../drapeau/portugal.png'
+import belgiumFlagBody from '../../drapeau/belgique.png'
+import netherlandsFlagBody from '../../drapeau/pays-bas.png'
+import switzerlandFlagBody from '../../drapeau/suisse.png'
+import swedenFlagBody from '../../drapeau/suede.png'
+import polandFlagBody from '../../drapeau/pologne.png'
+import ukraineFlagBody from '../../drapeau/ukraine.png'
+import greeceFlagBody from '../../drapeau/grece.png'
+import romaniaFlagBody from '../../drapeau/roumanie.png'
+import irelandFlagBody from '../../drapeau/irlande.png'
+import croatiaFlagBody from '../../drapeau/croatie.png'
+import norwayFlagBody from '../../drapeau/norvege.png'
+import denmarkFlagBody from '../../drapeau/danemark.png'
+import finlandFlagBody from '../../drapeau/finlande.png'
+import turkeyFlagBody from '../../drapeau/turquie.png'
+import canadaFlagBody from '../../drapeau/canada.png'
+import mexicoFlagBody from '../../drapeau/mexique.png'
+import brazilFlagBody from '../../drapeau/bresil.png'
+import argentinaFlagBody from '../../drapeau/argentine.png'
+import colombiaFlagBody from '../../drapeau/colombie.png'
+import chileFlagBody from '../../drapeau/chili.png'
+import peruFlagBody from '../../drapeau/perou.png'
+import jamaicaFlagBody from '../../drapeau/jamaique.png'
+import moroccoFlagBody from '../../drapeau/maroc.png'
+import algeriaFlagBody from '../../drapeau/algerie.png'
+import tunisiaFlagBody from '../../drapeau/tunisie.png'
+import egyptFlagBody from '../../drapeau/egypte.png'
+import senegalFlagBody from '../../drapeau/senegal.png'
+import nigeriaFlagBody from '../../drapeau/nigeria.png'
+import southAfricaFlagBody from '../../drapeau/afrique-du-sud.png'
+import cameroonFlagBody from '../../drapeau/cameroun.png'
+import ivoryCoastFlagBody from '../../drapeau/cote-divoire.png'
+import ghanaFlagBody from '../../drapeau/ghana.png'
+import congoFlagBody from '../../drapeau/congo.png'
+import ethiopiaFlagBody from '../../drapeau/ethiopie.png'
+import japanFlagBody from '../../drapeau/japon.png'
+import southKoreaFlagBody from '../../drapeau/coree-du-sud.png'
+import indiaFlagBody from '../../drapeau/inde.png'
+import pakistanFlagBody from '../../drapeau/pakistan.png'
+import indonesiaFlagBody from '../../drapeau/indonesie.png'
+import philippinesFlagBody from '../../drapeau/philippines.png'
+import vietnamFlagBody from '../../drapeau/vietnam.png'
+import thailandFlagBody from '../../drapeau/thailande.png'
+import saudiArabiaFlagBody from '../../drapeau/arabie-saoudite.png'
+import iranFlagBody from '../../drapeau/iran.png'
+import australiaFlagBody from '../../drapeau/australie.png'
+import newZealandFlagBody from '../../drapeau/nouvelle-zelande.png'
+import haitiFlagBody from '../../drapeau/haiti.png'
+import cubaFlagBody from '../../drapeau/cuba.png'
+import dominicanRepFlagBody from '../../drapeau/rep-dominicaine.png'
 
 type FlagSkin = {
   name: string
-  flag?: string
-  preview?: string
+  preview: string
   colors: [string, string, string, string]
-  bodyTexture?: string
-  textureOffsetX?: number
-  textureScale?: number
+  bodyTexture: string
 }
 
 const HEAD_OPTIONS: { id: HeadType; label: string; preview: string; bodyTexture?: string }[] = [
@@ -27,84 +75,78 @@ const HEAD_OPTIONS: { id: HeadType; label: string; preview: string; bodyTexture?
   { id: 'stpatrick', label: 'St Patrick', preview: '/heads/stpatrick.png', bodyTexture: '/heads/stpatrick-body.png' },
 ]
 
-const DEFAULT_FLAG_TEXTURE_SCALE = 1.4
 
 // ============================================
-// FLAG PRESETS — colors from flags around the world
+// FLAG PRESETS
 // ============================================
 const FLAG_SKINS: FlagSkin[] = [
   // Europe
-  { name: 'France', preview: franceFlagBody, bodyTexture: franceFlagBody, colors: ['#002395', '#FFFFFF', '#ED2939', '#002395'], textureOffsetX: 0.18, textureScale: DEFAULT_FLAG_TEXTURE_SCALE },
-  { name: 'Allemagne', preview: germanyFlagBody, bodyTexture: germanyFlagBody, colors: ['#000000', '#DD0000', '#FFCC00', '#000000'], textureOffsetX: 0.08, textureScale: DEFAULT_FLAG_TEXTURE_SCALE },
-  { name: 'Italie', flag: '🇮🇹', colors: ['#008C45', '#FFFFFF', '#CD212A', '#008C45'] },
-  { name: 'Espagne', preview: spainFlagBody, bodyTexture: spainFlagBody, colors: ['#AA151B', '#F1BF00', '#AA151B', '#F1BF00'], textureScale: DEFAULT_FLAG_TEXTURE_SCALE },
-  { name: 'Portugal', flag: '🇵🇹', colors: ['#006600', '#FF0000', '#FFCC00', '#006600'] },
-  { name: 'Royaume-Uni', preview: ukFlagBody, bodyTexture: ukFlagBody, colors: ['#00247D', '#CF142B', '#FFFFFF', '#CF142B'], textureOffsetX: 0.08, textureScale: DEFAULT_FLAG_TEXTURE_SCALE },
-  { name: 'Belgique', flag: '🇧🇪', colors: ['#000000', '#FDDA24', '#EF3340', '#000000'] },
-  { name: 'Pays-Bas', flag: '🇳🇱', colors: ['#AE1C28', '#FFFFFF', '#21468B', '#AE1C28'] },
-  { name: 'Suisse', flag: '🇨🇭', colors: ['#FF0000', '#FFFFFF', '#FF0000', '#FFFFFF'] },
-  { name: 'Suede', flag: '🇸🇪', colors: ['#005BAA', '#FECC02', '#005BAA', '#FECC02'] },
-  { name: 'Pologne', flag: '🇵🇱', colors: ['#FFFFFF', '#DC143C', '#FFFFFF', '#DC143C'] },
-  { name: 'Ukraine', flag: '🇺🇦', colors: ['#0057B7', '#FFD700', '#0057B7', '#FFD700'] },
-  { name: 'Grece', flag: '🇬🇷', colors: ['#004C98', '#FFFFFF', '#004C98', '#FFFFFF'] },
-  { name: 'Roumanie', flag: '🇷🇴', colors: ['#002B7F', '#FCD116', '#CE1126', '#002B7F'] },
-  { name: 'Irlande', flag: '🇮🇪', colors: ['#169B62', '#FFFFFF', '#FF883E', '#169B62'] },
-  { name: 'Croatie', flag: '🇭🇷', colors: ['#FF0000', '#FFFFFF', '#171796', '#FF0000'] },
-  { name: 'Norvege', flag: '🇳🇴', colors: ['#EF2B2D', '#002868', '#FFFFFF', '#EF2B2D'] },
-  { name: 'Danemark', flag: '🇩🇰', colors: ['#C60C30', '#FFFFFF', '#C60C30', '#FFFFFF'] },
-  { name: 'Finlande', flag: '🇫🇮', colors: ['#FFFFFF', '#003580', '#FFFFFF', '#003580'] },
-  { name: 'Russie', preview: russiaFlagBody, bodyTexture: russiaFlagBody, colors: ['#FFFFFF', '#0039A6', '#D52B1E', '#FFFFFF'], textureOffsetX: 0.08, textureScale: DEFAULT_FLAG_TEXTURE_SCALE },
-  { name: 'Turquie', flag: '🇹🇷', colors: ['#E30A17', '#FFFFFF', '#E30A17', '#FFFFFF'] },
+  { name: 'France', preview: franceFlagBody, bodyTexture: franceFlagBody, colors: ['#002395', '#FFFFFF', '#ED2939', '#002395'] },
+  { name: 'Allemagne', preview: germanyFlagBody, bodyTexture: germanyFlagBody, colors: ['#000000', '#DD0000', '#FFCC00', '#000000'] },
+  { name: 'Italie', preview: italyFlagBody, bodyTexture: italyFlagBody, colors: ['#008C45', '#FFFFFF', '#CD212A', '#008C45'] },
+  { name: 'Espagne', preview: spainFlagBody, bodyTexture: spainFlagBody, colors: ['#AA151B', '#F1BF00', '#AA151B', '#F1BF00'] },
+  { name: 'Portugal', preview: portugalFlagBody, bodyTexture: portugalFlagBody, colors: ['#006600', '#FF0000', '#FFCC00', '#006600'] },
+  { name: 'Royaume-Uni', preview: ukFlagBody, bodyTexture: ukFlagBody, colors: ['#00247D', '#CF142B', '#FFFFFF', '#CF142B'] },
+  { name: 'Belgique', preview: belgiumFlagBody, bodyTexture: belgiumFlagBody, colors: ['#000000', '#FDDA24', '#EF3340', '#000000'] },
+  { name: 'Pays-Bas', preview: netherlandsFlagBody, bodyTexture: netherlandsFlagBody, colors: ['#AE1C28', '#FFFFFF', '#21468B', '#AE1C28'] },
+  { name: 'Suisse', preview: switzerlandFlagBody, bodyTexture: switzerlandFlagBody, colors: ['#FF0000', '#FFFFFF', '#FF0000', '#FFFFFF'] },
+  { name: 'Suede', preview: swedenFlagBody, bodyTexture: swedenFlagBody, colors: ['#005BAA', '#FECC02', '#005BAA', '#FECC02'] },
+  { name: 'Pologne', preview: polandFlagBody, bodyTexture: polandFlagBody, colors: ['#FFFFFF', '#DC143C', '#FFFFFF', '#DC143C'] },
+  { name: 'Ukraine', preview: ukraineFlagBody, bodyTexture: ukraineFlagBody, colors: ['#0057B7', '#FFD700', '#0057B7', '#FFD700'] },
+  { name: 'Grece', preview: greeceFlagBody, bodyTexture: greeceFlagBody, colors: ['#004C98', '#FFFFFF', '#004C98', '#FFFFFF'] },
+  { name: 'Roumanie', preview: romaniaFlagBody, bodyTexture: romaniaFlagBody, colors: ['#002B7F', '#FCD116', '#CE1126', '#002B7F'] },
+  { name: 'Irlande', preview: irelandFlagBody, bodyTexture: irelandFlagBody, colors: ['#169B62', '#FFFFFF', '#FF883E', '#169B62'] },
+  { name: 'Croatie', preview: croatiaFlagBody, bodyTexture: croatiaFlagBody, colors: ['#FF0000', '#FFFFFF', '#171796', '#FF0000'] },
+  { name: 'Norvege', preview: norwayFlagBody, bodyTexture: norwayFlagBody, colors: ['#EF2B2D', '#002868', '#FFFFFF', '#EF2B2D'] },
+  { name: 'Danemark', preview: denmarkFlagBody, bodyTexture: denmarkFlagBody, colors: ['#C60C30', '#FFFFFF', '#C60C30', '#FFFFFF'] },
+  { name: 'Finlande', preview: finlandFlagBody, bodyTexture: finlandFlagBody, colors: ['#FFFFFF', '#003580', '#FFFFFF', '#003580'] },
+  { name: 'Russie', preview: russiaFlagBody, bodyTexture: russiaFlagBody, colors: ['#FFFFFF', '#0039A6', '#D52B1E', '#FFFFFF'] },
+  { name: 'Turquie', preview: turkeyFlagBody, bodyTexture: turkeyFlagBody, colors: ['#E30A17', '#FFFFFF', '#E30A17', '#FFFFFF'] },
   // Americas
-  { name: 'USA', preview: usaFlagBody, bodyTexture: usaFlagBody, colors: ['#3C3B6E', '#B22234', '#FFFFFF', '#B22234'], textureOffsetX: 0.12, textureScale: DEFAULT_FLAG_TEXTURE_SCALE },
-  { name: 'Canada', flag: '🇨🇦', colors: ['#FF0000', '#FFFFFF', '#FF0000', '#FFFFFF'] },
-  { name: 'Mexique', flag: '🇲🇽', colors: ['#006341', '#FFFFFF', '#CE1126', '#006341'] },
-  { name: 'Bresil', flag: '🇧🇷', colors: ['#009739', '#FEDD00', '#012169', '#009739'] },
-  { name: 'Argentine', flag: '🇦🇷', colors: ['#74ACDF', '#FFFFFF', '#F6B40E', '#74ACDF'] },
-  { name: 'Colombie', flag: '🇨🇴', colors: ['#FCD116', '#003893', '#CE1126', '#FCD116'] },
-  { name: 'Chili', flag: '🇨🇱', colors: ['#FFFFFF', '#D52B1E', '#0039A6', '#FFFFFF'] },
-  { name: 'Perou', flag: '🇵🇪', colors: ['#D91023', '#FFFFFF', '#D91023', '#FFFFFF'] },
-  { name: 'Jamaique', flag: '🇯🇲', colors: ['#009B3A', '#000000', '#FED100', '#009B3A'] },
+  { name: 'USA', preview: usaFlagBody, bodyTexture: usaFlagBody, colors: ['#3C3B6E', '#B22234', '#FFFFFF', '#B22234'] },
+  { name: 'Canada', preview: canadaFlagBody, bodyTexture: canadaFlagBody, colors: ['#FF0000', '#FFFFFF', '#FF0000', '#FFFFFF'] },
+  { name: 'Mexique', preview: mexicoFlagBody, bodyTexture: mexicoFlagBody, colors: ['#006341', '#FFFFFF', '#CE1126', '#006341'] },
+  { name: 'Bresil', preview: brazilFlagBody, bodyTexture: brazilFlagBody, colors: ['#009739', '#FEDD00', '#012169', '#009739'] },
+  { name: 'Argentine', preview: argentinaFlagBody, bodyTexture: argentinaFlagBody, colors: ['#74ACDF', '#FFFFFF', '#74ACDF', '#74ACDF'] },
+  { name: 'Colombie', preview: colombiaFlagBody, bodyTexture: colombiaFlagBody, colors: ['#FCD116', '#003893', '#CE1126', '#FCD116'] },
+  { name: 'Chili', preview: chileFlagBody, bodyTexture: chileFlagBody, colors: ['#FFFFFF', '#D52B1E', '#0039A6', '#FFFFFF'] },
+  { name: 'Perou', preview: peruFlagBody, bodyTexture: peruFlagBody, colors: ['#D91023', '#FFFFFF', '#D91023', '#FFFFFF'] },
+  { name: 'Jamaique', preview: jamaicaFlagBody, bodyTexture: jamaicaFlagBody, colors: ['#009B3A', '#000000', '#FED100', '#009B3A'] },
   // Africa
-  { name: 'Maroc', flag: '🇲🇦', colors: ['#C1272D', '#006233', '#C1272D', '#006233'] },
-  { name: 'Algerie', flag: '🇩🇿', colors: ['#006633', '#FFFFFF', '#D21034', '#006633'] },
-  { name: 'Tunisie', flag: '🇹🇳', colors: ['#E70013', '#FFFFFF', '#E70013', '#FFFFFF'] },
-  { name: 'Egypte', flag: '🇪🇬', colors: ['#CE1126', '#FFFFFF', '#000000', '#CE1126'] },
-  { name: 'Senegal', flag: '🇸🇳', colors: ['#00853F', '#FDEF42', '#E31B23', '#00853F'] },
-  { name: 'Nigeria', flag: '🇳🇬', colors: ['#008751', '#FFFFFF', '#008751', '#FFFFFF'] },
-  { name: 'Afrique du Sud', flag: '🇿🇦', colors: ['#007A4D', '#FFB612', '#DE3831', '#002395'] },
-  { name: 'Cameroun', flag: '🇨🇲', colors: ['#007A33', '#CE1126', '#FCD116', '#007A33'] },
-  { name: 'Cote d\'Ivoire', flag: '🇨🇮', colors: ['#FF8200', '#FFFFFF', '#009A44', '#FF8200'] },
-  { name: 'Ghana', flag: '🇬🇭', colors: ['#EF3340', '#FCD116', '#009739', '#000000'] },
-  { name: 'Congo', flag: '🇨🇩', colors: ['#007FFF', '#F7D618', '#CE1021', '#007FFF'] },
-  { name: 'Ethiopie', flag: '🇪🇹', colors: ['#078930', '#FCDD09', '#DA121A', '#0F47AF'] },
+  { name: 'Maroc', preview: moroccoFlagBody, bodyTexture: moroccoFlagBody, colors: ['#C1272D', '#006233', '#C1272D', '#006233'] },
+  { name: 'Algerie', preview: algeriaFlagBody, bodyTexture: algeriaFlagBody, colors: ['#006633', '#FFFFFF', '#D21034', '#006633'] },
+  { name: 'Tunisie', preview: tunisiaFlagBody, bodyTexture: tunisiaFlagBody, colors: ['#E70013', '#FFFFFF', '#E70013', '#FFFFFF'] },
+  { name: 'Egypte', preview: egyptFlagBody, bodyTexture: egyptFlagBody, colors: ['#CE1126', '#FFFFFF', '#000000', '#CE1126'] },
+  { name: 'Senegal', preview: senegalFlagBody, bodyTexture: senegalFlagBody, colors: ['#00853F', '#FDEF42', '#E31B23', '#00853F'] },
+  { name: 'Nigeria', preview: nigeriaFlagBody, bodyTexture: nigeriaFlagBody, colors: ['#008751', '#FFFFFF', '#008751', '#FFFFFF'] },
+  { name: 'Afrique du Sud', preview: southAfricaFlagBody, bodyTexture: southAfricaFlagBody, colors: ['#007A4D', '#FFB612', '#DE3831', '#002395'] },
+  { name: 'Cameroun', preview: cameroonFlagBody, bodyTexture: cameroonFlagBody, colors: ['#007A33', '#CE1126', '#FCD116', '#007A33'] },
+  { name: 'Cote d\'Ivoire', preview: ivoryCoastFlagBody, bodyTexture: ivoryCoastFlagBody, colors: ['#FF8200', '#FFFFFF', '#009A44', '#FF8200'] },
+  { name: 'Ghana', preview: ghanaFlagBody, bodyTexture: ghanaFlagBody, colors: ['#EF3340', '#FCD116', '#009739', '#000000'] },
+  { name: 'Congo', preview: congoFlagBody, bodyTexture: congoFlagBody, colors: ['#007FFF', '#F7D618', '#CE1021', '#007FFF'] },
+  { name: 'Ethiopie', preview: ethiopiaFlagBody, bodyTexture: ethiopiaFlagBody, colors: ['#078930', '#FCDD09', '#DA121A', '#0F47AF'] },
   // Asia
-  { name: 'Japon', flag: '🇯🇵', colors: ['#FFFFFF', '#BC002D', '#FFFFFF', '#BC002D'] },
-  { name: 'Chine', preview: chinaFlagBody, bodyTexture: chinaFlagBody, colors: ['#DE2910', '#FFDE00', '#DE2910', '#FFDE00'], textureOffsetX: 0.12, textureScale: DEFAULT_FLAG_TEXTURE_SCALE },
-  { name: 'Coree du Sud', flag: '🇰🇷', colors: ['#FFFFFF', '#CD2E3A', '#0047A0', '#000000'] },
-  { name: 'Inde', flag: '🇮🇳', colors: ['#FF9933', '#FFFFFF', '#138808', '#000080'] },
-  { name: 'Pakistan', flag: '🇵🇰', colors: ['#01411C', '#FFFFFF', '#01411C', '#FFFFFF'] },
-  { name: 'Indonesie', flag: '🇮🇩', colors: ['#FF0000', '#FFFFFF', '#FF0000', '#FFFFFF'] },
-  { name: 'Philippines', flag: '🇵🇭', colors: ['#0038A8', '#CE1126', '#FCD116', '#FFFFFF'] },
-  { name: 'Vietnam', flag: '🇻🇳', colors: ['#DA251D', '#FFCD00', '#DA251D', '#FFCD00'] },
-  { name: 'Thailande', flag: '🇹🇭', colors: ['#ED1C24', '#FFFFFF', '#241D4F', '#FFFFFF'] },
-  { name: 'Arabie Saoudite', flag: '🇸🇦', colors: ['#006C35', '#FFFFFF', '#006C35', '#FFFFFF'] },
-  { name: 'Iran', flag: '🇮🇷', colors: ['#239F40', '#FFFFFF', '#DA0000', '#239F40'] },
+  { name: 'Japon', preview: japanFlagBody, bodyTexture: japanFlagBody, colors: ['#FFFFFF', '#BC002D', '#FFFFFF', '#BC002D'] },
+  { name: 'Chine', preview: chinaFlagBody, bodyTexture: chinaFlagBody, colors: ['#DE2910', '#FFDE00', '#DE2910', '#FFDE00'] },
+  { name: 'Coree du Sud', preview: southKoreaFlagBody, bodyTexture: southKoreaFlagBody, colors: ['#FFFFFF', '#CD2E3A', '#0047A0', '#000000'] },
+  { name: 'Inde', preview: indiaFlagBody, bodyTexture: indiaFlagBody, colors: ['#FF9933', '#FFFFFF', '#138808', '#000080'] },
+  { name: 'Pakistan', preview: pakistanFlagBody, bodyTexture: pakistanFlagBody, colors: ['#01411C', '#FFFFFF', '#01411C', '#FFFFFF'] },
+  { name: 'Indonesie', preview: indonesiaFlagBody, bodyTexture: indonesiaFlagBody, colors: ['#FF0000', '#FFFFFF', '#FF0000', '#FFFFFF'] },
+  { name: 'Philippines', preview: philippinesFlagBody, bodyTexture: philippinesFlagBody, colors: ['#0038A8', '#CE1126', '#FCD116', '#FFFFFF'] },
+  { name: 'Vietnam', preview: vietnamFlagBody, bodyTexture: vietnamFlagBody, colors: ['#DA251D', '#FFCD00', '#DA251D', '#FFCD00'] },
+  { name: 'Thailande', preview: thailandFlagBody, bodyTexture: thailandFlagBody, colors: ['#ED1C24', '#FFFFFF', '#241D4F', '#FFFFFF'] },
+  { name: 'Arabie Saoudite', preview: saudiArabiaFlagBody, bodyTexture: saudiArabiaFlagBody, colors: ['#006C35', '#FFFFFF', '#006C35', '#FFFFFF'] },
+  { name: 'Iran', preview: iranFlagBody, bodyTexture: iranFlagBody, colors: ['#239F40', '#FFFFFF', '#DA0000', '#239F40'] },
   // Oceania
-  { name: 'Australie', flag: '🇦🇺', colors: ['#00008B', '#FF0000', '#FFFFFF', '#00008B'] },
-  { name: 'Nouvelle-Zelande', flag: '🇳🇿', colors: ['#00247D', '#CC142B', '#FFFFFF', '#00247D'] },
+  { name: 'Australie', preview: australiaFlagBody, bodyTexture: australiaFlagBody, colors: ['#00008B', '#FF0000', '#FFFFFF', '#00008B'] },
+  { name: 'Nouvelle-Zelande', preview: newZealandFlagBody, bodyTexture: newZealandFlagBody, colors: ['#00247D', '#CC142B', '#FFFFFF', '#00247D'] },
   // Caribbean / Islands
-  { name: 'Haiti', flag: '🇭🇹', colors: ['#00209F', '#D21034', '#00209F', '#D21034'] },
-  { name: 'Cuba', flag: '🇨🇺', colors: ['#002A8F', '#FFFFFF', '#CF142B', '#002A8F'] },
-  { name: 'Rep. Dominicaine', flag: '🇩🇴', colors: ['#002D62', '#CE1126', '#FFFFFF', '#002D62'] },
-  // Special
-  { name: 'Arc-en-ciel', flag: '🏳️‍🌈', colors: ['#FF0000', '#FF8800', '#FFFF00', '#008800'] },
-  { name: 'Pan-Africain', flag: '✊🏿', colors: ['#FF0000', '#000000', '#009900', '#FF0000'] },
+  { name: 'Haiti', preview: haitiFlagBody, bodyTexture: haitiFlagBody, colors: ['#00209F', '#D21034', '#00209F', '#D21034'] },
+  { name: 'Cuba', preview: cubaFlagBody, bodyTexture: cubaFlagBody, colors: ['#002A8F', '#FFFFFF', '#CF142B', '#002A8F'] },
+  { name: 'Rep. Dominicaine', preview: dominicanRepFlagBody, bodyTexture: dominicanRepFlagBody, colors: ['#002D62', '#CE1126', '#FFFFFF', '#002D62'] },
 ]
 
-const FLAG_TEXTURE_META = new Map(
-  FLAG_SKINS.filter(flag => flag.bodyTexture).map(flag => [flag.bodyTexture!, flag]),
-)
+
 
 function drawContainedTextureInCircle(
   ctx: CanvasRenderingContext2D,
@@ -182,16 +224,21 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
       next[slot] = color
       return next
     })
+    setIsFlagSkin(false)
   }
+
+  const [isFlagSkin, setIsFlagSkin] = useState(currentSkin.isFlag ?? false)
 
   const applyFlag = (flagColors: string[], bodyTexture?: string) => {
     setColors([...flagColors])
     setSelectedBodyTexture(bodyTexture)
+    setIsFlagSkin(true)
   }
 
   const applyPreset = (skin: WormSkin) => {
     setColors([...skin.colors])
     setSelectedBodyTexture(skin.bodyTexture)
+    setIsFlagSkin(false)
   }
 
   // Draw worm preview
@@ -223,14 +270,13 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
       const bodyTextureKey = selectedBodyTexture ?? selectedHead?.bodyTexture
       const bImg = bodyTextureKey ? bodyImgs[bodyTextureKey] : undefined
       if (bImg) {
-        const textureMeta = bodyTextureKey ? FLAG_TEXTURE_META.get(bodyTextureKey) : undefined
         ctx.save()
         ctx.beginPath()
         ctx.arc(sx, sy, radius, 0, Math.PI * 2)
         ctx.clip()
         ctx.fillStyle = colors[i % colors.length]
         ctx.fillRect(sx - radius, sy - radius, radius * 2, radius * 2)
-        drawContainedTextureInCircle(ctx, bImg, sx, sy, radius, textureMeta?.textureOffsetX, textureMeta?.textureScale)
+        drawContainedTextureInCircle(ctx, bImg, sx, sy, radius)
         ctx.restore()
       } else {
         // Solid color body
@@ -372,11 +418,7 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
               onClick={() => applyFlag(f.colors, f.bodyTexture)}
               title={f.name}
             >
-              {f.preview ? (
-                <img src={f.preview} alt={f.name} style={shopStyles.flagPreview} />
-              ) : (
-                <span style={{ fontSize: 34 }}>{f.flag}</span>
-              )}
+              <img src={f.preview} alt={f.name} style={shopStyles.flagPreview} />
               <span style={shopStyles.flagName}>{f.name}</span>
             </div>
           ))}
@@ -395,6 +437,7 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
               name: 'Custom',
               headType,
               bodyTexture: selectedBodyTexture ?? selectedHead?.bodyTexture,
+              isFlag: isFlagSkin && !!selectedBodyTexture,
             })
           }}
         >
