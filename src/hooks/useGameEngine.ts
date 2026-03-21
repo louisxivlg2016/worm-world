@@ -2408,6 +2408,8 @@ export function useGameEngine(
       s.controlMode = 'touch'
       s.touchVector.x = touch.clientX - s.touchStart.x
       s.touchVector.y = touch.clientY - s.touchStart.y
+      // Boost only with two fingers
+      s.boosting = e.touches.length >= 2
     }
 
     const handleTouchStart = (e: TouchEvent) => {
@@ -2415,18 +2417,24 @@ export function useGameEngine(
       const s = stateRef.current
       const touch = e.touches[0]
       if (!touch) return
-      s.boosting = true
+      // Only boost with two fingers
+      s.boosting = e.touches.length >= 2
       s.controlMode = 'touch'
-      s.touchStart = { x: touch.clientX, y: touch.clientY }
-      s.touchVector.x = 0
-      s.touchVector.y = 0
+      if (!s.touchStart) {
+        s.touchStart = { x: touch.clientX, y: touch.clientY }
+      }
+      s.touchVector.x = touch.clientX - s.touchStart.x
+      s.touchVector.y = touch.clientY - s.touchStart.y
     }
 
-    const handleTouchEnd = () => {
-      stateRef.current.boosting = false
-      stateRef.current.touchStart = null
-      stateRef.current.touchVector.x = 0
-      stateRef.current.touchVector.y = 0
+    const handleTouchEnd = (e: TouchEvent) => {
+      // Stop boosting when fewer than 2 fingers remain
+      stateRef.current.boosting = e.touches.length >= 2
+      if (e.touches.length === 0) {
+        stateRef.current.touchStart = null
+        stateRef.current.touchVector.x = 0
+        stateRef.current.touchVector.y = 0
+      }
     }
 
     const handleContextMenu = (e: Event) => e.preventDefault()

@@ -375,7 +375,7 @@ export function ShopScreen({ currentSkin, onApply, onBack }: ShopScreenProps) {
               {f.preview ? (
                 <img src={f.preview} alt={f.name} style={shopStyles.flagPreview} />
               ) : (
-                <span style={{ fontSize: 22 }}>{f.flag}</span>
+                <span style={{ fontSize: 34 }}>{f.flag}</span>
               )}
               <span style={shopStyles.flagName}>{f.name}</span>
             </div>
@@ -486,17 +486,17 @@ const shopStyles: Record<string, React.CSSProperties> = {
   },
   flagGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-    gap: 6,
-    maxHeight: 240,
+    gridTemplateColumns: 'repeat(auto-fill, minmax(170px, 1fr))',
+    gap: 10,
+    maxHeight: 350,
     overflow: 'auto',
   },
   flagItem: {
     display: 'flex',
     alignItems: 'center',
-    gap: 6,
-    padding: '6px 8px',
-    borderRadius: 10,
+    gap: 10,
+    padding: '10px 12px',
+    borderRadius: 12,
     background: 'rgba(255,255,255,0.06)',
     border: '1px solid rgba(255,255,255,0.1)',
     cursor: 'pointer',
@@ -504,16 +504,16 @@ const shopStyles: Record<string, React.CSSProperties> = {
   },
   flagName: {
     color: 'rgba(255,255,255,0.7)',
-    fontSize: 11,
+    fontSize: 14,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
   flagPreview: {
-    width: 28,
-    height: 20,
+    width: 52,
+    height: 36,
     objectFit: 'cover',
-    borderRadius: 4,
+    borderRadius: 6,
     border: '1px solid rgba(255,255,255,0.15)',
     flexShrink: 0,
   },
