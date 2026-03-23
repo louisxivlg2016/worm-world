@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Effect } from 'effect'
-import { RoomService, type RoomInfo } from '@/services/RoomService'
+import { spacetimeService } from '@/services/SpacetimeService'
 import type { GameMode } from '@/types/game'
 
 interface LobbyScreenProps {
@@ -11,21 +10,19 @@ interface LobbyScreenProps {
 
 export function LobbyScreen({ onJoinRoom, onBack }: LobbyScreenProps) {
   const { t } = useTranslation()
-  const [rooms, setRooms] = useState<RoomInfo[]>([])
+  const [rooms, setRooms] = useState<Array<{ id: bigint; name: string; slug: string; gameMode: string; maxPlayers: number; memberCount: number }>>([])
   const [roomName, setRoomName] = useState('')
   const [joinSlug, setJoinSlug] = useState('')
   const [gameMode, setGameMode] = useState<GameMode>('battle')
   const [loading, setLoading] = useState(false)
 
-  const loadRooms = useCallback(async () => {
-    const result = await Effect.runPromise(
-      RoomService.listPublicRooms().pipe(Effect.catchAll(() => Effect.succeed([] as RoomInfo[])))
-    )
-    setRooms(result)
+  const loadRooms = useCallback(() => {
+    setRooms(spacetimeService.getRoomList())
   }, [])
 
   useEffect(() => {
     loadRooms()
+    spacetimeService.updateCallbacks({ onRoomListChanged: loadRooms })
     const interval = setInterval(loadRooms, 5000)
     return () => clearInterval(interval)
   }, [loadRooms])
@@ -34,16 +31,10 @@ export function LobbyScreen({ onJoinRoom, onBack }: LobbyScreenProps) {
     if (!roomName.trim()) return
     setLoading(true)
     try {
-      const result = await Effect.runPromise(
-        RoomService.createRoom(roomName.trim(), true, gameMode, 8).pipe(
-          Effect.catchAll((e) => Effect.fail(e))
-        )
-      )
-      // After creating, join our own room
-      const joinResult = await Effect.runPromise(
-        RoomService.joinRoom(result.slug).pipe(Effect.catchAll((e) => Effect.fail(e)))
-      )
-      onJoinRoom(result.slug, joinResult.roomId, result.gameMode as GameMode, result.seed)
+      const result = await spacetimeService.createRoom(roomName.trim(), true, gameMode, 8)
+      if (result) {
+        onJoinRoom(result.slug, String(spacetimeService.getCurrentRoomId()), result.gameMode as GameMode, result.seed)
+      }
     } catch (e) {
       console.error('Failed to create room:', e)
     } finally {
@@ -51,13 +42,13 @@ export function LobbyScreen({ onJoinRoom, onBack }: LobbyScreenProps) {
     }
   }
 
-  const handleJoin = async (slug: string) => {
+  const handleJoin = (slug: string) => {
     setLoading(true)
     try {
-      const result = await Effect.runPromise(
-        RoomService.joinRoom(slug).pipe(Effect.catchAll((e) => Effect.fail(e)))
-      )
-      onJoinRoom(slug, result.roomId, result.gameMode, result.seed)
+      const result = spacetimeService.joinRoom(slug)
+      if (result) {
+        onJoinRoom(slug, String(result.roomId), result.gameMode as GameMode, result.seed)
+      }
     } catch (e) {
       console.error('Failed to join room:', e)
     } finally {
@@ -127,14 +118,14 @@ export function LobbyScreen({ onJoinRoom, onBack }: LobbyScreenProps) {
             </div>
           )}
           {rooms.map((room) => (
-            <div key={room.id} style={styles.roomEntry}>
+            <div key={String(room.id)} style={styles.roomEntry}>
               <div>
                 <span style={styles.roomName}>{room.name}</span>
                 <span style={styles.roomMode}>{room.gameMode}</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 <span style={styles.roomPlayers}>
-                  {room.memberCount ?? 0}/{room.maxPlayers} {t('players')}
+                  {room.memberCount}/{room.maxPlayers} {t('players')}
                 </span>
                 <button style={styles.joinSmallBtn} onClick={() => handleJoin(room.slug)}>
                   {t('joinRoom')}
@@ -201,11 +192,7 @@ const styles: Record<string, React.CSSProperties> = {
     outline: 'none',
     marginBottom: 10,
   },
-  modeSelector: {
-    display: 'flex',
-    gap: 8,
-    marginBottom: 12,
-  },
+  modeSelector: { display: 'flex', gap: 8, marginBottom: 12 },
   modeBtn: {
     flex: 1,
     padding: '8px 16px',
@@ -238,10 +225,7 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     whiteSpace: 'nowrap',
   },
-  roomList: {
-    maxHeight: 200,
-    overflow: 'auto',
-  },
+  roomList: { maxHeight: 200, overflow: 'auto' },
   roomEntry: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -252,21 +236,9 @@ const styles: Record<string, React.CSSProperties> = {
     background: 'rgba(255,255,255,0.05)',
     border: '1px solid rgba(255,255,255,0.1)',
   },
-  roomName: {
-    color: 'white',
-    fontWeight: 600,
-    fontSize: 14,
-    marginRight: 8,
-  },
-  roomMode: {
-    color: 'rgba(255,255,255,0.5)',
-    fontSize: 12,
-    textTransform: 'uppercase',
-  },
-  roomPlayers: {
-    color: 'rgba(255,255,255,0.6)',
-    fontSize: 13,
-  },
+  roomName: { color: 'white', fontWeight: 600, fontSize: 14, marginRight: 8 },
+  roomMode: { color: 'rgba(255,255,255,0.5)', fontSize: 12, textTransform: 'uppercase' },
+  roomPlayers: { color: 'rgba(255,255,255,0.6)', fontSize: 13 },
   joinSmallBtn: {
     padding: '6px 14px',
     border: 'none',

@@ -8,6 +8,7 @@ import { GameCanvas } from '@/components/GameCanvas'
 import { SKINS, type WormSkin, type GameMode, type GameScreen } from '@/types/game'
 import { getStorage } from '@/services/StorageService'
 import { GAME_EVENTS, isEventActive, getEventByMode } from '@/config/events'
+import { spacetimeService } from '@/services/SpacetimeService'
 import backgroundMusic from '../music/Starlight_Arcadepremieree.mp3'
 
 interface DeathInfo {
@@ -68,6 +69,15 @@ export function AppInner() {
       audio.currentTime = 0
       backgroundAudioRef.current = null
     }
+  }, [])
+
+  // Connect to SpacetimeDB
+  useEffect(() => {
+    spacetimeService.connect().then(() => {
+      console.log('[App] SpacetimeDB connected')
+    }).catch(err => {
+      console.error('[App] SpacetimeDB connection failed:', err)
+    })
   }, [])
 
   const handlePlay = useCallback((name: string, skin: WormSkin) => {
