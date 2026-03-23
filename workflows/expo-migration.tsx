@@ -44,12 +44,6 @@ const { Workflow, Task, smithers, outputs } = createSmithers({
 
 const PROJECT_DIR = "/home/louisxiv/worm-world";
 
-function feedback(ctx: any, reviewId: string): string {
-  const result = ctx.latest(reviewResult, reviewId);
-  if (!result?.issues?.length) return "";
-  return "\nPREVIOUS REVIEW FEEDBACK:\n" + result.issues.join("\n") + "\n";
-}
-
 const coder = new ClaudeCodeAgent({
   model: "claude-opus-4-6",
   dangerouslySkipPermissions: true,
@@ -59,7 +53,8 @@ const coder = new ClaudeCodeAgent({
 const reviewer = new CodexAgent({
   model: "gpt-5.3-codex",
   config: { model_reasoning_effort: "high" },
-  fullAuto: true,
+  dangerouslyBypassApprovalsAndSandbox: true,
+  skipGitRepoCheck: true,
   cd: PROJECT_DIR,
 });
 
@@ -70,467 +65,427 @@ export default smithers((ctx) => (
       {/* ═══════════════════════════════════════════
           PHASE 1: Expo Scaffold + NativeTabs + DOM Game
           ═══════════════════════════════════════════ */}
-      <Ralph maxIterations={3} onMaxReached="return-last">
-        <Task
-          id="impl1"
-          agent={coder}
-          retries={2}
-          resultSchema={implResult}
-          cd={PROJECT_DIR}
-        >
-{`Migrate worm-world to Expo (Phase 1: Scaffold + Game via DOM component).
-${feedback(ctx, "review1")}
+      <Ralph
+        until={ctx.latest(reviewResult, "review1")?.approved}
+        maxIterations={3}
+        onMaxReached="return-last"
+      >
+        <Sequence>
+        <Task id="impl1" output={implResult} agent={coder} retries={2}>
+{`You are working on worm-world at ${PROJECT_DIR}.
+${ctx.latest(reviewResult, "review1")?.issues?.length ? `\nPREVIOUS REVIEW FEEDBACK:\n${ctx.latest(reviewResult, "review1")!.issues.join("\n")}\n` : ""}
+Implement Phase 1: Expo scaffold + NativeTabs + "use dom" game wrapper.
 
-This is a Vite + React 19 + TypeScript slither.io clone at ${PROJECT_DIR}.
+This is a Vite + React 19 + TypeScript slither.io clone.
 
-STEP 1: Install Expo dependencies
-  bun add expo expo-router react-native react-native-web react-native-safe-area-context react-native-screens react-native-reanimated react-native-gesture-handler @expo/metro-runtime
-  bun add -D @expo/metro-config babel-preset-expo
+echo "=== Phase 1: Installing Expo dependencies ==="
+bun add expo expo-router react-native react-native-web react-native-safe-area-context react-native-screens react-native-reanimated react-native-gesture-handler @expo/metro-runtime
+bun add -D @expo/metro-config babel-preset-expo
 
-STEP 2: Create app.json with:
-  - name: "Worm World", slug: "worm-world", scheme: "wormworld"
-  - web.bundler: "metro", web.output: "static"
-  - plugins: ["expo-router"]
+echo "=== Creating app.json ==="
+Create app.json: name "Worm World", slug "worm-world", scheme "wormworld", web.bundler "metro", web.output "static", plugins ["expo-router"]
 
-STEP 3: Create metro.config.js with @/ alias resolving to src/:
+echo "=== Creating metro.config.js ==="
+Create metro.config.js with @/ alias resolving to src/:
   const { getDefaultConfig } = require("expo/metro-config");
   const path = require("path");
   const config = getDefaultConfig(__dirname);
   config.resolver.alias = { "@": path.resolve(__dirname, "src") };
   module.exports = config;
 
-STEP 4: Create babel.config.js:
-  module.exports = { presets: ["babel-preset-expo"] };
+echo "=== Creating babel.config.js ==="
+Create babel.config.js: module.exports = { presets: ["babel-preset-expo"] };
 
-STEP 5: Update package.json:
-  - "main": "expo-router/entry"
-  - scripts: "start": "expo start", "android": "expo start --android", "ios": "expo start --ios"
+echo "=== Updating package.json ==="
+Update package.json: "main": "expo-router/entry", add expo scripts (start, android, ios)
 
-STEP 6: Create app/_layout.tsx with NativeTabs (4 tabs):
+echo "=== Creating NativeTabs layout ==="
+Create app/_layout.tsx with NativeTabs (4 tabs):
   import { NativeTabs } from "expo-router/unstable-native-tabs";
-  Tabs: (game) Play gamecontroller.fill/sports_esports, (shop) Shop cart.fill/shopping_cart, (lobby) Multi person.2.fill/groups, (profile) Profile person.crop.circle.fill/account_circle
+  (game) Play gamecontroller.fill/sports_esports
+  (shop) Shop cart.fill/shopping_cart
+  (lobby) Multi person.2.fill/groups
+  (profile) Profile person.crop.circle.fill/account_circle
 
-STEP 7: Create app/_layout.web.tsx with Tabs from "expo-router/tabs":
-  Same 4 tabs but using web-compatible Tabs component with emoji icons.
+echo "=== Creating web layout ==="
+Create app/_layout.web.tsx with Tabs from "expo-router/tabs":
+  Same 4 tabs, web-compatible with emoji icons.
   Default tabBarItemStyle: { display: "none" }, override each visible tab with { display: "flex" }.
 
-STEP 8: Create tab group layouts and index files:
-  - app/(game)/_layout.tsx: Stack with headerShown: false
-  - app/(game)/index.tsx: Renders GameDom component full-screen
-  - app/(shop)/_layout.tsx: Stack with headerLargeTitle
-  - app/(shop)/index.tsx: Placeholder "Shop coming in Phase 2"
-  - app/(lobby)/_layout.tsx: Stack with headerLargeTitle
-  - app/(lobby)/index.tsx: Placeholder "Lobby coming in Phase 2"
-  - app/(profile)/_layout.tsx: Stack with headerLargeTitle
-  - app/(profile)/index.tsx: Placeholder "Profile coming in Phase 2"
+echo "=== Creating tab groups ==="
+Create tab group layouts and index files:
+  app/(game)/_layout.tsx: Stack headerShown: false
+  app/(game)/index.tsx: Renders GameDom full-screen
+  app/(shop)/_layout.tsx: Stack headerLargeTitle
+  app/(shop)/index.tsx: Placeholder "Shop coming in Phase 2"
+  app/(lobby)/_layout.tsx: Stack headerLargeTitle
+  app/(lobby)/index.tsx: Placeholder "Lobby coming in Phase 2"
+  app/(profile)/_layout.tsx: Stack headerLargeTitle
+  app/(profile)/index.tsx: Placeholder "Profile coming in Phase 2"
 
-STEP 9: Create src/expo/GameDom.tsx with "use dom" directive:
-  "use dom";
-  import { App } from "@/App";
-  This wraps the existing web <App /> component.
-  Pass onHaptic, onShare, onPlaySound as props.
-  Inject window.__nativeBridge for DOM <-> native communication.
+echo "=== Creating DOM game component ==="
+Create src/expo/GameDom.tsx with "use dom" directive wrapping <App />.
+Pass onHaptic, onShare, onPlaySound props. Inject window.__nativeBridge.
 
-STEP 10: Create src/expo/bridge.ts with NativeBridge interface:
-  haptic(type), playSound(name), share(text), scheduleNotification(title, body, delayMs)
-  Web fallback that does nothing.
+echo "=== Creating bridge and theme ==="
+Create src/expo/bridge.ts: NativeBridge interface with web fallbacks.
+Create src/expo/theme.ts: colors (background, surface, primary, accent, text), spacing tokens.
+Create app/+html.tsx: font links (Bungee, Fredoka) + meta viewport.
 
-STEP 11: Create src/expo/theme.ts with design tokens:
-  colors: background "#2c3e50", surface "#34495e", primary "#e67e22", accent "#f39c12", text "#ecf0f1", etc.
-  spacing: xs 4, sm 8, md 16, lg 24, xl 32
+echo "=== Fixing import.meta.env ==="
+In SpacetimeService.ts: replace import.meta.env.VITE_* with process.env.VITE_* || process.env.EXPO_PUBLIC_*
+Update vite.config.ts to use loadEnv() and define process.env.VITE_* values.
 
-STEP 12: Create app/+html.tsx with font links (Bungee, Fredoka) and meta viewport.
+echo "=== Verifying builds ==="
+bun run build
+bunx expo export --platform web
 
-STEP 13: Fix import.meta.env in SpacetimeService.ts:
-  Replace import.meta.env.VITE_* with process.env.VITE_* || process.env.EXPO_PUBLIC_*
-  Update vite.config.ts to use loadEnv() and define process.env.VITE_* values.
+DO NOT modify useGameEngine.ts or any core game logic.
+DO NOT modify existing screen components in this phase.
 
-STEP 14: Verify builds:
-  - bun run build (Vite web build must still work)
-  - bunx expo export --platform web (Expo web must work)
+Log progress with echo statements. Fix any errors until builds pass.
 
-DO NOT modify the game engine (useGameEngine.ts) or any core game logic.
-DO NOT modify existing screen components (WelcomeScreen, ShopScreen, etc.) in this phase.
-The game runs entirely through the "use dom" component wrapping the existing App.`}
+Return JSON: { summary: "...", filesChanged: ["path1", ...] }`}
         </Task>
-        <Task
-          id="review1"
-          agent={reviewer}
-          resultSchema={reviewResult}
-        >
-{`Review Phase 1 of Expo migration for worm-world at ${PROJECT_DIR}.
 
-CHECK these files exist and are correct:
-1. app.json — has expo config with scheme, plugins
-2. metro.config.js — has @/ alias
+        <Task id="review1" output={reviewResult} agent={reviewer} retries={2}>
+{`Review Phase 1 of Expo migration at ${PROJECT_DIR}.
+
+Check these files exist and are correct:
+1. app.json — has expo config with scheme "wormworld", plugins ["expo-router"]
+2. metro.config.js — has @/ alias resolving to src/
 3. babel.config.js — uses babel-preset-expo
 4. app/_layout.tsx — NativeTabs with 4 tabs (game, shop, lobby, profile)
-5. app/_layout.web.tsx — web Tabs with tabBarItemStyle hiding
+5. app/_layout.web.tsx — web Tabs with tabBarItemStyle hiding pattern
 6. app/(game)/_layout.tsx + index.tsx — Stack + GameDom render
 7. app/(shop|lobby|profile)/_layout.tsx + index.tsx — Stack + placeholder
-8. src/expo/GameDom.tsx — has "use dom" directive, imports App
-9. src/expo/bridge.ts — NativeBridge interface
-10. src/expo/theme.ts — design tokens
-11. app/+html.tsx — font links
-12. src/services/SpacetimeService.ts — no import.meta.env (uses process.env)
+8. src/expo/GameDom.tsx — has "use dom" directive as first line, imports App
+9. src/expo/bridge.ts — NativeBridge interface with haptic, playSound, share, scheduleNotification
+10. src/expo/theme.ts — colors and spacing tokens
+11. app/+html.tsx — font links for Bungee and Fredoka
+12. src/services/SpacetimeService.ts — NO import.meta.env (uses process.env)
 
-RUN these commands:
+Run these commands and check output:
   cd ${PROJECT_DIR}
-  bunx tsc --noEmit 2>&1 | head -20
   bun run build 2>&1 | tail -5
   bunx expo export --platform web 2>&1 | tail -10
   timeout 15 bunx expo start --no-dev 2>&1 | tail -20 || true
 
-Verify original Vite build still works.
-Return { approved, issues, summary }.`}
+If ALL checks pass AND builds succeed: { approved: true, issues: [], summary: "Phase 1 looks good" }
+If ANY issue: { approved: false, issues: ["describe each issue"], summary: "Found N issues" }`}
         </Task>
+        </Sequence>
       </Ralph>
 
       {/* ═══════════════════════════════════════════
           PHASE 2: Native Shop, Profile, Lobby Screens
           ═══════════════════════════════════════════ */}
-      <Ralph maxIterations={3} onMaxReached="return-last">
-        <Task
-          id="impl2"
-          agent={coder}
-          retries={2}
-          resultSchema={implResult}
-          cd={PROJECT_DIR}
-        >
-{`Expo migration Phase 2: Native Shop, Profile, Lobby screens.
-${feedback(ctx, "review2")}
+      <Ralph
+        until={ctx.latest(reviewResult, "review2")?.approved}
+        maxIterations={3}
+        onMaxReached="return-last"
+      >
+        <Sequence>
+        <Task id="impl2" output={implResult} agent={coder} retries={2}>
+{`You are working on worm-world at ${PROJECT_DIR}.
+${ctx.latest(reviewResult, "review2")?.issues?.length ? `\nPREVIOUS REVIEW FEEDBACK:\n${ctx.latest(reviewResult, "review2")!.issues.join("\n")}\n` : ""}
+Implement Phase 2: Native Shop, Profile, Lobby screens.
 
-Create native React Native versions of the Shop, Profile, and Lobby screens.
-These replace the placeholder screens from Phase 1.
+echo "=== Phase 2: Creating native screens ==="
 
 SHOP (app/(shop)/index.tsx):
-- ScrollView with flag grid (FlatList numColumns=3 for flags)
-- Search bar for flags (Stack.SearchBar or TextInput)
-- Head/costume selector as horizontal ScrollView
+- ScrollView with FlatList numColumns=3 for flag grid
+- Search TextInput for flags
+- Horizontal ScrollView for head/costume selector
 - Body style toggle (Circles vs Tube)
-- Color picker section
-- Coin balance display
-- Apply button with price
-- Data comes from the same FLAG_SKINS, HEAD_OPTIONS, GAME_EVENTS arrays
-- Flag images: use require() for each flag PNG in drapeau/
-- Create src/assets/flags.ts that maps flag names to require() calls
+- Color picker section, coin balance, apply button with price
+- Data from FLAG_SKINS, HEAD_OPTIONS, GAME_EVENTS arrays in ShopScreen.tsx
+- Create src/assets/flags.ts mapping flag names to require() calls for drapeau/ PNGs
 
-SHOP FORM SHEETS:
-- app/(shop)/buy-confirm.tsx: presentation "formSheet", sheetAllowedDetents [0.3]
-  Shows cost breakdown and confirm/cancel buttons
+echo "=== Creating shop form sheets ==="
+app/(shop)/buy-confirm.tsx: presentation "formSheet", sheetAllowedDetents [0.3], cost + confirm/cancel
 
-PROFILE (app/(profile)/index.tsx):
-- Card-based layout with stats rows (best score, best time, kills, games, play time)
-- Costumes unlocked progress bar
-- Event badges
-- Coin balance
-- Uses loadStats() from ProfileScreen.tsx
-- Settings row -> navigate to settings sheet
+echo "=== Creating native profile ==="
+app/(profile)/index.tsx: Card layout, stats rows (best score, time, kills, games, play time), costumes progress bar, event badges, coin balance
+app/(profile)/settings.tsx: formSheet sheetAllowedDetents [0.75, 1.0], reset data with Alert.alert
 
-PROFILE FORM SHEETS:
-- app/(profile)/settings.tsx: presentation "formSheet", sheetAllowedDetents [0.75, 1.0]
-  Reset data button with Alert.alert confirmation
+echo "=== Creating native lobby ==="
+app/(lobby)/index.tsx: TextInput for room name, mode selector, join by code, FlatList for public rooms. Uses spacetimeService directly.
 
-LOBBY (app/(lobby)/index.tsx):
-- Create room: TextInput for name, mode selector buttons
-- Join by code: TextInput + join button
-- Public rooms: FlatList with room entries
-- Uses spacetimeService directly
-- All the same logic as current LobbyScreen but with RN components
+Use theme.ts colors/spacing. Use Pressable not TouchableOpacity. Use boxShadow strings. Use borderCurve: 'continuous'. Use useWindowDimensions() not Dimensions.get().
 
-Use theme.ts colors and spacing throughout.
-Use Pressable (not TouchableOpacity), boxShadow strings, borderCurve: 'continuous'.
-Use useWindowDimensions() not Dimensions.get().
+echo "=== Verifying builds ==="
+bun run build
+bunx expo export --platform web
 
-Verify:
-  bun run build && bunx expo export --platform web`}
+Log progress with echo. Fix errors until builds pass.
+
+Return JSON: { summary: "...", filesChanged: ["path1", ...] }`}
         </Task>
-        <Task
-          id="review2"
-          agent={reviewer}
-          resultSchema={reviewResult}
-        >
-{`Review Phase 2: Native screens for worm-world at ${PROJECT_DIR}.
 
-CHECK:
+        <Task id="review2" output={reviewResult} agent={reviewer} retries={2}>
+{`Review Phase 2: Native screens at ${PROJECT_DIR}.
+
+Check:
 1. app/(shop)/index.tsx — native shop with flag grid, search, head selector, body style, prices
-2. app/(shop)/buy-confirm.tsx — formSheet with cost + confirm
-3. app/(profile)/index.tsx — native profile with stats, progress bar, badges
-4. app/(profile)/settings.tsx — formSheet with reset
-5. app/(lobby)/index.tsx — native lobby with create/join/list
-6. src/assets/flags.ts — flag name -> require() mapping
-7. All use theme.ts colors, Pressable, boxShadow, borderCurve
-8. No TouchableOpacity, no Platform.select shadows, no Dimensions.get()
+2. app/(shop)/buy-confirm.tsx — formSheet presentation with cost breakdown + confirm
+3. app/(profile)/index.tsx — native profile with stats, progress bar, event badges
+4. app/(profile)/settings.tsx — formSheet with reset data using Alert.alert
+5. app/(lobby)/index.tsx — native lobby with create/join/list using spacetimeService
+6. src/assets/flags.ts — flag name -> require() mapping exists
+7. All screens use theme.ts colors, Pressable, boxShadow, borderCurve: 'continuous'
+8. Zero TouchableOpacity, zero Platform.select shadows, zero Dimensions.get()
 
-RUN:
+Run:
   cd ${PROJECT_DIR}
+  grep -r "TouchableOpacity" app/ src/expo/ --include="*.tsx" | head -5
   bun run build 2>&1 | tail -5
   bunx expo export --platform web 2>&1 | tail -10
-  timeout 15 bunx expo start --no-dev 2>&1 | tail -20 || true
 
-Return { approved, issues, summary }.`}
+If ALL checks pass AND builds succeed: { approved: true, issues: [], summary: "Phase 2 looks good" }
+If ANY issue: { approved: false, issues: ["..."], summary: "Found N issues" }`}
         </Task>
+        </Sequence>
       </Ralph>
 
       {/* ═══════════════════════════════════════════
           PHASE 3: Native Features
           ═══════════════════════════════════════════ */}
-      <Ralph maxIterations={3} onMaxReached="return-last">
-        <Task
-          id="impl3"
-          agent={coder}
-          retries={2}
-          resultSchema={implResult}
-          cd={PROJECT_DIR}
-        >
-{`Expo migration Phase 3: Native features (haptics, audio, orientation, keep awake).
-${feedback(ctx, "review3")}
+      <Ralph
+        until={ctx.latest(reviewResult, "review3")?.approved}
+        maxIterations={3}
+        onMaxReached="return-last"
+      >
+        <Sequence>
+        <Task id="impl3" output={implResult} agent={coder} retries={2}>
+{`You are working on worm-world at ${PROJECT_DIR}.
+${ctx.latest(reviewResult, "review3")?.issues?.length ? `\nPREVIOUS REVIEW FEEDBACK:\n${ctx.latest(reviewResult, "review3")!.issues.join("\n")}\n` : ""}
+Implement Phase 3: Native features (haptics, audio, orientation, keep awake).
 
-STEP 1: Install native packages:
-  bun add expo-haptics expo-av expo-screen-orientation expo-keep-awake expo-notifications expo-sharing expo-font @expo-google-fonts/bungee @expo-google-fonts/fredoka
+echo "=== Phase 3: Installing native packages ==="
+bun add expo-haptics expo-av expo-screen-orientation expo-keep-awake expo-notifications expo-sharing expo-font @expo-google-fonts/bungee @expo-google-fonts/fredoka
 
-STEP 2: Create src/expo/haptics.ts:
-  Wrap expo-haptics with platform guard (try/catch for web)
-  Functions: lightImpact, mediumImpact, heavyImpact, success, error, selection
+echo "=== Creating haptics module ==="
+src/expo/haptics.ts: Wrap expo-haptics with try/catch for web. Functions: lightImpact, mediumImpact, heavyImpact, success, error, selection.
 
-STEP 3: Create src/expo/audio.ts:
-  Wrap expo-av Audio.Sound
-  Functions: playSound(name), playMusic(uri), stopMusic()
-  Sound pool for concurrent effects
+echo "=== Creating audio module ==="
+src/expo/audio.ts: Wrap expo-av Audio.Sound. Functions: playSound(name), playMusic(uri), stopMusic(). Sound pool for concurrent effects.
 
-STEP 4: Create src/expo/notifications.ts:
-  Local notifications for: event mode available, daily reward reminder
-  Request permissions on first launch
+echo "=== Creating notifications module ==="
+src/expo/notifications.ts: Local notifications for event mode available, daily reward. Permission request on first launch.
 
-STEP 5: Create src/expo/share.ts:
-  Share score/invite link using expo-sharing
-  Format: "I scored {score} in Worm World! Join me: wormworld://room/{slug}"
+echo "=== Creating share module ==="
+src/expo/share.ts: Share score/invite via expo-sharing. Format: "I scored {score} in Worm World! Join me: wormworld://room/{slug}"
 
-STEP 6: Wire native callbacks in app/(game)/index.tsx:
-  Pass onHaptic, onPlaySound, onShare to GameDom component
-  useKeepAwake() while game is active
-  Lock landscape orientation during gameplay (catch errors for web)
+echo "=== Wiring native callbacks ==="
+app/(game)/index.tsx: Pass onHaptic, onPlaySound, onShare to GameDom. useKeepAwake(). Lock landscape during gameplay (catch errors for web).
 
-STEP 7: Load fonts in app/_layout.tsx:
-  Use useFonts from expo-font with Bungee and Fredoka
-  SplashScreen.preventAutoHideAsync() until fonts loaded
+echo "=== Loading fonts ==="
+app/_layout.tsx: useFonts with Bungee and Fredoka. SplashScreen.preventAutoHideAsync() until fonts loaded.
 
-STEP 8: Update app.json plugins:
-  Add expo-screen-orientation, expo-notifications
+echo "=== Updating app.json ==="
+Add plugins: expo-screen-orientation, expo-notifications
 
-STEP 9: In the game DOM component bridge, call native haptics on:
-  - Boost activation
-  - Kill an enemy
-  - Collect coin
-  - Death
+echo "=== Bridge haptic triggers ==="
+In game DOM bridge, call native haptics on: boost, kill, coin collect, death.
 
-Verify:
-  bun run build && bunx expo export --platform web`}
+echo "=== Verifying builds ==="
+bun run build
+bunx expo export --platform web
+
+All expo API calls MUST be wrapped in try/catch for web compatibility.
+
+Log progress with echo. Fix errors until builds pass.
+
+Return JSON: { summary: "...", filesChanged: ["path1", ...] }`}
         </Task>
-        <Task
-          id="review3"
-          agent={reviewer}
-          resultSchema={reviewResult}
-        >
-{`Review Phase 3: Native features for worm-world at ${PROJECT_DIR}.
 
-CHECK:
-1. src/expo/haptics.ts — platform-guarded haptic functions
-2. src/expo/audio.ts — expo-av sound pool
+        <Task id="review3" output={reviewResult} agent={reviewer} retries={2}>
+{`Review Phase 3: Native features at ${PROJECT_DIR}.
+
+Check:
+1. src/expo/haptics.ts — functions exist, all wrapped in try/catch
+2. src/expo/audio.ts — expo-av based sound pool
 3. src/expo/notifications.ts — local notification helpers
 4. src/expo/share.ts — share score/invite
-5. app/(game)/index.tsx — passes native callbacks, useKeepAwake, orientation lock
-6. app/_layout.tsx — font loading with SplashScreen
-7. app.json — plugins array includes expo-screen-orientation, expo-notifications
-8. All expo API calls wrapped in try/catch for web compatibility
+5. app/(game)/index.tsx — passes native callbacks to GameDom, useKeepAwake, orientation lock with .catch()
+6. app/_layout.tsx — useFonts with SplashScreen.preventAutoHideAsync
+7. app.json — plugins includes expo-screen-orientation, expo-notifications
+8. All expo API calls wrapped in try/catch (grep for unwrapped calls)
 
-RUN:
+Run:
   cd ${PROJECT_DIR}
   bun run build 2>&1 | tail -5
   bunx expo export --platform web 2>&1 | tail -10
   timeout 15 bunx expo start --no-dev 2>&1 | tail -20 || true
 
-Return { approved, issues, summary }.`}
+If ALL checks pass AND builds succeed: { approved: true, issues: [], summary: "Phase 3 looks good" }
+If ANY issue: { approved: false, issues: ["..."], summary: "Found N issues" }`}
         </Task>
+        </Sequence>
       </Ralph>
 
       {/* ═══════════════════════════════════════════
           PHASE 4: Navigation Polish + Design System
           ═══════════════════════════════════════════ */}
-      <Ralph maxIterations={3} onMaxReached="return-last">
-        <Task
-          id="impl4"
-          agent={coder}
-          retries={2}
-          resultSchema={implResult}
-          cd={PROJECT_DIR}
-        >
-{`Expo migration Phase 4: Navigation polish, animations, design refinement.
-${feedback(ctx, "review4")}
+      <Ralph
+        until={ctx.latest(reviewResult, "review4")?.approved}
+        maxIterations={3}
+        onMaxReached="return-last"
+      >
+        <Sequence>
+        <Task id="impl4" output={implResult} agent={coder} retries={2}>
+{`You are working on worm-world at ${PROJECT_DIR}.
+${ctx.latest(reviewResult, "review4")?.issues?.length ? `\nPREVIOUS REVIEW FEEDBACK:\n${ctx.latest(reviewResult, "review4")!.issues.join("\n")}\n` : ""}
+Implement Phase 4: Navigation polish, animations, design refinement.
 
-STEP 1: Polish NativeTabs:
-  Add badges: "NEW" on Shop if new costumes available, dot badge on lobby if rooms exist
-  State-variant icons (filled when selected, outline when not)
+echo "=== Phase 4: Polishing NativeTabs ==="
+Add badges: "NEW" on Shop if new costumes, dot badge on lobby if rooms exist.
+State-variant icons (filled selected, outline unselected).
 
-STEP 2: Stack headers for all tabs:
-  headerTransparent: true, headerLargeTitle: true
-  headerLargeTitleShadowVisible: false, headerBlurEffect: "none"
-  contentStyle: { backgroundColor: colors.background }
-  headerTintColor: colors.text
+echo "=== Stack headers ==="
+All tab Stacks: headerTransparent: true, headerLargeTitle: true, headerLargeTitleShadowVisible: false, headerBlurEffect: "none", contentStyle: { backgroundColor: colors.background }, headerTintColor: colors.text.
 
-STEP 3: Staggered animations with react-native-reanimated:
-  Shop: FadeInDown.delay(index * 50) on flag grid items
-  Profile: FadeInUp on stat rows
-  Lobby: FadeInDown on room list entries
+echo "=== Staggered animations ==="
+bun add react-native-reanimated (if not already)
+Shop: FadeInDown.delay(index * 50) on flag grid items.
+Profile: FadeInUp on stat rows.
+Lobby: FadeInDown on room list entries.
 
-STEP 4: Form sheet polish:
-  All form sheets: contentStyle: { backgroundColor: "transparent" }
-  sheetGrabberVisible: true
-  Correct detent sizes for each sheet type
+echo "=== Form sheet polish ==="
+All form sheets: contentStyle: { backgroundColor: "transparent" }, sheetGrabberVisible: true, correct detent sizes.
 
-STEP 5: Bottom-zone layout:
-  Interactive elements (stats, player card, balance) at bottom of screens
-  Hero/branding at top
-  Play button centered
+echo "=== Dark theme ==="
+ThemeProvider with DarkTheme from @react-navigation/native. All cards colors.surface, all text colors.text/textSecondary.
 
-STEP 6: Dark theme enforcement:
-  ThemeProvider with DarkTheme from @react-navigation/native
-  All cards use colors.surface, not white
-  All text uses colors.text or colors.textSecondary
+echo "=== Style consistency ==="
+Replace ALL TouchableOpacity -> Pressable.
+Replace ALL Platform.select shadows -> boxShadow strings.
+Add borderCurve: 'continuous' to all rounded elements.
+Add fontVariant: 'tabular-nums' to all numeric displays.
 
-STEP 7: Style consistency sweep:
-  Replace any TouchableOpacity -> Pressable
-  Replace Platform.select shadows -> boxShadow strings
-  Add borderCurve: 'continuous' to all rounded elements
-  Add fontVariant: 'tabular-nums' to all numeric displays
-  Haptic feedback on interactive elements
+echo "=== Tab hiding during gameplay ==="
+Hide tab bar when game is playing. Show on death/back.
 
-STEP 8: Hide tabs during active gameplay:
-  When game is playing, hide the tab bar for full immersion
-  Show tabs again on death/back to menu
+echo "=== Verifying builds ==="
+bun run build
+bunx expo export --platform web
 
-Verify:
-  bun run build && bunx expo export --platform web`}
+Log progress with echo. Fix errors until builds pass.
+
+Return JSON: { summary: "...", filesChanged: ["path1", ...] }`}
         </Task>
-        <Task
-          id="review4"
-          agent={reviewer}
-          resultSchema={reviewResult}
-        >
-{`Review Phase 4: Navigation polish for worm-world at ${PROJECT_DIR}.
 
-CHECK:
+        <Task id="review4" output={reviewResult} agent={reviewer} retries={2}>
+{`Review Phase 4: Navigation polish at ${PROJECT_DIR}.
+
+Check:
 1. NativeTabs has badges and state-variant icons
-2. All Stack layouts use transparent headers + headerLargeTitle
-3. Staggered animations with react-native-reanimated in shop, profile, lobby
-4. All form sheets have transparent contentStyle + grabber
+2. All Stack layouts: headerTransparent, headerLargeTitle
+3. Staggered animations with react-native-reanimated (FadeInDown/FadeInUp)
+4. All form sheets: transparent contentStyle + grabber visible
 5. ThemeProvider with DarkTheme wraps app
-6. Zero TouchableOpacity in codebase (use Pressable)
-7. Zero Platform.select shadows (use boxShadow strings)
-8. borderCurve: 'continuous' on all rounded elements
-9. fontVariant: 'tabular-nums' on all numbers
+6. Zero TouchableOpacity: grep -r "TouchableOpacity" app/ src/expo/ --include="*.tsx"
+7. Zero Platform.select shadows: grep -r "Platform.select" app/ src/expo/ --include="*.tsx"
+8. borderCurve: 'continuous' on rounded elements
+9. fontVariant: 'tabular-nums' on numbers
 10. Tab bar hidden during gameplay
 
-RUN:
+Run:
   cd ${PROJECT_DIR}
-  grep -r "TouchableOpacity" app/ src/expo/ --include="*.tsx" | head -5
-  grep -r "Platform.select" app/ src/expo/ --include="*.tsx" | head -5
+  grep -r "TouchableOpacity" app/ src/expo/ --include="*.tsx" | wc -l
+  grep -r "Platform.select" app/ src/expo/ --include="*.tsx" | wc -l
   bun run build 2>&1 | tail -5
   bunx expo export --platform web 2>&1 | tail -10
   timeout 15 bunx expo start --no-dev 2>&1 | tail -20 || true
 
-Return { approved, issues, summary }.`}
+If ALL checks pass AND builds succeed: { approved: true, issues: [], summary: "Phase 4 looks good" }
+If ANY issue: { approved: false, issues: ["..."], summary: "Found N issues" }`}
         </Task>
+        </Sequence>
       </Ralph>
 
       {/* ═══════════════════════════════════════════
           PHASE 5: App Assets + EAS + Full Verification
           ═══════════════════════════════════════════ */}
-      <Ralph maxIterations={3} onMaxReached="return-last">
-        <Task
-          id="impl5"
-          agent={coder}
-          retries={2}
-          resultSchema={implResult}
-          cd={PROJECT_DIR}
-        >
-{`Expo migration Phase 5: App assets, EAS config, full build verification.
-${feedback(ctx, "review5")}
+      <Ralph
+        until={ctx.latest(reviewResult, "review5")?.approved}
+        maxIterations={3}
+        onMaxReached="return-last"
+      >
+        <Sequence>
+        <Task id="impl5" output={implResult} agent={coder} retries={2}>
+{`You are working on worm-world at ${PROJECT_DIR}.
+${ctx.latest(reviewResult, "review5")?.issues?.length ? `\nPREVIOUS REVIEW FEEDBACK:\n${ctx.latest(reviewResult, "review5")!.issues.join("\n")}\n` : ""}
+Implement Phase 5: App assets, EAS config, full build verification.
 
-STEP 1: App icon:
-  Create assets/icon.png (1024x1024) — a simple worm icon
-  Use ImageMagick to generate: green circle with cartoon worm eyes
-  Set in app.json: icon, splash.image, adaptiveIcon
+echo "=== Phase 5: Creating app icon ==="
+Use ImageMagick to create assets/icon.png (1024x1024): green circle with cartoon worm eyes.
+Set in app.json: icon, splash.image, adaptiveIcon.
 
-STEP 2: Splash screen:
-  Create assets/splash.png (1284x2778)
-  Configure expo-splash-screen in app.json
-  Use SplashScreen.preventAutoHideAsync() + hideAsync() after fonts load
+echo "=== Creating splash screen ==="
+Create assets/splash.png (1284x2778) with ImageMagick.
+Configure expo-splash-screen in app.json.
+SplashScreen.preventAutoHideAsync() + hideAsync() after fonts load.
 
-STEP 3: Create eas.json:
-  {
-    "cli": { "version": ">= 13.0.0" },
-    "build": {
-      "development": { "developmentClient": true, "distribution": "internal" },
-      "preview": { "distribution": "internal" },
-      "production": {}
-    }
-  }
+echo "=== Creating EAS config ==="
+Create eas.json with development, preview, production build profiles.
 
-STEP 4: Create .env.example:
+echo "=== Creating env example ==="
+Create .env.example:
   EXPO_PUBLIC_SPACETIMEDB_URI=wss://maincloud.spacetimedb.com
   EXPO_PUBLIC_SPACETIMEDB_DB=worm-world-server
 
-STEP 5: Deep linking:
-  Handle wormworld://room/{slug} in app/(lobby)/index.tsx
-  Use expo-linking to parse incoming URLs
-  Auto-join room when deep link received
+echo "=== Deep linking ==="
+Handle wormworld://room/{slug} in app/(lobby)/index.tsx.
+Use expo-linking to parse incoming URLs.
 
-STEP 6: Update .gitignore:
-  Add: .expo/, ios/, android/, *.jks, *.keystore
+echo "=== Updating gitignore ==="
+Add to .gitignore: .expo/, ios/, android/, *.jks, *.keystore
 
-STEP 7: Create app/(game)/edit-username.tsx:
-  FormSheet for editing player name (sheetAllowedDetents [0.35])
+echo "=== Creating edit-username sheet ==="
+app/(game)/edit-username.tsx: FormSheet sheetAllowedDetents [0.35] for editing player name.
 
-STEP 8: FULL VERIFICATION — ALL must pass:
-  1. bunx tsc --noEmit 2>&1 | head -20
-  2. bun run build 2>&1 | tail -5 (Vite web build)
-  3. bunx expo export --platform web 2>&1 | tail -10 (Expo web)
-  4. timeout 15 bunx expo start --no-dev 2>&1 | tail -20 || true (app starts)
-  5. bunx expo-doctor 2>&1 | tail -10 (dependency check)
+echo "=== FULL VERIFICATION ==="
+bun run build
+bunx expo export --platform web
+timeout 15 bunx expo start --no-dev 2>&1 | tail -20 || true
+bunx expo-doctor 2>&1 | tail -10
 
-If any fail, fix them before completing.`}
+Fix ANY failures before completing.
+
+Log progress with echo. Fix errors until ALL builds pass.
+
+Return JSON: { summary: "...", filesChanged: ["path1", ...] }`}
         </Task>
-        <Task
-          id="review5"
-          agent={reviewer}
-          resultSchema={reviewResult}
-        >
-{`Final review of Expo migration for worm-world at ${PROJECT_DIR}.
 
-CHECK all files:
-1. assets/icon.png exists (1024x1024)
+        <Task id="review5" output={reviewResult} agent={reviewer} retries={2}>
+{`Final review of Expo migration at ${PROJECT_DIR}.
+
+Check all files:
+1. assets/icon.png exists and is 1024x1024
 2. assets/splash.png exists
-3. eas.json with 3 build profiles
-4. .env.example with EXPO_PUBLIC vars
+3. eas.json with development, preview, production profiles
+4. .env.example with EXPO_PUBLIC_SPACETIMEDB_URI and EXPO_PUBLIC_SPACETIMEDB_DB
 5. .gitignore includes .expo/, ios/, android/
-6. app/(game)/edit-username.tsx — formSheet
-7. Deep linking handler in lobby
+6. app/(game)/edit-username.tsx — formSheet for player name
+7. Deep linking handler in app/(lobby)/index.tsx
 
-RUN ALL verification commands:
+Run ALL verification:
   cd ${PROJECT_DIR}
-  bunx tsc --noEmit 2>&1 | head -20
   bun run build 2>&1 | tail -5
   bunx expo export --platform web 2>&1 | tail -10
   timeout 15 bunx expo start --no-dev 2>&1 | tail -20 || true
   bunx expo-doctor 2>&1 | tail -10
 
-Check that original Vite web build still produces output.
-Check that Expo web export succeeds.
-Check that Expo dev server starts without crash.
+Vite web build must produce output.
+Expo web export must succeed.
+Expo dev server must start without crash.
 
-Return { approved, issues, summary }.`}
+If ALL checks pass AND ALL builds succeed: { approved: true, issues: [], summary: "Migration complete" }
+If ANY issue: { approved: false, issues: ["..."], summary: "Found N issues" }`}
         </Task>
+        </Sequence>
       </Ralph>
 
     </Sequence>
