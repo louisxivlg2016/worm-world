@@ -1834,24 +1834,32 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
       ctx.closePath()
       ctx.clip()
 
-      // Fill
-      if (bodyTexImg) {
-        // Draw flag texture per segment (same as circle mode) inside the tube clip
-        for (let i = 0; i < pts.length; i++) {
-          const p = pts[i]
-          const sz = R * 2
-          const aspect = bodyTexImg.naturalWidth / bodyTexImg.naturalHeight
-          let dw = sz, dh = sz / aspect
-          if (dh < sz) { dh = sz; dw = sz * aspect }
-          ctx.drawImage(bodyTexImg, p.x - dw / 2, p.y - dh / 2, dw, dh)
+      // Fill tube with flag color stripes running along the tube length
+      {
+        const stripeCount = colors.length
+        const stripeR = R / stripeCount
+        for (let s = 0; s < stripeCount; s++) {
+          ctx.fillStyle = colors[s]
+          ctx.beginPath()
+          // Offset from center: goes from -R to +R in equal bands
+          const off1 = -R + (s / stripeCount) * R * 2
+          const off2 = -R + ((s + 1) / stripeCount) * R * 2
+          // First point
+          const p0 = pts[0], n0 = normals[0]
+          ctx.moveTo(p0.x + n0.nx * off1, p0.y + n0.ny * off1)
+          // Upper edge of this stripe
+          for (let i = 1; i < pts.length; i++) {
+            const p = pts[i], n = normals[i]
+            ctx.lineTo(p.x + n.nx * off1, p.y + n.ny * off1)
+          }
+          // Lower edge of this stripe (reversed)
+          for (let i = pts.length - 1; i >= 0; i--) {
+            const p = pts[i], n = normals[i]
+            ctx.lineTo(p.x + n.nx * off2, p.y + n.ny * off2)
+          }
+          ctx.closePath()
+          ctx.fill()
         }
-      } else {
-        const tubeGrad = ctx.createLinearGradient(minX, 0, maxX, 0)
-        for (let ci = 0; ci < colors.length; ci++) {
-          tubeGrad.addColorStop(ci / (colors.length - 1 || 1), colors[ci])
-        }
-        ctx.fillStyle = tubeGrad
-        ctx.fillRect(minX, minY, maxX - minX, maxY - minY)
       }
 
       ctx.restore()
