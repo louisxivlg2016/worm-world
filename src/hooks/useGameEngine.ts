@@ -1,4 +1,5 @@
 import { useRef, useEffect, useCallback } from 'react'
+import { getEventByMode, isEventMode } from '@/config/events'
 import {
   WORLD_SIZE, FOOD_COUNT, SPECIAL_FOOD_COUNT, AI_WORM_COUNT,
   BASE_SPEED, BASE_SEGMENT_GAP, BASE_RADIUS, TURN_SPEED, COIN_COUNT,
@@ -24,11 +25,17 @@ function loadHeadImage(src: string): HTMLImageElement | null {
   return null
 }
 
+// Build HEAD_IMAGES dynamically from events + base heads
+import { GAME_EVENTS as _EVENTS_FOR_HEADS } from '@/config/events'
 const HEAD_IMAGES: Record<string, string> = {
   queen: '/heads/queen.png',
   king: '/heads/king.png',
   dragon: '/heads/dragon.png',
-  stpatrick: '/heads/stpatrick.png',
+}
+for (const ev of _EVENTS_FOR_HEADS) {
+  for (const c of ev.costumes) {
+    HEAD_IMAGES[c.id] = c.preview
+  }
 }
 
 // Body texture cache
@@ -44,7 +51,11 @@ function loadBodyTexture(src: string): HTMLImageElement | null {
 
 const BODY_TEXTURES: Record<string, string> = {
   dragon: '/heads/dragon-body.png',
-  stpatrick: '/heads/stpatrick-body.png',
+}
+for (const ev of _EVENTS_FOR_HEADS) {
+  for (const c of ev.costumes) {
+    BODY_TEXTURES[c.id] = c.bodyTexture
+  }
 }
 
 const DEFAULT_FLAG_TEXTURE_SCALE = 1.4
@@ -177,6 +188,7 @@ interface EngineState {
   roomId: string | null
   gameMode: GameMode
   localBattleDeaths: number
+  playerKills: number
   isGameOver: boolean
 }
 
@@ -295,8 +307,8 @@ function createWorm(x: number, y: number, skin: WormSkin, name: string, isPlayer
 
 function getWormRadius(worm: Worm): number {
   const len = worm.segments.length
-  const growth = Math.pow(len / 150, 2) * 8
-  return BASE_RADIUS + Math.min(growth, 28)
+  const growth = Math.pow(len / 300, 2) * 5
+  return BASE_RADIUS + Math.min(growth, 10)
 }
 
 function getWormSpeed(worm: Worm): number {
@@ -1141,12 +1153,63 @@ function killWorm(worm: Worm, foods: Food[], particles: Particle[]) {
 // ============================================
 // DRAWING
 // ============================================
-function drawBackground(ctx: CanvasRenderingContext2D, camera: Camera, w: number, h: number, player: Worm) {
+// Event background image cache
+const eventBgCache = new Map<string, HTMLImageElement>()
+import { GAME_EVENTS } from '@/config/events'
+for (const ev of GAME_EVENTS) {
+  const img = new Image()
+  img.src = ev.bgImage
+  img.onload = () => { eventBgCache.set(ev.id, img) }
+}
+
+function drawBackground(ctx: CanvasRenderingContext2D, camera: Camera, w: number, h: number, player: Worm, gameMode?: GameMode) {
+  const event = gameMode ? getEventByMode(gameMode) : undefined
+
   const grd = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w)
-  grd.addColorStop(0, '#1a5c8a')
-  grd.addColorStop(1, '#0e3a5c')
+  if (event) {
+    grd.addColorStop(0, event.bgGradient[0])
+    grd.addColorStop(1, event.bgGradient[1])
+  } else {
+    grd.addColorStop(0, '#1a5c8a')
+    grd.addColorStop(1, '#0e3a5c')
+  }
   ctx.fillStyle = grd
   ctx.fillRect(0, 0, w, h)
+
+  // Event: draw themed images scattered in the world (capped for performance)
+  if (event) {
+    const bgImg = eventBgCache.get(event.id)
+    if (bgImg) {
+      const effectiveZoom = Math.max(camera.zoom, 0.4) // clamp to avoid too many draws
+      const spacing = 380
+      const startWX = Math.floor((camera.x - w / 2 / effectiveZoom) / spacing) * spacing
+      const startWY = Math.floor((camera.y - h / 2 / effectiveZoom) / spacing) * spacing
+      const endWX = camera.x + w / 2 / effectiveZoom
+      const endWY = camera.y + h / 2 / effectiveZoom
+      ctx.globalAlpha = 0.12
+      let count = 0
+      for (let wx = startWX; wx <= endWX; wx += spacing) {
+        for (let wy = startWY; wy <= endWY; wy += spacing) {
+          if (++count > 60) break // hard cap
+          const hash = ((wx * 73856093) ^ (wy * 19349663)) >>> 0
+          const ox = (hash % 200) - 100
+          const oy = ((hash * 31) % 200) - 100
+          const rot = ((hash * 17) % 360) * Math.PI / 180
+          const size = 35 + (hash % 30)
+          const p = worldToScreen(wx + ox, wy + oy, camera, w, h)
+          if (p.x < -size || p.x > w + size || p.y < -size || p.y > h + size) continue
+          const s = size * camera.zoom
+          ctx.save()
+          ctx.translate(p.x, p.y)
+          ctx.rotate(rot)
+          ctx.drawImage(bgImg, -s / 2, -s / 2, s, s)
+          ctx.restore()
+        }
+        if (count > 60) break
+      }
+      ctx.globalAlpha = 1
+    }
+  }
 
   // Carpet texture (reduced for performance)
   const seed = Math.floor(camera.x * 0.1) + Math.floor(camera.y * 0.1) * 1000
@@ -1162,7 +1225,7 @@ function drawBackground(ctx: CanvasRenderingContext2D, camera: Camera, w: number
   const half = WORLD_SIZE / 2
   const tl = worldToScreen(-half, -half, camera, w, h)
   const br = worldToScreen(half, half, camera, w, h)
-  ctx.strokeStyle = 'rgba(255,80,80,0.5)'
+  ctx.strokeStyle = event ? event.borderColor : 'rgba(255,80,80,0.5)'
   ctx.lineWidth = 4 * camera.zoom
   ctx.setLineDash([20 * camera.zoom, 10 * camera.zoom])
   ctx.strokeRect(tl.x, tl.y, br.x - tl.x, br.y - tl.y)
@@ -1173,7 +1236,7 @@ function drawBackground(ctx: CanvasRenderingContext2D, camera: Camera, w: number
   const edgeDist = Math.min(Math.abs(head.x) - half, Math.abs(head.y) - half)
   if (edgeDist > -300) {
     const alpha = Math.max(0, (300 + edgeDist) / 300) * 0.3
-    ctx.fillStyle = `rgba(255,30,30,${alpha})`
+    ctx.fillStyle = event ? `${event.glowColor}${alpha})` : `rgba(255,30,30,${alpha})`
     ctx.fillRect(0, 0, w, h)
   }
 }
@@ -1393,15 +1456,17 @@ function getEmojiCanvas(emoji: string): HTMLCanvasElement {
 
 function drawFood(ctx: CanvasRenderingContext2D, foods: Food[], camera: Camera, w: number, h: number) {
   const time = Date.now() * 0.003
+  const margin = 40
   for (const f of foods) {
     const p = worldToScreen(f.x, f.y, camera, w, h)
-    if (p.x < -40 || p.x > w + 40 || p.y < -40 || p.y > h + 40) continue
+    if (p.x < -margin || p.x > w + margin || p.y < -margin || p.y > h + margin) continue
     const r = f.radius * camera.zoom
+    if (r < 1) continue // skip tiny items when zoomed out
     const pulse = 1 + Math.sin(time + f.pulse) * 0.1
     const size = r * 4.0 * pulse
 
-    // Glow for special food
-    if (f.special && size > 6) {
+    // Glow for special food (skip glow when zoomed out for perf)
+    if (f.special && size > 6 && camera.zoom > 0.35) {
       ctx.beginPath()
       const glowGrd = ctx.createRadialGradient(p.x, p.y, size * 0.3, p.x, p.y, size * 1.5)
       glowGrd.addColorStop(0, 'rgba(255,100,200,0.35)')
@@ -1525,11 +1590,12 @@ function drawCoins(ctx: CanvasRenderingContext2D, coins: Coin[], camera: Camera,
     const p = worldToScreen(c.x, c.y, camera, w, h)
     if (p.x < -30 || p.x > w + 30 || p.y < -30 || p.y > h + 30) continue
     const r = c.radius * camera.zoom
+    if (r < 1.5) continue // skip tiny coins when zoomed out
     const pulse = 1 + Math.sin(time + c.pulse) * 0.15
     const size = r * pulse
 
-    // Glow
-    if (size > 5) {
+    // Glow (skip when zoomed out)
+    if (size > 5 && camera.zoom > 0.35) {
       ctx.beginPath()
       const glowGrd = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 2.5)
       glowGrd.addColorStop(0, 'rgba(255,215,0,0.2)')
@@ -1638,12 +1704,12 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   const bodyTexKey = worm.skin.bodyTexture
   const bodyTexImg = bodyTexKey ? (bodyTextureCache.get(bodyTexKey) ?? loadBodyTexture(bodyTexKey)) : null
 
-  // For flag textures: draw all segments as one combined shape, then texture
-  const isFlag = bodyTexImg && worm.skin.isFlag
+  // Smooth tube body rendering (for flags or tube body style)
+  const isTube = worm.skin.bodyStyle === 'tube'
+  const isFlag = bodyTexImg && worm.skin.isFlag && !isTube
 
+  // Flag skins: clip circles + stretch one texture over the whole body
   if (isFlag && bodyTexImg) {
-
-    // 1) Build one combined path of all segment circles & track bounding box
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
     ctx.save()
     ctx.beginPath()
@@ -1659,26 +1725,14 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
       if (p.y + segR > maxY) maxY = p.y + segR
     }
     ctx.clip()
-
-    // 2) Draw one single texture stretched over the entire worm body
     if (minX < Infinity) {
-      const bw = maxX - minX
-      const bh = maxY - minY
+      const bw = maxX - minX, bh = maxY - minY
       const aspect = bodyTexImg.naturalWidth / bodyTexImg.naturalHeight
-      // Cover the bounding box while preserving aspect ratio
-      let drawW = bw
-      let drawH = bw / aspect
-      if (drawH < bh) {
-        drawH = bh
-        drawW = bh * aspect
-      }
-      const dx = minX + (bw - drawW) / 2
-      const dy = minY + (bh - drawH) / 2
-      ctx.drawImage(bodyTexImg, dx, dy, drawW, drawH)
+      let drawW = bw, drawH = bw / aspect
+      if (drawH < bh) { drawH = bh; drawW = bh * aspect }
+      ctx.drawImage(bodyTexImg, minX + (bw - drawW) / 2, minY + (bh - drawH) / 2, drawW, drawH)
     }
     ctx.restore()
-
-    // Invincible overlay for flag worms
     if (invincible) {
       for (let i = segments.length - 1; i >= 0; i--) {
         const seg = segments[i]
@@ -1693,8 +1747,142 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
     }
   }
 
+  if (isTube) {
+    // Build screen-space points (skip every other for perf on long worms)
+    const step = segments.length > 200 ? 2 : 1
+    const pts: { x: number; y: number }[] = []
+    for (let i = 0; i < segments.length; i += step) {
+      const seg = segments[i]
+      const p = worldToScreen(seg.x, seg.y, camera, w, h)
+      pts.push(p)
+    }
+
+    if (pts.length >= 3) {
+      const R = segR + 1 // slightly larger for smooth look
+
+      // Compute smoothed normals
+      const normals: { nx: number; ny: number }[] = []
+      for (let i = 0; i < pts.length; i++) {
+        let dx = 0, dy = 0
+        // Average direction from neighbors
+        const range = 3
+        for (let j = Math.max(0, i - range); j < Math.min(pts.length - 1, i + range); j++) {
+          dx += pts[j + 1].x - pts[j].x
+          dy += pts[j + 1].y - pts[j].y
+        }
+        const len = Math.sqrt(dx * dx + dy * dy) || 1
+        normals.push({ nx: -dy / len, ny: dx / len })
+      }
+
+      // Build upper/lower edges with smoothed normals
+      const upper: { x: number; y: number }[] = []
+      const lower: { x: number; y: number }[] = []
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
+
+      for (let i = 0; i < pts.length; i++) {
+        const p = pts[i], n = normals[i]
+        upper.push({ x: p.x + n.nx * R, y: p.y + n.ny * R })
+        lower.push({ x: p.x - n.nx * R, y: p.y - n.ny * R })
+        const ex = R + 4
+        if (p.x - ex < minX) minX = p.x - ex
+        if (p.y - ex < minY) minY = p.y - ex
+        if (p.x + ex > maxX) maxX = p.x + ex
+        if (p.y + ex > maxY) maxY = p.y + ex
+      }
+
+      // Helper: draw smooth curve through points
+      const drawSmoothCurve = (points: { x: number; y: number }[]) => {
+        if (points.length < 2) return
+        ctx.moveTo(points[0].x, points[0].y)
+        for (let i = 0; i < points.length - 1; i++) {
+          const cx = (points[i].x + points[i + 1].x) / 2
+          const cy = (points[i].y + points[i + 1].y) / 2
+          ctx.quadraticCurveTo(points[i].x, points[i].y, cx, cy)
+        }
+        const last = points[points.length - 1]
+        ctx.lineTo(last.x, last.y)
+      }
+
+      // === 1) Dark outline (drawn first, thicker) ===
+      ctx.save()
+      ctx.lineJoin = 'round'
+      ctx.lineCap = 'round'
+      ctx.lineWidth = (R * 2 + 8) * camera.zoom / segR
+      ctx.strokeStyle = 'rgba(0,0,0,0.95)'
+      ctx.beginPath()
+      drawSmoothCurve(pts)
+      ctx.stroke()
+      ctx.restore()
+
+      // === 2) Clip to tube shape and fill ===
+      ctx.save()
+      ctx.beginPath()
+      drawSmoothCurve(upper)
+      // Tail cap
+      const tail = pts[pts.length - 1]
+      ctx.arc(tail.x, tail.y, R,
+        Math.atan2(upper[upper.length - 1].y - tail.y, upper[upper.length - 1].x - tail.x),
+        Math.atan2(lower[lower.length - 1].y - tail.y, lower[lower.length - 1].x - tail.x))
+      // Lower edge reversed
+      const lowerRev = [...lower].reverse()
+      drawSmoothCurve(lowerRev)
+      // Head cap
+      const headPt = pts[0]
+      ctx.arc(headPt.x, headPt.y, R,
+        Math.atan2(lower[0].y - headPt.y, lower[0].x - headPt.x),
+        Math.atan2(upper[0].y - headPt.y, upper[0].x - headPt.x))
+      ctx.closePath()
+      ctx.clip()
+
+      // Fill
+      if (bodyTexImg) {
+        // Stretch flag over worm's world-space bounding box (anchored, doesn't move)
+        let wMinX = Infinity, wMinY = Infinity, wMaxX = -Infinity, wMaxY = -Infinity
+        for (let i = 0; i < segments.length; i += step) {
+          const s = segments[i]
+          if (s.x < wMinX) wMinX = s.x
+          if (s.y < wMinY) wMinY = s.y
+          if (s.x > wMaxX) wMaxX = s.x
+          if (s.y > wMaxY) wMaxY = s.y
+        }
+        // Pad by radius
+        wMinX -= radius; wMinY -= radius; wMaxX += radius; wMaxY += radius
+        const tl = worldToScreen(wMinX, wMinY, camera, w, h)
+        const br = worldToScreen(wMaxX, wMaxY, camera, w, h)
+        const sw = br.x - tl.x, sh = br.y - tl.y
+        // Cover-fit the flag (no transparency)
+        const aspect = bodyTexImg.naturalWidth / bodyTexImg.naturalHeight
+        let dw = sw, dh = sw / aspect
+        if (dh < sh) { dh = sh; dw = sh * aspect }
+        ctx.drawImage(bodyTexImg, tl.x + (sw - dw) / 2, tl.y + (sh - dh) / 2, dw, dh)
+      } else {
+        const tubeGrad = ctx.createLinearGradient(minX, 0, maxX, 0)
+        for (let ci = 0; ci < colors.length; ci++) {
+          tubeGrad.addColorStop(ci / (colors.length - 1 || 1), colors[ci])
+        }
+        ctx.fillStyle = tubeGrad
+        ctx.fillRect(minX, minY, maxX - minX, maxY - minY)
+      }
+
+      ctx.restore()
+
+      // Invincible glow
+      if (invincible) {
+        ctx.save()
+        ctx.lineJoin = 'round'
+        ctx.lineCap = 'round'
+        ctx.lineWidth = (R * 2 + 8) * camera.zoom / segR
+        ctx.strokeStyle = `rgba(255,255,255,${invAlpha})`
+        ctx.beginPath()
+        drawSmoothCurve(pts)
+        ctx.stroke()
+        ctx.restore()
+      }
+    }
+  }
+
   for (let i = segments.length - 1; i >= 0; i--) {
-    if (isFlag) break // already drawn above
+    if (isTube || isFlag) break // already drawn above
     const seg = segments[i]
     const p = worldToScreen(seg.x, seg.y, camera, w, h)
     if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
@@ -1924,7 +2112,8 @@ export interface GameEngineCallbacks {
   onCoinsUpdate: (coins: number) => void
   onBoostUpdate: (energy: number) => void
   onLeaderboardUpdate: (entries: { name: string; score: number; isPlayer: boolean }[]) => void
-  onDeath: (score: number, length: number, coins: number) => void
+  onDeath: (score: number, length: number, coins: number, kills: number) => void
+  onWin?: () => void
 }
 
 export function useGameEngine(
@@ -1964,6 +2153,7 @@ export function useGameEngine(
     roomId: null,
     gameMode: 'ffa',
     localBattleDeaths: 0,
+    playerKills: 0,
     isGameOver: false,
   })
 
@@ -1989,6 +2179,7 @@ export function useGameEngine(
     { headType: 'king' },
     { headType: 'dragon', bodyTexture: '/heads/dragon-body.png' },
     { headType: 'stpatrick', bodyTexture: '/heads/stpatrick-body.png' },
+    { headType: 'santa', bodyTexture: '/heads/santa-body.png' },
   ]
 
   const spawnAIWorm = useCallback((forceSmall?: boolean) => {
@@ -1998,9 +2189,16 @@ export function useGameEngine(
     const baseSkin = AI_SKINS[Math.floor(Math.random() * AI_SKINS.length)]
     const name = getUniqueAIName()
 
-    // 30% chance to get a shop costume
+    // Event mode: all AI get event-themed skins
     let skin: WormSkin = { ...baseSkin }
-    if (Math.random() < 0.3) {
+    const activeEvent = getEventByMode(s.gameMode)
+    if (activeEvent && activeEvent.costumes.length > 0) {
+      const randCostume = activeEvent.costumes[Math.floor(Math.random() * activeEvent.costumes.length)]
+      skin = { colors: [...activeEvent.aiColors], eye: '#fff' }
+      skin.headType = randCostume.id as any
+      skin.bodyTexture = randCostume.bodyTexture
+    } else if (Math.random() < 0.3) {
+      // 30% chance to get a shop costume
       const costume = AI_COSTUMES[Math.floor(Math.random() * AI_COSTUMES.length)]
       skin.headType = costume.headType
       if (costume.bodyTexture) skin.bodyTexture = costume.bodyTexture
@@ -2120,6 +2318,7 @@ export function useGameEngine(
     s.roomId = roomId ?? null
     s.gameMode = gameMode ?? 'ffa'
     s.localBattleDeaths = 0
+    s.playerKills = 0
     s.isGameOver = false
     s.remotePlayers = new Map()
 
@@ -2300,9 +2499,11 @@ export function useGameEngine(
         s.particles,
         () => {
           s.gameRunning = false
-          callbacksRef.current.onDeath(s.player!.score, s.player!.segments.length, s.playerCoins)
+          callbacksRef.current.onDeath(s.player!.score, s.player!.segments.length, s.playerCoins, s.playerKills)
         },
         (_worm, _idx) => {
+          // Check if player killed this worm (player's body was the obstacle)
+          if (s.player && s.player.alive) s.playerKills++
           setTimeout(() => {
             const idx = s.aiWorms.indexOf(_worm)
             if (idx >= 0) {
@@ -2355,7 +2556,7 @@ export function useGameEngine(
       // Draw
       const ctx = canvas.getContext('2d')!
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      drawBackground(ctx, s.camera, canvas.width, canvas.height, s.player)
+      drawBackground(ctx, s.camera, canvas.width, canvas.height, s.player, s.gameMode)
       drawFood(ctx, s.foods, s.camera, canvas.width, canvas.height)
       drawChests(ctx, s.chests, s.camera, canvas.width, canvas.height)
       drawCoins(ctx, s.coins, s.camera, canvas.width, canvas.height)
@@ -2374,6 +2575,14 @@ export function useGameEngine(
       // Active potion effect indicators
       drawActiveEffects(ctx, s.activeEffects, canvas.width)
       drawFlyingCoins(ctx, s.flyingCoins, s.camera, canvas.width, canvas.height)
+
+      // Event mode win condition: score >= 500
+      if (isEventMode(s.gameMode) && s.player.score >= 500 && !s.isGameOver) {
+        s.isGameOver = true
+        s.gameRunning = false
+        callbacksRef.current.onWin?.()
+        return
+      }
 
       // UI updates
       if (s.frameCount % 5 === 0) {

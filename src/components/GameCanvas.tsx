@@ -10,7 +10,8 @@ interface GameCanvasProps {
   roomId?: string
   gameMode?: GameMode
   seed?: number
-  onDeath: (score: number, length: number, coins: number) => void
+  onDeath: (score: number, length: number, coins: number, kills: number) => void
+  onWin?: () => void
   onBack: () => void
 }
 
@@ -22,6 +23,7 @@ export function GameCanvas({
   gameMode,
   seed,
   onDeath,
+  onWin,
   onBack,
 }: GameCanvasProps) {
   const { t } = useTranslation()
@@ -40,6 +42,7 @@ export function GameCanvas({
     onBoostUpdate: setBoostEnergy,
     onLeaderboardUpdate: setLeaderboard,
     onDeath,
+    onWin,
   }
 
   const { startGame, stopGame } = useGameEngine(canvasRef, minimapRef, callbacks)
@@ -126,7 +129,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   coinPanel: {
     position: 'fixed',
-    bottom: 30, left: 20,
+    top: 20, left: 20,
     display: 'flex',
     alignItems: 'center',
     gap: 8,

@@ -21,7 +21,11 @@ export interface Segment {
   y: number
 }
 
-export type HeadType = 'default' | 'queen' | 'king' | 'dragon' | 'stpatrick'
+export type HeadType = 'default' | 'queen' | 'king' | 'dragon'
+  | 'stpatrick' | 'santa' | 'newyear' | 'valentine' | 'easter' | 'halloween' | 'summer'
+  | 'carnival' | 'holi' | 'mayday' | 'bastille' | 'july4th' | 'muertos' | 'diwali' | 'reveillon' | 'cny' | 'thanksgiving' | 'eid'
+
+export type BodyStyle = 'circles' | 'tube'
 
 export interface WormSkin {
   colors: string[]
@@ -30,6 +34,7 @@ export interface WormSkin {
   headType?: HeadType
   bodyTexture?: string // URL to a body texture image
   isFlag?: boolean // true for flag skins (continuous body texture)
+  bodyStyle?: BodyStyle
 }
 
 export interface Food {
@@ -143,7 +148,9 @@ export interface Camera {
 }
 
 export type GameMode = 'battle' | 'ctf' | 'ffa' | 'coins'
-export type GameScreen = 'menu' | 'lobby' | 'shop' | 'playing' | 'dead'
+  | 'stpatrick' | 'noel' | 'newyear' | 'valentine' | 'easter' | 'halloween' | 'summer'
+  | 'carnival' | 'holi' | 'mayday' | 'bastille' | 'july4th' | 'muertos' | 'diwali' | 'reveillon' | 'cny' | 'thanksgiving' | 'eid'
+export type GameScreen = 'menu' | 'lobby' | 'shop' | 'profile' | 'playing' | 'dead' | 'event-win'
 
 export interface GameState {
   screen: GameScreen

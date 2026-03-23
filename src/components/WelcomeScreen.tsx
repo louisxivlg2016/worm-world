@@ -1,23 +1,27 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { SKINS, type WormSkin } from '@/types/game'
+import { SKINS, type WormSkin, type GameMode } from '@/types/game'
+import type { GameEvent } from '@/config/events'
 
 interface WelcomeScreenProps {
   customSkin: WormSkin | null
+  activeEvents: GameEvent[]
   onPlay: (name: string, skin: WormSkin) => void
   onPlayCoins: (name: string, skin: WormSkin) => void
+  onPlayEvent: (mode: GameMode, name: string, skin: WormSkin) => void
   onMultiplayer: () => void
   onShop: () => void
+  onProfile: () => void
 }
 
-export function WelcomeScreen({ customSkin, onPlay, onPlayCoins, onMultiplayer, onShop }: WelcomeScreenProps) {
+export function WelcomeScreen({ customSkin, activeEvents, onPlay, onPlayCoins, onPlayEvent, onMultiplayer, onShop, onProfile }: WelcomeScreenProps) {
   const { t } = useTranslation()
   const [name, setName] = useState('')
   const [selectedSkin, setSelectedSkin] = useState(0)
+  const [useCustom, setUseCustom] = useState(!!customSkin)
 
-  // If there's a custom skin, it's shown as the last option
-  const allSkins = customSkin ? [...SKINS, customSkin] : SKINS
-  const activeSkin = allSkins[selectedSkin] ?? SKINS[0]
+  // If custom skin is active from shop, use it; otherwise use selected default skin
+  const activeSkin = (useCustom && customSkin) ? customSkin : (SKINS[selectedSkin] ?? SKINS[0])
 
   const handlePlay = () => {
     onPlay(name.trim() || `Guest${Math.floor(Math.random() * 999)}`, activeSkin)
@@ -37,23 +41,18 @@ export function WelcomeScreen({ customSkin, onPlay, onPlayCoins, onMultiplayer, 
         onKeyDown={(e) => { if (e.key === 'Enter') handlePlay() }}
       />
       <div style={styles.skinSelector}>
-        {allSkins.map((skin, i) => (
+        {SKINS.map((skin, i) => (
           <div
             key={i}
             style={{
               ...styles.skinOption,
               background: `linear-gradient(135deg, ${skin.colors[0]}, ${skin.colors[1]})`,
-              borderColor: i === selectedSkin ? '#ffd700' : 'rgba(255,255,255,0.15)',
-              boxShadow: i === selectedSkin ? '0 0 20px rgba(255,215,0,0.5)' : 'none',
-              transform: i === selectedSkin ? 'scale(1.15)' : 'scale(1)',
+              borderColor: !customSkin && i === selectedSkin ? '#ffd700' : 'rgba(255,255,255,0.15)',
+              boxShadow: !customSkin && i === selectedSkin ? '0 0 20px rgba(255,215,0,0.5)' : 'none',
+              transform: !customSkin && i === selectedSkin ? 'scale(1.15)' : 'scale(1)',
             }}
-            onClick={() => setSelectedSkin(i)}
-          >
-            {/* Star icon for custom skin */}
-            {customSkin && i === allSkins.length - 1 && (
-              <span style={{ fontSize: 18, position: 'absolute', top: -6, right: -6 }}>&#11088;</span>
-            )}
-          </div>
+            onClick={() => { setSelectedSkin(i); setUseCustom(false) }}
+          />
         ))}
       </div>
       <button style={styles.playBtn} onClick={handlePlay}>
@@ -62,12 +61,41 @@ export function WelcomeScreen({ customSkin, onPlay, onPlayCoins, onMultiplayer, 
       <button style={styles.coinsBtn} onClick={() => onPlayCoins(name.trim() || `Guest${Math.floor(Math.random() * 999)}`, activeSkin)}>
         {t('coinsMode')}
       </button>
+      {activeEvents.length > 0 && (
+        <div style={styles.eventsScroll}>
+          {activeEvents.map(event => (
+            <button
+              key={event.id}
+              style={{
+                padding: '10px 28px',
+                border: 'none',
+                borderRadius: 50,
+                fontFamily: "'Bungee', cursive",
+                fontSize: 14,
+                color: '#FFFFFF',
+                background: event.btnGradient,
+                cursor: 'pointer',
+                boxShadow: event.btnShadow,
+                letterSpacing: 1,
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+              }}
+              onClick={() => onPlayEvent(event.id, name.trim() || `Guest${Math.floor(Math.random() * 999)}`, activeSkin)}
+            >
+              {event.emoji} {event.label}
+            </button>
+          ))}
+        </div>
+      )}
       <div style={styles.btnRow}>
         <button style={styles.multiBtn} onClick={onMultiplayer}>
           {t('multiplay')}
         </button>
         <button style={styles.shopBtn} onClick={onShop}>
           {t('shop')}
+        </button>
+        <button style={styles.profileBtn} onClick={onProfile}>
+          Profil
         </button>
       </div>
 
@@ -176,6 +204,16 @@ const styles: Record<string, React.CSSProperties> = {
     letterSpacing: 2,
     marginBottom: 12,
   },
+  eventsScroll: {
+    display: 'flex',
+    gap: 8,
+    overflowX: 'auto',
+    maxWidth: '90vw',
+    padding: '8px 4px',
+    marginBottom: 8,
+    scrollbarWidth: 'thin',
+    WebkitOverflowScrolling: 'touch',
+  } as React.CSSProperties,
   btnRow: {
     display: 'flex',
     gap: 12,
@@ -200,6 +238,18 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 16,
     color: '#ffd700',
     background: 'rgba(255,215,0,0.1)',
+    cursor: 'pointer',
+    backdropFilter: 'blur(10px)',
+    letterSpacing: 2,
+  },
+  profileBtn: {
+    padding: '12px 30px',
+    border: '2px solid rgba(100,200,255,0.4)',
+    borderRadius: 50,
+    fontFamily: "'Bungee', cursive",
+    fontSize: 16,
+    color: '#64c8ff',
+    background: 'rgba(100,200,255,0.1)',
     cursor: 'pointer',
     backdropFilter: 'blur(10px)',
     letterSpacing: 2,
