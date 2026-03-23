@@ -1836,25 +1836,15 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
 
       // Fill
       if (bodyTexImg) {
-        // Stretch flag over worm's world-space bounding box (anchored, doesn't move)
-        let wMinX = Infinity, wMinY = Infinity, wMaxX = -Infinity, wMaxY = -Infinity
-        for (let i = 0; i < segments.length; i += step) {
-          const s = segments[i]
-          if (s.x < wMinX) wMinX = s.x
-          if (s.y < wMinY) wMinY = s.y
-          if (s.x > wMaxX) wMaxX = s.x
-          if (s.y > wMaxY) wMaxY = s.y
+        // Draw flag texture per segment (same as circle mode) inside the tube clip
+        for (let i = 0; i < pts.length; i++) {
+          const p = pts[i]
+          const sz = R * 2
+          const aspect = bodyTexImg.naturalWidth / bodyTexImg.naturalHeight
+          let dw = sz, dh = sz / aspect
+          if (dh < sz) { dh = sz; dw = sz * aspect }
+          ctx.drawImage(bodyTexImg, p.x - dw / 2, p.y - dh / 2, dw, dh)
         }
-        // Pad by radius
-        wMinX -= radius; wMinY -= radius; wMaxX += radius; wMaxY += radius
-        const tl = worldToScreen(wMinX, wMinY, camera, w, h)
-        const br = worldToScreen(wMaxX, wMaxY, camera, w, h)
-        const sw = br.x - tl.x, sh = br.y - tl.y
-        // Cover-fit the flag (no transparency)
-        const aspect = bodyTexImg.naturalWidth / bodyTexImg.naturalHeight
-        let dw = sw, dh = sw / aspect
-        if (dh < sh) { dh = sh; dw = sh * aspect }
-        ctx.drawImage(bodyTexImg, tl.x + (sw - dw) / 2, tl.y + (sh - dh) / 2, dw, dh)
       } else {
         const tubeGrad = ctx.createLinearGradient(minX, 0, maxX, 0)
         for (let ci = 0; ci < colors.length; ci++) {
@@ -2546,7 +2536,7 @@ export function useGameEngine(
         const head = s.player.segments[0]
         s.camera.x += (head.x - s.camera.x) * 0.08
         s.camera.y += (head.y - s.camera.y) * 0.08
-        let targetZoom = Math.max(0.5, 1 - s.player.segments.length * 0.001)
+        let targetZoom = Math.max(0.8, 1.6 - s.player.segments.length * 0.0008)
         if (hasZoom) targetZoom *= 0.55 // zoom out effect
         s.camera.zoom += (targetZoom - s.camera.zoom) * 0.05
       }
