@@ -10,7 +10,7 @@ import {
   type Segment, type WormSkin, type AIStrategy, type GameMode, type HeadType, type PotionType,
   POTION_DURATION, POTION_COUNT, CHEST_COUNT,
 } from '@/types/game'
-import { MultiplayerService, selfId } from '@/services/MultiplayerService'
+// Multiplayer now handled by SpacetimeService
 
 // ============================================
 // HEAD IMAGE CACHE — load once
@@ -183,7 +183,7 @@ interface EngineState {
   // Spatial
   foodGrid: SpatialGrid
   // Multiplayer
-  mp: MultiplayerService | null
+  mp: null
   roomSlug: string | null
   roomId: string | null
   gameMode: GameMode
