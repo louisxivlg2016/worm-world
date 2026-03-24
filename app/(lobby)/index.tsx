@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import * as Linking from "expo-linking";
+import { useRouter } from "expo-router";
 import { colors, spacing } from "@/expo/theme";
 import { spacetimeService } from "@/services/SpacetimeService";
 import type { GameMode } from "@/types/game";
@@ -25,6 +26,7 @@ type RoomInfo = {
 };
 
 export default function LobbyScreen() {
+  const router = useRouter();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 600;
   const contentMaxWidth = 600;
@@ -70,7 +72,13 @@ export default function LobbyScreen() {
     if (!roomName.trim()) return;
     setLoading(true);
     try {
-      await spacetimeService.createRoom(roomName.trim(), true, gameMode, 8);
+      const result = await spacetimeService.createRoom(roomName.trim(), true, gameMode, 8);
+      if (result) {
+        // Subscribe to game data and navigate to play tab
+        const roomId = spacetimeService.getCurrentRoomId();
+        if (roomId) spacetimeService.subscribeToGameData(roomId);
+        router.push("/");
+      }
     } catch (e) {
       console.error("Failed to create room:", e);
     } finally {
@@ -82,7 +90,11 @@ export default function LobbyScreen() {
     if (!slug.trim()) return;
     setLoading(true);
     try {
-      spacetimeService.joinRoom(slug.trim());
+      const result = spacetimeService.joinRoom(slug.trim());
+      if (result) {
+        spacetimeService.subscribeToGameData(result.roomId);
+        router.push("/");
+      }
     } catch (e) {
       console.error("Failed to join room:", e);
     } finally {
