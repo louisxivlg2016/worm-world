@@ -36,6 +36,8 @@ export default defineConfig(({ mode }) => {
       'process.env.VITE_SPACETIMEDB_DB': JSON.stringify(env.VITE_SPACETIMEDB_DB || ''),
       'process.env.EXPO_PUBLIC_SPACETIMEDB_URI': JSON.stringify(env.EXPO_PUBLIC_SPACETIMEDB_URI || ''),
       'process.env.EXPO_PUBLIC_SPACETIMEDB_DB': JSON.stringify(env.EXPO_PUBLIC_SPACETIMEDB_DB || ''),
+      'process.env.VITE_DEV_MODE': JSON.stringify(env.VITE_DEV_MODE || ''),
+      'process.env.EXPO_PUBLIC_DEV_MODE': JSON.stringify(env.EXPO_PUBLIC_DEV_MODE || ''),
     },
     publicDir: "public",
     resolve: { alias: { "@": "/src" } },
