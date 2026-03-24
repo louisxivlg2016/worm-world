@@ -1,6 +1,0 @@
-{
-  "buildCommand": "NODE_OPTIONS='--max-old-space-size=8192' bunx expo export --platform web --no-bytecode",
-  "outputDirectory": "dist",
-  "installCommand": "bun install",
-  "framework": null
-}
