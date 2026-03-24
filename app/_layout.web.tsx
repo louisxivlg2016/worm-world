@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Slot, usePathname, useRouter } from "expo-router";
 import { ThemeProvider, DarkTheme } from "@react-navigation/native";
+import "@/i18n";
 import { colors } from "@/expo/theme";
 import { GameStateProvider, useGameState } from "@/context/GameStateContext";
 import { spacetimeService } from "@/services/SpacetimeService";

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { NativeTabs } from "expo-router/unstable-native-tabs";
 import { ThemeProvider, DarkTheme } from "@react-navigation/native";
+import "@/i18n";
 import { colors } from "@/expo/theme";
 import { GameStateProvider, useGameState } from "@/context/GameStateContext";
 import { GAME_EVENTS, isEventActive } from "@/config/events";
