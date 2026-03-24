@@ -415,20 +415,29 @@ export const GAME_EVENTS: GameEvent[] = [
   },
 ]
 
-const DEV_MODE = true
+const DEV_MODE = (process.env.VITE_DEV_MODE || process.env.EXPO_PUBLIC_DEV_MODE) === 'true'
 
 export function isEventActive(event: GameEvent): boolean {
   if (DEV_MODE) return true
+
   const today = new Date()
-  const m = today.getMonth()
-  const d = today.getDate()
-  if (event.startMonth === event.endMonth) {
-    return m === event.startMonth && d >= event.startDay && d <= event.endDay
+  const WINDOW_DAYS = 14 // show 2 weeks before and after
+
+  // Build event date for this year
+  const eventStart = new Date(today.getFullYear(), event.startMonth, event.startDay)
+  const eventEnd = new Date(today.getFullYear(), event.endMonth, event.endDay)
+
+  // Visible window: 14 days before start to 14 days after end
+  const windowStart = new Date(eventStart)
+  windowStart.setDate(windowStart.getDate() - WINDOW_DAYS)
+  const windowEnd = new Date(eventEnd)
+  windowEnd.setDate(windowEnd.getDate() + WINDOW_DAYS)
+
+  // Handle year wrap (e.g. checking Dec event in January)
+  if (windowStart > windowEnd) {
+    return today >= windowStart || today <= windowEnd
   }
-  // Cross-month range
-  if (m === event.startMonth && d >= event.startDay) return true
-  if (m === event.endMonth && d <= event.endDay) return true
-  return false
+  return today >= windowStart && today <= windowEnd
 }
 
 export function getEventByMode(mode: GameMode): GameEvent | undefined {
