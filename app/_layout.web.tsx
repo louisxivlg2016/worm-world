@@ -1,4 +1,4 @@
-import { Slot, usePathname } from "expo-router";
+import { Slot, usePathname, useRouter } from "expo-router";
 import { ThemeProvider, DarkTheme } from "@react-navigation/native";
 import { colors } from "@/expo/theme";
 import { GameStateProvider, useGameState } from "@/context/GameStateContext";
@@ -36,6 +36,7 @@ export default function RootLayout() {
 function WebLayout() {
   const pathname = usePathname();
   const { isPlaying } = useGameState();
+  const router = useRouter();
 
   return (
     <>
@@ -53,18 +54,18 @@ function WebLayout() {
           {tabs.map((tab) => {
             const active = tab.match(pathname);
             return (
-              <a
+              <div
                 key={tab.href}
-                href={tab.href}
+                onClick={(e) => { e.preventDefault(); router.push(tab.href as any); }}
                 style={{
                   flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
                   justifyContent: "center", gap: 2, padding: "4px 0",
-                  textDecoration: "none", color: active ? colors.primary : colors.textSecondary,
+                  cursor: "pointer", color: active ? colors.primary : colors.textSecondary,
                 }}
               >
                 <span style={{ fontSize: 22 }}>{tab.icon}</span>
                 <span style={{ fontSize: 10, fontWeight: 500 }}>{tab.label}</span>
-              </a>
+              </div>
             );
           })}
         </div>
