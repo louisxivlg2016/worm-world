@@ -1450,11 +1450,12 @@ function generateDiamonds() {
     diamondCanvases.push(c)
   }
 }
-generateDiamonds()
+if (IS_DOM) generateDiamonds()
 
 // Emoji fallback for death food
 const emojiCache = new Map<string, HTMLCanvasElement>()
-function getEmojiCanvas(emoji: string): HTMLCanvasElement {
+function getEmojiCanvas(emoji: string): HTMLCanvasElement | null {
+  if (!IS_DOM) return null
   if (emojiCache.has(emoji)) return emojiCache.get(emoji)!
   const c = document.createElement('canvas')
   c.width = 80; c.height = 80

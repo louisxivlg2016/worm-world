@@ -71,6 +71,11 @@ export function AppInner() {
     }
   }, [])
 
+  // Notify native bridge of game state changes (for tab bar hiding)
+  useEffect(() => {
+    window.__nativeBridge?.gameStateChange?.(screen === 'playing')
+  }, [screen])
+
   // Connect to SpacetimeDB
   useEffect(() => {
     spacetimeService.connect().then(() => {
@@ -90,7 +95,7 @@ export function AppInner() {
     setSeed(undefined)
     gameStartTimeRef.current = Date.now()
     setScreen('playing')
-    document.body.style.cursor = 'none'
+    if (typeof document !== 'undefined') document.body.style.cursor = 'none'
   }, [startBackgroundMusic])
 
   const handlePlayCoins = useCallback((name: string, skin: WormSkin) => {
@@ -103,7 +108,7 @@ export function AppInner() {
     setSeed(undefined)
     gameStartTimeRef.current = Date.now()
     setScreen('playing')
-    document.body.style.cursor = 'none'
+    if (typeof document !== 'undefined') document.body.style.cursor = 'none'
   }, [startBackgroundMusic])
 
   const handlePlayEvent = useCallback((mode: GameMode, name: string, skin: WormSkin) => {
@@ -116,7 +121,7 @@ export function AppInner() {
     setSeed(undefined)
     gameStartTimeRef.current = Date.now()
     setScreen('playing')
-    document.body.style.cursor = 'none'
+    if (typeof document !== 'undefined') document.body.style.cursor = 'none'
   }, [startBackgroundMusic])
 
   const handleEventWin = useCallback(() => {
@@ -125,7 +130,7 @@ export function AppInner() {
       getStorage().setItem(event.unlockKey, 'true')
     }
     setScreen('event-win')
-    document.body.style.cursor = 'default'
+    if (typeof document !== 'undefined') document.body.style.cursor = 'default'
   }, [gameMode])
 
   const handleMultiplayer = useCallback(() => {
@@ -176,7 +181,7 @@ export function AppInner() {
     setSeed(roomSeed)
     gameStartTimeRef.current = Date.now()
     setScreen('playing')
-    document.body.style.cursor = 'none'
+    if (typeof document !== 'undefined') document.body.style.cursor = 'none'
   }, [startBackgroundMusic])
 
   const handleDeath = useCallback((score: number, length: number, coins: number, kills: number) => {
@@ -197,20 +202,20 @@ export function AppInner() {
     stats.totalPlayTime += elapsed
     saveStats(stats)
     setScreen('dead')
-    document.body.style.cursor = 'default'
+    if (typeof document !== 'undefined') document.body.style.cursor = 'default'
   }, [startBackgroundMusic])
 
   const handleRetry = useCallback(() => {
     startBackgroundMusic()
     gameStartTimeRef.current = Date.now()
     setScreen('playing')
-    document.body.style.cursor = 'none'
+    if (typeof document !== 'undefined') document.body.style.cursor = 'none'
   }, [startBackgroundMusic])
 
   const handleBackToMenu = useCallback(() => {
     startBackgroundMusic()
     setScreen('menu')
-    document.body.style.cursor = 'default'
+    if (typeof document !== 'undefined') document.body.style.cursor = 'default'
   }, [startBackgroundMusic])
 
   // Event modes: available on specific dates (or always for dev)
@@ -299,6 +304,8 @@ export function AppInner() {
     </div>
   )
 }
+
+export default AppInner
 
 const styles: Record<string, React.CSSProperties> = {
   deathContainer: {
