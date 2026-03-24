@@ -1,6 +1,5 @@
-import { Link, Slot, usePathname } from "expo-router";
+import { Slot, usePathname } from "expo-router";
 import { ThemeProvider, DarkTheme } from "@react-navigation/native";
-import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "@/expo/theme";
 import { GameStateProvider, useGameState } from "@/context/GameStateContext";
 
@@ -19,9 +18,9 @@ const appTheme = {
 
 const tabs = [
   { href: "/", icon: "🎮", label: "Play", match: (pathname: string) => pathname === "/" || pathname.startsWith("/(game)") },
-  { href: "/shop", icon: "🛒", label: "Shop", match: (pathname: string) => pathname === "/shop" || pathname.startsWith("/(shop)") || pathname === "/buy-confirm" },
-  { href: "/lobby", icon: "👥", label: "Multi", match: (pathname: string) => pathname === "/lobby" || pathname.startsWith("/(lobby)") },
-  { href: "/profile", icon: "👤", label: "Profile", match: (pathname: string) => pathname === "/profile" || pathname.startsWith("/(profile)") || pathname === "/settings" },
+  { href: "/shop", icon: "🛒", label: "Shop", match: (p: string) => p === "/shop" || p.startsWith("/(shop)") || p.startsWith("/buy") },
+  { href: "/lobby", icon: "👥", label: "Multi", match: (p: string) => p === "/lobby" || p.startsWith("/(lobby)") || p === "/multi" },
+  { href: "/profile", icon: "👤", label: "Profile", match: (p: string) => p === "/profile" || p.startsWith("/(profile)") || p === "/settings" },
 ] as const;
 
 export default function RootLayout() {
@@ -39,78 +38,38 @@ function WebLayout() {
   const { isPlaying } = useGameState();
 
   return (
-    <View style={styles.page}>
-      <View style={styles.content}>
+    <>
+      <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: isPlaying ? 0 : 64, overflow: "auto", background: colors.background }}>
         <Slot />
-      </View>
+      </div>
 
       {!isPlaying && (
-        <View style={styles.tabBar}>
+        <div style={{
+          position: "fixed", bottom: 0, left: 0, right: 0, height: 64,
+          display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-around",
+          background: colors.surface, borderTop: "1px solid rgba(255,255,255,0.1)",
+          zIndex: 9999,
+        }}>
           {tabs.map((tab) => {
             const active = tab.match(pathname);
-
             return (
-              <Link key={tab.href} href={tab.href} asChild>
-                <Pressable style={styles.tabButton}>
-                  <Text style={[styles.tabIcon, active ? styles.tabIconActive : styles.tabIconInactive]}>
-                    {tab.icon}
-                  </Text>
-                  <Text style={[styles.tabLabel, active ? styles.tabLabelActive : styles.tabLabelInactive]}>
-                    {tab.label}
-                  </Text>
-                </Pressable>
-              </Link>
+              <a
+                key={tab.href}
+                href={tab.href}
+                style={{
+                  flex: 1, display: "flex", flexDirection: "column", alignItems: "center",
+                  justifyContent: "center", gap: 2, padding: "4px 0",
+                  textDecoration: "none", color: active ? colors.primary : colors.textSecondary,
+                }}
+              >
+                <span style={{ fontSize: 22 }}>{tab.icon}</span>
+                <span style={{ fontSize: 10, fontWeight: 500 }}>{tab.label}</span>
+              </a>
             );
           })}
-        </View>
+        </div>
       )}
-    </View>
+    </>
   );
 }
 
-const styles = StyleSheet.create({
-  page: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    flex: 1,
-  },
-  tabBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    backgroundColor: colors.surface,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.1)",
-    paddingBottom: 8,
-    paddingTop: 8,
-    height: 64,
-  },
-  tabButton: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 2,
-    paddingVertical: 4,
-  },
-  tabIcon: {
-    fontSize: 22,
-  },
-  tabIconActive: {
-    color: colors.primary,
-  },
-  tabIconInactive: {
-    color: colors.textSecondary,
-  },
-  tabLabel: {
-    fontSize: 10,
-    fontWeight: "500",
-  },
-  tabLabelActive: {
-    color: colors.primary,
-  },
-  tabLabelInactive: {
-    color: colors.textSecondary,
-  },
-});

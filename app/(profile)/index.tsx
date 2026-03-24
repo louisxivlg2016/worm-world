@@ -67,18 +67,18 @@ export default function ProfileScreen() {
       {/* Coin Balance Card */}
       <View style={styles.card}>
         <View style={styles.coinBadge}>
-          <Text style={styles.coinText}>{"\u{1FA99}"} {coins}</Text>
+          <Text style={styles.coinText}>🪙 {coins}</Text>
         </View>
       </View>
 
       {/* Stats Card */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Statistiques</Text>
-        <StatRow index={0} icon="\u{1F3C6}" label="Meilleur Score" value={stats.bestScore.toLocaleString()} />
-        <StatRow index={1} icon="\u23F1\uFE0F" label="Meilleur Temps" value={formatTime(stats.bestTime)} />
-        <StatRow index={2} icon="\u{1F480}" label="Vaincu" value={String(stats.kills)} />
-        <StatRow index={3} icon="\u{1F3AE}" label="Parties jouées" value={String(stats.gamesPlayed)} />
-        <StatRow index={4} icon="\u23F3" label="Temps total" value={formatTime(stats.totalPlayTime)} />
+        <StatRow index={0} icon="🏆" label="Meilleur Score" value={stats.bestScore.toLocaleString()} />
+        <StatRow index={1} icon="⏱️" label="Meilleur Temps" value={formatTime(stats.bestTime)} />
+        <StatRow index={2} icon="💀" label="Vaincu" value={String(stats.kills)} />
+        <StatRow index={3} icon="🎮" label="Parties jouées" value={String(stats.gamesPlayed)} />
+        <StatRow index={4} icon="⏳" label="Temps total" value={formatTime(stats.totalPlayTime)} />
       </View>
 
       {/* Costumes Progress Card */}
