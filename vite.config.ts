@@ -1,4 +1,4 @@
-import { defineConfig } from "vite"
+import { defineConfig, loadEnv } from "vite"
 import react from "@vitejs/plugin-react"
 import obfuscatorPlugin from "vite-plugin-javascript-obfuscator"
 import { execSync } from "child_process"
@@ -9,6 +9,7 @@ const commitHash = (() => {
 })()
 
 export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), ['VITE_', 'EXPO_PUBLIC_'])
   const obfuscate = mode !== 'development' && mode !== 'production' && mode !== 'crazygames'
   const base = (mode !== 'development' && mode !== 'production') ? './' : '/'
 
@@ -29,7 +30,13 @@ export default defineConfig(({ mode }) => {
         },
       })] : []),
     ],
-    define: { __BUILD_HASH__: JSON.stringify(commitHash) },
+    define: {
+      __BUILD_HASH__: JSON.stringify(commitHash),
+      'process.env.VITE_SPACETIMEDB_URI': JSON.stringify(env.VITE_SPACETIMEDB_URI || ''),
+      'process.env.VITE_SPACETIMEDB_DB': JSON.stringify(env.VITE_SPACETIMEDB_DB || ''),
+      'process.env.EXPO_PUBLIC_SPACETIMEDB_URI': JSON.stringify(env.EXPO_PUBLIC_SPACETIMEDB_URI || ''),
+      'process.env.EXPO_PUBLIC_SPACETIMEDB_DB': JSON.stringify(env.EXPO_PUBLIC_SPACETIMEDB_DB || ''),
+    },
     publicDir: "public",
     resolve: { alias: { "@": "/src" } },
   }

@@ -2,8 +2,8 @@ import { DbConnection, type EventContext, type SubscriptionEventContext } from '
 import type { Room, RoomMember, PlayerState, GameEvent as DbGameEvent } from '@/module_bindings/types'
 import type { Identity } from 'spacetimedb'
 
-const SPACETIMEDB_URI = import.meta.env.VITE_SPACETIMEDB_URI || 'wss://maincloud.spacetimedb.com'
-const SPACETIMEDB_DB = import.meta.env.VITE_SPACETIMEDB_DB || 'worm-world-server'
+const SPACETIMEDB_URI = process.env.EXPO_PUBLIC_SPACETIMEDB_URI || process.env.VITE_SPACETIMEDB_URI || 'wss://maincloud.spacetimedb.com'
+const SPACETIMEDB_DB = process.env.EXPO_PUBLIC_SPACETIMEDB_DB || process.env.VITE_SPACETIMEDB_DB || 'worm-world-server'
 
 export interface RemotePlayerData {
   identity: Identity

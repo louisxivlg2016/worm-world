@@ -3,3 +3,8 @@ dist
 builds
 .env.local
 *.log
+.expo/
+ios/
+android/
+*.jks
+*.keystore

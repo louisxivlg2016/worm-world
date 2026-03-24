@@ -1,6 +1,6 @@
-import { Tabs } from "expo-router/tabs";
-import { Text } from "react-native";
+import { Link, Slot, usePathname } from "expo-router";
 import { ThemeProvider, DarkTheme } from "@react-navigation/native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { colors } from "@/expo/theme";
 import { GameStateProvider, useGameState } from "@/context/GameStateContext";
 
@@ -17,77 +17,100 @@ const appTheme = {
   },
 };
 
+const tabs = [
+  { href: "/", icon: "🎮", label: "Play", match: (pathname: string) => pathname === "/" || pathname.startsWith("/(game)") },
+  { href: "/shop", icon: "🛒", label: "Shop", match: (pathname: string) => pathname === "/shop" || pathname.startsWith("/(shop)") || pathname === "/buy-confirm" },
+  { href: "/lobby", icon: "👥", label: "Multi", match: (pathname: string) => pathname === "/lobby" || pathname.startsWith("/(lobby)") },
+  { href: "/profile", icon: "👤", label: "Profile", match: (pathname: string) => pathname === "/profile" || pathname.startsWith("/(profile)") || pathname === "/settings" },
+] as const;
+
 export default function RootLayout() {
   return (
     <ThemeProvider value={appTheme}>
       <GameStateProvider>
-        <TabsNavigator />
+        <WebLayout />
       </GameStateProvider>
     </ThemeProvider>
   );
 }
 
-function TabsNavigator() {
+function WebLayout() {
+  const pathname = usePathname();
   const { isPlaying } = useGameState();
 
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarPosition: "bottom",
-        tabBarItemStyle: { display: "none" },
-        tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: "rgba(255,255,255,0.1)",
-          display: isPlaying ? "none" : "flex",
-          paddingBottom: 8,
-          paddingTop: 8,
-          height: 64,
-        },
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textSecondary,
-      }}
-    >
-      <Tabs.Screen
-        name="(game)"
+    <View style={styles.page}>
+      <View style={styles.content}>
+        <Slot />
+      </View>
 
-        options={{
-          title: "Play",
-          href: "/(game)",
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🎮</Text>,
-          tabBarItemStyle: { display: "flex" },
-        }}
-      />
-      <Tabs.Screen
-        name="(shop)"
+      {!isPlaying && (
+        <View style={styles.tabBar}>
+          {tabs.map((tab) => {
+            const active = tab.match(pathname);
 
-        options={{
-          title: "Shop",
-          href: "/(shop)",
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🛒</Text>,
-          tabBarItemStyle: { display: "flex" },
-        }}
-      />
-      <Tabs.Screen
-        name="(lobby)"
-
-        options={{
-          title: "Multi",
-          href: "/(lobby)",
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>👥</Text>,
-          tabBarItemStyle: { display: "flex" },
-        }}
-      />
-      <Tabs.Screen
-        name="(profile)"
-
-        options={{
-          title: "Profile",
-          href: "/(profile)",
-          tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>👤</Text>,
-          tabBarItemStyle: { display: "flex" },
-        }}
-      />
-    </Tabs>
+            return (
+              <Link key={tab.href} href={tab.href} asChild>
+                <Pressable style={styles.tabButton}>
+                  <Text style={[styles.tabIcon, active ? styles.tabIconActive : styles.tabIconInactive]}>
+                    {tab.icon}
+                  </Text>
+                  <Text style={[styles.tabLabel, active ? styles.tabLabelActive : styles.tabLabelInactive]}>
+                    {tab.label}
+                  </Text>
+                </Pressable>
+              </Link>
+            );
+          })}
+        </View>
+      )}
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  content: {
+    flex: 1,
+  },
+  tabBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    backgroundColor: colors.surface,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.1)",
+    paddingBottom: 8,
+    paddingTop: 8,
+    height: 64,
+  },
+  tabButton: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 2,
+    paddingVertical: 4,
+  },
+  tabIcon: {
+    fontSize: 22,
+  },
+  tabIconActive: {
+    color: colors.primary,
+  },
+  tabIconInactive: {
+    color: colors.textSecondary,
+  },
+  tabLabel: {
+    fontSize: 10,
+    fontWeight: "500",
+  },
+  tabLabelActive: {
+    color: colors.primary,
+  },
+  tabLabelInactive: {
+    color: colors.textSecondary,
+  },
+});
