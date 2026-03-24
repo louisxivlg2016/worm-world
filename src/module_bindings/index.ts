@@ -63,7 +63,7 @@ const tablesSchema = __schema({
   game_event: __table({
     name: 'game_event',
     indexes: [
-      { name: 'id', algorithm: 'btree', columns: [
+      { name: 'id', accessor: 'id', algorithm: 'btree', columns: [
         'id',
       ] },
     ],
@@ -74,7 +74,7 @@ const tablesSchema = __schema({
   player: __table({
     name: 'player',
     indexes: [
-      { name: 'identity', algorithm: 'btree', columns: [
+      { name: 'identity', accessor: 'identity', algorithm: 'btree', columns: [
         'identity',
       ] },
     ],
@@ -85,10 +85,10 @@ const tablesSchema = __schema({
   player_state: __table({
     name: 'player_state',
     indexes: [
-      { name: 'identity', algorithm: 'btree', columns: [
+      { name: 'identity', accessor: 'identity', algorithm: 'btree', columns: [
         'identity',
       ] },
-      { name: 'room_id', algorithm: 'btree', columns: [
+      { name: 'room_id', accessor: 'roomId', algorithm: 'btree', columns: [
         'roomId',
       ] },
     ],
@@ -99,10 +99,10 @@ const tablesSchema = __schema({
   room: __table({
     name: 'room',
     indexes: [
-      { name: 'id', algorithm: 'btree', columns: [
+      { name: 'id', accessor: 'id', algorithm: 'btree', columns: [
         'id',
       ] },
-      { name: 'slug', algorithm: 'btree', columns: [
+      { name: 'slug', accessor: 'slug', algorithm: 'btree', columns: [
         'slug',
       ] },
     ],
@@ -114,10 +114,10 @@ const tablesSchema = __schema({
   room_member: __table({
     name: 'room_member',
     indexes: [
-      { name: 'id', algorithm: 'btree', columns: [
+      { name: 'id', accessor: 'id', algorithm: 'btree', columns: [
         'id',
       ] },
-      { name: 'room_id', algorithm: 'btree', columns: [
+      { name: 'room_id', accessor: 'roomId', algorithm: 'btree', columns: [
         'roomId',
       ] },
     ],
