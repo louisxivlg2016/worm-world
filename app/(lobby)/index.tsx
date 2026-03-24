@@ -114,24 +114,32 @@ export default function LobbyScreen() {
     }
   };
 
-  const renderRoom = ({ item, index }: { item: RoomInfo; index: number }) => (
-    <Animated.View entering={FadeInDown.delay(index * 50).springify()}>
-      <View style={styles.roomEntry}>
-        <View style={styles.roomInfo}>
-          <Text style={styles.roomName}>{item.name}</Text>
-          <Text style={styles.roomMode}>{item.gameMode.toUpperCase()}</Text>
+  const renderRoom = ({ item, index }: { item: RoomInfo; index: number }) => {
+    const members = spacetimeService.getRoomMembers(item.id);
+    return (
+      <Animated.View entering={FadeInDown.delay(index * 50).springify()}>
+        <View style={styles.roomEntry}>
+          <View style={styles.roomInfo}>
+            <Text style={styles.roomName}>{item.name}</Text>
+            <Text style={styles.roomMode}>{item.gameMode.toUpperCase()}</Text>
+            {members.length > 0 && (
+              <Text style={styles.roomMembers}>
+                👥 {members.map(m => m.username || "???").join(", ")}
+              </Text>
+            )}
+          </View>
+          <View style={styles.roomRight}>
+            <Text style={styles.roomPlayers}>
+              {item.memberCount}/{item.maxPlayers}
+            </Text>
+            <Pressable onPress={() => handleJoin(item.slug)} style={styles.joinSmallBtn}>
+              <Text style={styles.joinSmallText}>Rejoindre</Text>
+            </Pressable>
+          </View>
         </View>
-        <View style={styles.roomRight}>
-          <Text style={styles.roomPlayers}>
-            {item.memberCount}/{item.maxPlayers}
-          </Text>
-          <Pressable onPress={() => handleJoin(item.slug)} style={styles.joinSmallBtn}>
-            <Text style={styles.joinSmallText}>Rejoindre</Text>
-          </Pressable>
-        </View>
-      </View>
-    </Animated.View>
-  );
+      </Animated.View>
+    );
+  };
 
   const desktopContainerStyle = isDesktop
     ? { maxWidth: contentMaxWidth, alignSelf: 'center' as const, width: '100%' as any }
@@ -340,6 +348,11 @@ const styles = StyleSheet.create({
   roomMode: {
     color: colors.textSecondary,
     fontSize: 11,
+  },
+  roomMembers: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    marginTop: 2,
   },
   roomRight: {
     flexDirection: "row",
