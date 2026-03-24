@@ -2338,6 +2338,56 @@ export function useGameEngine(
     s.isGameOver = false
     s.remotePlayers = new Map()
 
+    // Wire up multiplayer if in a room
+    if (s.roomSlug && typeof window !== 'undefined') {
+      try {
+        const { spacetimeService } = require('@/services/SpacetimeService')
+
+        // Start broadcasting our state at 12Hz
+        spacetimeService.startUpdateLoop(() => {
+          if (!s.player || !s.player.alive) return {
+            x: 0, y: 0, angle: 0, score: 0, alive: false,
+            segmentsCount: 0, boosting: false, skinJson: '{}', name: playerName,
+          }
+          return {
+            x: s.player.segments[0].x,
+            y: s.player.segments[0].y,
+            angle: s.player.angle,
+            score: s.player.score,
+            alive: s.player.alive,
+            segmentsCount: s.player.segments.length,
+            boosting: s.player.boosting,
+            skinJson: JSON.stringify(playerSkin),
+            name: playerName,
+          }
+        })
+
+        // Listen for remote player updates
+        spacetimeService.updateCallbacks({
+          onRemotePlayerUpdate: (identityHex: string, data: any) => {
+            let rp = s.remotePlayers.get(identityHex)
+            if (!rp) {
+              rp = createWorm(data.x, data.y, playerSkin, data.name || 'Player', false)
+              rp.isPlayer = false
+              s.remotePlayers.set(identityHex, rp)
+            }
+            rp.segments[0].x = data.x
+            rp.segments[0].y = data.y
+            rp.angle = data.angle
+            rp.score = data.score
+            rp.alive = data.alive
+            rp.name = data.name || 'Player'
+            rp.boosting = data.boosting
+          },
+          onRemotePlayerLeft: (identityHex: string) => {
+            s.remotePlayers.delete(identityHex)
+          },
+        })
+      } catch (e) {
+        console.error('[MP] Failed to setup multiplayer:', e)
+      }
+    }
+
     // Start loop
     const loop = (timestamp: number) => {
       if (!s.gameRunning) return
@@ -2614,7 +2664,7 @@ export function useGameEngine(
       }
 
       if (s.frameCount % 30 === 0) {
-        const all = [s.player, ...s.aiWorms].filter(w => w.alive)
+        const all = [s.player, ...s.aiWorms, ...s.remotePlayers.values()].filter(w => w.alive)
         all.sort((a, b) => b.score - a.score)
         callbacksRef.current.onLeaderboardUpdate(
           all.slice(0, 8).map(w => ({ name: w.name, score: w.score, isPlayer: w.isPlayer })),
@@ -2638,6 +2688,11 @@ export function useGameEngine(
   const stopGame = useCallback(() => {
     stateRef.current.gameRunning = false
     cancelAnimationFrame(animFrameRef.current)
+    // Stop multiplayer broadcast
+    try {
+      const { spacetimeService } = require('@/services/SpacetimeService')
+      spacetimeService.stopUpdateLoop()
+    } catch {}
   }, [])
 
   // Input handlers
