@@ -126,6 +126,8 @@ const COLOR_PALETTE = [
 export default function ShopScreen() {
   const { width } = useWindowDimensions();
   const router = useRouter();
+  const isDesktop = width >= 600;
+  const contentMaxWidth = 600;
 
   const [flagSearch, setFlagSearch] = useState("");
   const [headSearch, setHeadSearch] = useState("");
@@ -159,9 +161,10 @@ export default function ShopScreen() {
     return headOptions.filter((h) => h.label.toLowerCase().includes(q));
   }, [headSearch, headOptions]);
 
-  const numColumns = 3;
+  const numColumns = isDesktop ? 5 : 3;
   const itemGap = spacing.sm;
-  const flagItemWidth = (width - spacing.md * 2 - itemGap * (numColumns - 1)) / numColumns;
+  const effectiveWidth = isDesktop ? contentMaxWidth : width;
+  const flagItemWidth = (effectiveWidth - spacing.md * 2 - itemGap * (numColumns - 1)) / numColumns;
 
   const computePrice = useCallback(() => {
     if (selectedFlag) return FLAG_PRICE;
@@ -224,8 +227,13 @@ export default function ShopScreen() {
     [flagItemWidth, selectedFlag],
   );
 
+  const desktopContainerStyle = isDesktop
+    ? { maxWidth: contentMaxWidth, alignSelf: 'center' as const, width: '100%' as any, paddingHorizontal: spacing.md }
+    : {};
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <View style={desktopContainerStyle}>
       {/* Coin Balance */}
       <View style={styles.coinBar}>
         <Text style={styles.coinText}>{"\u{1FA99}"} {coins}</Text>
@@ -337,6 +345,7 @@ export default function ShopScreen() {
         onChangeText={setFlagSearch}
       />
       <FlatList
+        key={numColumns}
         data={filteredFlags}
         renderItem={renderFlagItem}
         keyExtractor={(item) => item.name}
@@ -357,6 +366,7 @@ export default function ShopScreen() {
       </Pressable>
 
       <View style={{ height: spacing.xxl }} />
+      </View>
     </ScrollView>
   );
 }

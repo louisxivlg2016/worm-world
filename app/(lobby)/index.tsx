@@ -7,6 +7,7 @@ import {
   Pressable,
   StyleSheet,
   ActivityIndicator,
+  useWindowDimensions,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import * as Linking from "expo-linking";
@@ -24,6 +25,10 @@ type RoomInfo = {
 };
 
 export default function LobbyScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 600;
+  const contentMaxWidth = 600;
+
   const [rooms, setRooms] = useState<RoomInfo[]>([]);
   const [roomName, setRoomName] = useState("");
   const [joinSlug, setJoinSlug] = useState("");
@@ -104,13 +109,22 @@ export default function LobbyScreen() {
     </Animated.View>
   );
 
+  const desktopContainerStyle = isDesktop
+    ? { maxWidth: contentMaxWidth, alignSelf: 'center' as const, width: '100%' as any }
+    : {};
+
+  const desktopInputStyle = isDesktop
+    ? { maxWidth: 400 }
+    : {};
+
   return (
     <View style={styles.container}>
+      <View style={[{ flex: 1, gap: spacing.md }, desktopContainerStyle]}>
       {/* Create Room */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Créer une salle</Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, desktopInputStyle]}
           placeholder="Nom de la salle..."
           placeholderTextColor={colors.textSecondary}
           value={roomName}
@@ -145,7 +159,7 @@ export default function LobbyScreen() {
       {/* Join by Code */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Rejoindre par code</Text>
-        <View style={styles.joinRow}>
+        <View style={[styles.joinRow, desktopInputStyle]}>
           <TextInput
             style={[styles.input, { flex: 1, marginBottom: 0 }]}
             placeholder="Code..."
@@ -176,6 +190,7 @@ export default function LobbyScreen() {
             <Text style={styles.emptyText}>Aucune salle disponible</Text>
           }
         />
+      </View>
       </View>
     </View>
   );

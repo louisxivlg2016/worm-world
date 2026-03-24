@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, Pressable, StyleSheet } from "react-native";
+import { View, Text, ScrollView, Pressable, StyleSheet, useWindowDimensions } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useRouter } from "expo-router";
 import { colors, spacing } from "@/expo/theme";
@@ -44,6 +44,9 @@ function StatRow({ icon, label, value, index }: { icon: string; label: string; v
 }
 
 export default function ProfileScreen() {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 600;
+  const contentMaxWidth = 600;
   const router = useRouter();
   const stats = loadStats();
 
@@ -62,8 +65,17 @@ export default function ProfileScreen() {
   const unlockedCostumes = unlockedEvents.reduce((sum, e) => sum + e.costumes.length, 0);
   const progressPct = totalCostumes > 0 ? (unlockedCostumes / totalCostumes) * 100 : 0;
 
+  const desktopContainerStyle = isDesktop
+    ? { maxWidth: contentMaxWidth, alignSelf: 'center' as const, width: '100%' as any, paddingHorizontal: spacing.md }
+    : {};
+
+  const desktopProgressStyle = isDesktop
+    ? { maxWidth: 400, alignSelf: 'center' as const, width: '100%' as any }
+    : {};
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <View style={[{ gap: spacing.md }, desktopContainerStyle]}>
       {/* Coin Balance Card */}
       <View style={styles.card}>
         <View style={styles.coinBadge}>
@@ -84,7 +96,7 @@ export default function ProfileScreen() {
       {/* Costumes Progress Card */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Costumes débloqués</Text>
-        <View style={styles.progressBar}>
+        <View style={[styles.progressBar, desktopProgressStyle]}>
           <View style={[styles.progressFill, { width: `${progressPct}%` }]} />
         </View>
         <Text style={styles.progressText}>
@@ -112,6 +124,7 @@ export default function ProfileScreen() {
       </Pressable>
 
       <View style={{ height: spacing.xxl }} />
+      </View>
     </ScrollView>
   );
 }
