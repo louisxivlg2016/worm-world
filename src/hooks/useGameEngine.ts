@@ -104,9 +104,11 @@ function drawContainedTextureInCircle(
   ctx.drawImage(img, dx, dy, drawW, drawH)
 }
 
-// Preload all
-Object.values(HEAD_IMAGES).forEach(src => loadHeadImage(src))
-Object.values(BODY_TEXTURES).forEach(src => loadBodyTexture(src))
+// Preload all (only in browser)
+if (typeof Image !== 'undefined') {
+  Object.values(HEAD_IMAGES).forEach(src => loadHeadImage(src))
+  Object.values(BODY_TEXTURES).forEach(src => loadBodyTexture(src))
+}
 
 // ============================================
 // SPATIAL GRID - O(1) food lookup instead of O(n)
