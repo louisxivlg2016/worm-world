@@ -1,5 +1,6 @@
 {
-  "buildCommand": "bun run build",
+  "buildCommand": "bunx expo export --platform web",
   "outputDirectory": "dist",
-  "framework": "vite"
+  "installCommand": "bun install",
+  "framework": null
 }
