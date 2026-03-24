@@ -52,6 +52,7 @@ function TabsNavigator() {
         name="(game)"
         options={{
           title: "Play",
+          href: "/(game)",
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🎮</Text>,
           tabBarItemStyle: { display: "flex" },
         }}
@@ -60,6 +61,7 @@ function TabsNavigator() {
         name="(shop)"
         options={{
           title: "Shop",
+          href: "/(shop)",
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🛒</Text>,
           tabBarItemStyle: { display: "flex" },
         }}
@@ -68,6 +70,7 @@ function TabsNavigator() {
         name="(lobby)"
         options={{
           title: "Multi",
+          href: "/(lobby)",
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>👥</Text>,
           tabBarItemStyle: { display: "flex" },
         }}
@@ -76,10 +79,16 @@ function TabsNavigator() {
         name="(profile)"
         options={{
           title: "Profile",
+          href: "/(profile)",
           tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>👤</Text>,
           tabBarItemStyle: { display: "flex" },
         }}
       />
+      {/* Hide sub-routes from tab bar */}
+      <Tabs.Screen name="settings" options={{ href: null }} />
+      <Tabs.Screen name="buy-confirm" options={{ href: null }} />
+      <Tabs.Screen name="edit-username" options={{ href: null }} />
+      <Tabs.Screen name="+not-found" options={{ href: null }} />
     </Tabs>
   );
 }
