@@ -87,17 +87,6 @@ export function WelcomeScreen({ customSkin, activeEvents, onPlay, onPlayCoins, o
           ))}
         </div>
       )}
-      <div style={styles.btnRow}>
-        <button style={styles.multiBtn} onClick={onMultiplayer}>
-          {t('multiplay')}
-        </button>
-        <button style={styles.shopBtn} onClick={onShop}>
-          {t('shop')}
-        </button>
-        <button style={styles.profileBtn} onClick={onProfile}>
-          Profil
-        </button>
-      </div>
 
       {/* Decorative particles */}
       {Array.from({ length: 15 }).map((_, i) => (
