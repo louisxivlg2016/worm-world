@@ -25,6 +25,7 @@ declare global {
       scheduleNotification: (title: string, body: string, seconds: number) => void;
       gameStateChange: (playing: boolean) => void;
     };
+    __expoTabBarHeight?: number;
   }
 }
 
@@ -42,19 +43,7 @@ export default function GameDom({ onHaptic, onShare, onPlaySound, onScheduleNoti
   return (
     <PlatformProvider>
       <AuthProvider>
-        <div id="game-root" style={{ position: "relative", width: "100%", height: "100vh" }}>
-          <style>{`
-            #game-root [style*="position: fixed"],
-            #game-root [style*="position:fixed"] {
-              position: absolute !important;
-            }
-            #game-root canvas[style*="position: fixed"],
-            #game-root canvas[style*="position:fixed"] {
-              position: absolute !important;
-            }
-          `}</style>
-          <AppInner />
-        </div>
+        <AppInner />
       </AuthProvider>
     </PlatformProvider>
   );

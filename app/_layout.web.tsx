@@ -40,8 +40,15 @@ function WebLayout() {
 
   return (
     <>
-      <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: isPlaying ? 0 : 64, overflow: "auto", background: colors.background }}>
-        <Slot />
+      <div style={{
+        position: "fixed", top: 0, left: 0, right: 0, bottom: isPlaying ? 0 : 64,
+        overflow: "hidden", background: colors.background,
+        // contain: paint creates a new stacking/containing context — position:fixed children stay inside
+        contain: "paint layout" as any,
+      }}>
+        <div style={{ width: "100%", height: "100%", position: "relative", overflow: "auto" }}>
+          <Slot />
+        </div>
       </div>
 
       {!isPlaying && (
