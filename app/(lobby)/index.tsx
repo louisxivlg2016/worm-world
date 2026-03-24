@@ -163,7 +163,8 @@ export default function LobbyScreen() {
         </View>
         <Pressable
           onPress={handleCreate}
-          style={[styles.createBtn, loading && styles.btnDisabled]}
+          disabled={loading || !roomName.trim()}
+          style={[styles.createBtn, (loading || !roomName.trim()) && styles.btnDisabled]}
         >
           {loading ? (
             <ActivityIndicator color={colors.text} />

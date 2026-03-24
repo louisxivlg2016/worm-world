@@ -5,6 +5,7 @@ import { colors } from "@/expo/theme";
 import { GameStateProvider, useGameState } from "@/context/GameStateContext";
 import { GAME_EVENTS, isEventActive } from "@/config/events";
 import { getStorage } from "@/services/StorageService";
+import { spacetimeService } from "@/services/SpacetimeService";
 
 let useFonts: ((fonts: Record<string, unknown>) => [boolean, Error | null]) | undefined;
 let SplashScreen: { preventAutoHideAsync: () => void; hideAsync: () => void } | undefined;
@@ -63,6 +64,15 @@ export default function RootLayout() {
       SplashScreen?.hideAsync?.()?.catch?.(() => {});
     }
   }, [fontsLoaded]);
+
+  // Connect to SpacetimeDB on app start
+  useEffect(() => {
+    spacetimeService.connect().then(() => {
+      console.log("[App] SpacetimeDB connected");
+    }).catch((err) => {
+      console.error("[App] SpacetimeDB connection failed:", err);
+    });
+  }, []);
 
   if (!fontsLoaded) return null;
 
