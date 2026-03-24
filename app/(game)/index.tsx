@@ -15,7 +15,9 @@ export default function HomeScreen() {
   const isDesktop = width >= 600;
   const { customSkin, playerSkin, startGame, totalCoins } = useGameState();
 
-  const [name, setName] = useState("");
+  const [name, setName] = useState(() => {
+    try { return getStorage().getItem("playerName") ?? ""; } catch { return ""; }
+  });
   const [selectedSkin, setSelectedSkin] = useState(0);
   const activeSkin = customSkin ?? SKINS[selectedSkin] ?? SKINS[0];
 
@@ -23,15 +25,20 @@ export default function HomeScreen() {
     (e) => isEventActive(e) && getStorage().getItem(e.unlockKey) !== "true"
   );
 
+  const saveName = (n: string) => {
+    setName(n);
+    try { getStorage().setItem("playerName", n); } catch {}
+  };
+
+  const getPlayerName = () => name.trim() || `Guest${Math.floor(Math.random() * 999)}`;
+
   const play = (mode: "ffa" | "coins") => {
-    const n = name.trim() || `Guest${Math.floor(Math.random() * 999)}`;
-    startGame(n, activeSkin, mode);
+    startGame(getPlayerName(), activeSkin, mode);
     router.push("/(game)/play");
   };
 
   const playEvent = (eventId: string) => {
-    const n = name.trim() || `Guest${Math.floor(Math.random() * 999)}`;
-    startGame(n, activeSkin, eventId as any);
+    startGame(getPlayerName(), activeSkin, eventId as any);
     router.push("/(game)/play");
   };
 
@@ -69,7 +76,7 @@ export default function HomeScreen() {
       {/* Name input */}
       <TextInput
         value={name}
-        onChangeText={setName}
+        onChangeText={saveName}
         placeholder={t("namePlaceholder")}
         placeholderTextColor={colors.textSecondary}
         maxLength={15}

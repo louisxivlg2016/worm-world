@@ -15,6 +15,7 @@ import { useRouter } from "expo-router";
 import { colors, spacing } from "@/expo/theme";
 import { spacetimeService } from "@/services/SpacetimeService";
 import { useGameState } from "@/context/GameStateContext";
+import { getStorage } from "@/services/StorageService";
 import { SKINS, type GameMode } from "@/types/game";
 
 type RoomInfo = {
@@ -69,23 +70,21 @@ export default function LobbyScreen() {
     return () => subscription.remove();
   }, []);
 
-  const { startGame, customSkin, playerSkin } = useGameState();
+  const { startGame, customSkin, playerSkin, playerName: ctxName } = useGameState();
   const activeSkin = customSkin ?? playerSkin ?? SKINS[0];
+  const savedName = (() => { try { return getStorage().getItem("playerName") ?? ""; } catch { return ""; } })();
+  const myName = ctxName || savedName || `Guest${Math.floor(Math.random() * 999)}`;
 
   const handleCreate = async () => {
     if (!roomName.trim()) return;
-    console.log("[Lobby] handleCreate called, roomName:", roomName, "gameMode:", gameMode);
     setLoading(true);
     try {
-      console.log("[Lobby] calling spacetimeService.createRoom...");
+      spacetimeService.setUsername(myName);
       const result = await spacetimeService.createRoom(roomName.trim(), true, gameMode, 8);
-      console.log("[Lobby] createRoom result:", result);
       if (result) {
         const rid = spacetimeService.getCurrentRoomId();
-        console.log("[Lobby] roomId:", rid, "slug:", result.slug);
         if (rid) spacetimeService.subscribeToGameData(rid);
-        startGame("Host", activeSkin, result.gameMode as GameMode, result.slug, String(rid), result.seed);
-        console.log("[Lobby] navigating to play...");
+        startGame(myName, activeSkin, result.gameMode as GameMode, result.slug, String(rid), result.seed);
         router.push("/(game)/play");
       } else {
         console.error("[Lobby] createRoom returned null - is SpacetimeDB connected?");
@@ -104,7 +103,7 @@ export default function LobbyScreen() {
       const result = spacetimeService.joinRoom(slug.trim());
       if (result) {
         spacetimeService.subscribeToGameData(result.roomId);
-        startGame("Player", activeSkin, result.gameMode as GameMode, slug, String(result.roomId), result.seed);
+        startGame(myName, activeSkin, result.gameMode as GameMode, slug, String(result.roomId), result.seed);
         router.push("/(game)/play");
       }
     } catch (e) {
