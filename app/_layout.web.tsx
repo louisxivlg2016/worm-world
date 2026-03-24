@@ -1,4 +1,5 @@
 import { Tabs } from "expo-router/tabs";
+import { Text, StyleSheet } from "react-native";
 import { ThemeProvider, DarkTheme } from "@react-navigation/native";
 import { colors } from "@/expo/theme";
 import { GameStateProvider, useGameState } from "@/context/GameStateContext";
@@ -51,7 +52,7 @@ function TabsNavigator() {
         name="(game)"
         options={{
           title: "Play",
-          tabBarIcon: () => <span>🎮</span>,
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🎮</Text>,
           tabBarItemStyle: { display: "flex" },
         }}
       />
@@ -59,7 +60,7 @@ function TabsNavigator() {
         name="(shop)"
         options={{
           title: "Shop",
-          tabBarIcon: () => <span>🛒</span>,
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>🛒</Text>,
           tabBarItemStyle: { display: "flex" },
         }}
       />
@@ -67,7 +68,7 @@ function TabsNavigator() {
         name="(lobby)"
         options={{
           title: "Multi",
-          tabBarIcon: () => <span>👥</span>,
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>👥</Text>,
           tabBarItemStyle: { display: "flex" },
         }}
       />
@@ -75,7 +76,7 @@ function TabsNavigator() {
         name="(profile)"
         options={{
           title: "Profile",
-          tabBarIcon: () => <span>👤</span>,
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 22, color }}>👤</Text>,
           tabBarItemStyle: { display: "flex" },
         }}
       />
