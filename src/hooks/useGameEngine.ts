@@ -1,4 +1,5 @@
 import { useRef, useEffect, useCallback } from 'react'
+import { getNativeBridge } from '@/expo/bridge'
 import { getEventByMode, isEventMode } from '@/config/events'
 import {
   WORLD_SIZE, FOOD_COUNT, SPECIAL_FOOD_COUNT, AI_WORM_COUNT,
@@ -13,11 +14,17 @@ import {
 // Multiplayer now handled by SpacetimeService
 
 // ============================================
+// DOM guard — skip Image/Canvas operations outside browser
+// ============================================
+const IS_DOM = typeof Image !== 'undefined'
+
+// ============================================
 // HEAD IMAGE CACHE — load once
 // ============================================
 const headImageCache = new Map<string, HTMLImageElement>()
 
 function loadHeadImage(src: string): HTMLImageElement | null {
+  if (!IS_DOM) return null
   if (headImageCache.has(src)) return headImageCache.get(src)!
   const img = new Image()
   img.src = src
@@ -42,6 +49,7 @@ for (const ev of _EVENTS_FOR_HEADS) {
 const bodyTextureCache = new Map<string, HTMLImageElement>()
 
 function loadBodyTexture(src: string): HTMLImageElement | null {
+  if (!IS_DOM) return null
   if (bodyTextureCache.has(src)) return bodyTextureCache.get(src)!
   const img = new Image()
   img.src = src
@@ -241,7 +249,7 @@ const POTION_IMAGES: Partial<Record<PotionType, string>> = {
 
 // Preload potion images
 const potionImgCache = new Map<string, HTMLImageElement>()
-Object.values(POTION_IMAGES).forEach(src => {
+if (IS_DOM) Object.values(POTION_IMAGES).forEach(src => {
   if (!src) return
   const img = new Image()
   img.src = src
@@ -503,6 +511,8 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
       }
       if (touching) {
         playerCoinsRef.value++
+        getNativeBridge().haptic('light')
+        getNativeBridge().playSound('coin')
         // Spawn flying coin animation toward the coin panel (bottom-left)
         if (flyingCoins && canvasH) {
           flyingCoins.push({
@@ -1156,7 +1166,7 @@ function killWorm(worm: Worm, foods: Food[], particles: Particle[]) {
 // Event background image cache
 const eventBgCache = new Map<string, HTMLImageElement>()
 import { GAME_EVENTS } from '@/config/events'
-for (const ev of GAME_EVENTS) {
+if (IS_DOM) for (const ev of GAME_EVENTS) {
   const img = new Image()
   img.src = ev.bgImage
   img.onload = () => { eventBgCache.set(ev.id, img) }
@@ -1245,6 +1255,7 @@ function drawBackground(ctx: CanvasRenderingContext2D, camera: Camera, w: number
 const foodImgCache = new Map<string, HTMLImageElement>()
 
 function preloadFoodImages() {
+  if (!IS_DOM) return
   const allPaths = [...new Set([...FOOD_IMAGES, ...SPECIAL_FOOD_IMAGES])]
   for (const src of allPaths) {
     if (foodImgCache.has(src)) continue
@@ -1580,9 +1591,11 @@ function drawPotions(ctx: CanvasRenderingContext2D, potions: Potion[], camera: C
 
 // Coin image
 let coinImg: HTMLImageElement | null = null
-const _coinImg = new Image()
-_coinImg.src = '/ui/coin.png'
-_coinImg.onload = () => { coinImg = _coinImg }
+if (IS_DOM) {
+  const _coinImg = new Image()
+  _coinImg.src = '/ui/coin.png'
+  _coinImg.onload = () => { coinImg = _coinImg }
+}
 
 function drawCoins(ctx: CanvasRenderingContext2D, coins: Coin[], camera: Camera, w: number, h: number) {
   const time = Date.now() * 0.004
@@ -1620,12 +1633,14 @@ function drawCoins(ctx: CanvasRenderingContext2D, coins: Coin[], camera: Camera,
 // Chest images
 let chestClosedImg: HTMLImageElement | null = null
 let chestOpenImg: HTMLImageElement | null = null
-const _chestClosed = new Image()
-_chestClosed.src = '/ui/chest-closed.png'
-_chestClosed.onload = () => { chestClosedImg = _chestClosed }
-const _chestOpen = new Image()
-_chestOpen.src = '/ui/chest-open.png'
-_chestOpen.onload = () => { chestOpenImg = _chestOpen }
+if (IS_DOM) {
+  const _chestClosed = new Image()
+  _chestClosed.src = '/ui/chest-closed.png'
+  _chestClosed.onload = () => { chestClosedImg = _chestClosed }
+  const _chestOpen = new Image()
+  _chestOpen.src = '/ui/chest-open.png'
+  _chestOpen.onload = () => { chestOpenImg = _chestOpen }
+}
 
 function drawChests(ctx: CanvasRenderingContext2D, chests: Chest[], camera: Camera, w: number, h: number) {
   const time = Date.now() * 0.003
@@ -2497,11 +2512,17 @@ export function useGameEngine(
         s.particles,
         () => {
           s.gameRunning = false
+          getNativeBridge().haptic('error')
+          getNativeBridge().playSound('death')
           callbacksRef.current.onDeath(s.player!.score, s.player!.segments.length, s.playerCoins, s.playerKills)
         },
         (_worm, _idx) => {
           // Check if player killed this worm (player's body was the obstacle)
-          if (s.player && s.player.alive) s.playerKills++
+          if (s.player && s.player.alive) {
+            s.playerKills++
+            getNativeBridge().haptic('success')
+            getNativeBridge().playSound('kill')
+          }
           setTimeout(() => {
             const idx = s.aiWorms.indexOf(_worm)
             if (idx >= 0) {
@@ -2637,6 +2658,7 @@ export function useGameEngine(
 
     const handleMouseDown = (e: MouseEvent) => {
       e.preventDefault()
+      if (!stateRef.current.boosting) getNativeBridge().haptic('medium')
       stateRef.current.boosting = true
     }
 
@@ -2665,7 +2687,9 @@ export function useGameEngine(
       const touch = e.touches[0]
       if (!touch) return
       // Only boost with two fingers
+      const wasBoosting = s.boosting
       s.boosting = e.touches.length >= 2
+      if (s.boosting && !wasBoosting) getNativeBridge().haptic('medium')
       s.controlMode = 'touch'
       if (!s.touchStart) {
         s.touchStart = { x: touch.clientX, y: touch.clientY }
@@ -2702,6 +2726,7 @@ export function useGameEngine(
         e.preventDefault()
       }
       if (e.key === ' ' || e.key === 'Shift') {
+        if (!stateRef.current.boosting) getNativeBridge().haptic('medium')
         stateRef.current.boosting = true
         e.preventDefault()
       }
