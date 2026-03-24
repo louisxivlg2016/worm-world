@@ -74,17 +74,24 @@ export default function LobbyScreen() {
 
   const handleCreate = async () => {
     if (!roomName.trim()) return;
+    console.log("[Lobby] handleCreate called, roomName:", roomName, "gameMode:", gameMode);
     setLoading(true);
     try {
+      console.log("[Lobby] calling spacetimeService.createRoom...");
       const result = await spacetimeService.createRoom(roomName.trim(), true, gameMode, 8);
+      console.log("[Lobby] createRoom result:", result);
       if (result) {
         const rid = spacetimeService.getCurrentRoomId();
+        console.log("[Lobby] roomId:", rid, "slug:", result.slug);
         if (rid) spacetimeService.subscribeToGameData(rid);
         startGame("Host", activeSkin, result.gameMode as GameMode, result.slug, String(rid), result.seed);
+        console.log("[Lobby] navigating to play...");
         router.push("/(game)/play");
+      } else {
+        console.error("[Lobby] createRoom returned null - is SpacetimeDB connected?");
       }
     } catch (e) {
-      console.error("Failed to create room:", e);
+      console.error("[Lobby] Failed to create room:", e);
     } finally {
       setLoading(false);
     }

@@ -44,7 +44,10 @@ class SpacetimeService {
     }
 
     return new Promise((resolve, reject) => {
-      const savedToken = localStorage.getItem('spacetimedb_token')
+      let savedToken: string | null = null
+      try { savedToken = localStorage.getItem('spacetimedb_token') } catch {}
+
+      console.log('[SpacetimeDB] Connecting to', SPACETIMEDB_URI, 'db:', SPACETIMEDB_DB, 'hasToken:', !!savedToken)
 
       try {
         this.conn = DbConnection.builder()
@@ -56,7 +59,7 @@ class SpacetimeService {
             this.identity = identity
             this.token = token
             this.connected = true
-            localStorage.setItem('spacetimedb_token', token)
+            try { localStorage.setItem('spacetimedb_token', token) } catch {}
 
             conn.subscriptionBuilder()
               .onApplied((_ctx: SubscriptionEventContext) => {
@@ -184,15 +187,21 @@ class SpacetimeService {
   // ─── Rooms ───
 
   async createRoom(name: string, isPublic = true, gameMode = 'ffa', maxPlayers = 8): Promise<{ slug: string; seed: number; gameMode: string; maxPlayers: number } | null> {
-    if (!this.conn) return null
+    console.log('[SpacetimeDB] createRoom called, conn:', !!this.conn, 'connected:', this.connected, 'identity:', this.identity?.toHexString())
+    if (!this.conn) {
+      console.error('[SpacetimeDB] createRoom: no connection!')
+      return null
+    }
     return new Promise((resolve) => {
       this.pendingCreateResolve = resolve
       setTimeout(() => {
         if (this.pendingCreateResolve === resolve) {
+          console.error('[SpacetimeDB] createRoom: timed out after 5s (room.onInsert never fired)')
           this.pendingCreateResolve = null
           resolve(null)
         }
       }, 5000)
+      console.log('[SpacetimeDB] calling reducers.createRoom...')
       this.conn!.reducers.createRoom({ name, isPublic, gameMode, maxPlayers })
     })
   }
