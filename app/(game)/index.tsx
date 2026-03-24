@@ -100,16 +100,14 @@ export default function GameScreen() {
 
   return (
     <View style={styles.container}>
-      {/* transform creates a new containing block so position:fixed inside stays contained */}
-      <View style={styles.gameWrapper}>
-        <GameDom
-          onHaptic={handleHaptic}
-          onShare={handleShare}
-          onPlaySound={handlePlaySound}
-          onScheduleNotification={handleScheduleNotification}
-          onGameStateChange={handleGameStateChange}
-        />
-      </View>
+      <GameDom
+        onHaptic={handleHaptic}
+        onShare={handleShare}
+        onPlaySound={handlePlaySound}
+        onScheduleNotification={handleScheduleNotification}
+        onGameStateChange={handleGameStateChange}
+        dom={{ style: { flex: 1, width: "100%", height: "100%" } }}
+      />
     </View>
   );
 }
@@ -118,11 +116,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#000",
-  },
-  gameWrapper: {
-    flex: 1,
-    // @ts-ignore — web-only: transform creates new containing block for position:fixed children
-    transform: [{ scale: 1 }],
-    overflow: "hidden",
   },
 });
