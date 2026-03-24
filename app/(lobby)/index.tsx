@@ -14,7 +14,8 @@ import * as Linking from "expo-linking";
 import { useRouter } from "expo-router";
 import { colors, spacing } from "@/expo/theme";
 import { spacetimeService } from "@/services/SpacetimeService";
-import type { GameMode } from "@/types/game";
+import { useGameState } from "@/context/GameStateContext";
+import { SKINS, type GameMode } from "@/types/game";
 
 type RoomInfo = {
   id: bigint;
@@ -68,16 +69,19 @@ export default function LobbyScreen() {
     return () => subscription.remove();
   }, []);
 
+  const { startGame, customSkin, playerSkin } = useGameState();
+  const activeSkin = customSkin ?? playerSkin ?? SKINS[0];
+
   const handleCreate = async () => {
     if (!roomName.trim()) return;
     setLoading(true);
     try {
       const result = await spacetimeService.createRoom(roomName.trim(), true, gameMode, 8);
       if (result) {
-        // Subscribe to game data and navigate to play tab
-        const roomId = spacetimeService.getCurrentRoomId();
-        if (roomId) spacetimeService.subscribeToGameData(roomId);
-        router.push("/");
+        const rid = spacetimeService.getCurrentRoomId();
+        if (rid) spacetimeService.subscribeToGameData(rid);
+        startGame("Host", activeSkin, result.gameMode as GameMode, result.slug, String(rid), result.seed);
+        router.push("/(game)/play");
       }
     } catch (e) {
       console.error("Failed to create room:", e);
@@ -93,7 +97,8 @@ export default function LobbyScreen() {
       const result = spacetimeService.joinRoom(slug.trim());
       if (result) {
         spacetimeService.subscribeToGameData(result.roomId);
-        router.push("/");
+        startGame("Player", activeSkin, result.gameMode as GameMode, slug, String(result.roomId), result.seed);
+        router.push("/(game)/play");
       }
     } catch (e) {
       console.error("Failed to join room:", e);

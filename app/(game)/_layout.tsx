@@ -5,24 +5,36 @@ export default function GameLayout() {
   return (
     <Stack
       screenOptions={{
-        headerTransparent: true,
-        headerLargeTitle: true,
-        headerLargeTitleShadowVisible: false,
-        headerBlurEffect: "none",
-        contentStyle: { backgroundColor: colors.background },
-        headerTintColor: colors.text,
         headerShown: false,
+        contentStyle: { backgroundColor: colors.background },
       }}
     >
-      <Stack.Screen name="index" options={{ title: "Play" }} />
+      <Stack.Screen name="index" />
+      <Stack.Screen name="play" options={{ gestureEnabled: false }} />
+      <Stack.Screen
+        name="dead"
+        options={{
+          presentation: "formSheet",
+          sheetAllowedDetents: [0.5, 0.75],
+          sheetGrabberVisible: true,
+          contentStyle: { backgroundColor: "transparent" },
+        }}
+      />
+      <Stack.Screen
+        name="event-win"
+        options={{
+          presentation: "formSheet",
+          sheetAllowedDetents: [0.5],
+          sheetGrabberVisible: true,
+          contentStyle: { backgroundColor: "transparent" },
+        }}
+      />
       <Stack.Screen
         name="edit-username"
         options={{
-          title: "Edit Username",
           presentation: "formSheet",
           sheetAllowedDetents: [0.35],
           sheetGrabberVisible: true,
-          sheetCornerRadius: 24,
         }}
       />
     </Stack>
