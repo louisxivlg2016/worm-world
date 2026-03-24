@@ -161,7 +161,7 @@ export default function ShopScreen() {
     return headOptions.filter((h) => h.label.toLowerCase().includes(q));
   }, [headSearch, headOptions]);
 
-  const numColumns = isDesktop ? 5 : 3;
+  const numColumns = isDesktop ? 3 : 2;
   const itemGap = spacing.sm;
   const effectiveWidth = isDesktop ? contentMaxWidth : width;
   const flagItemWidth = (effectiveWidth - spacing.md * 2 - itemGap * (numColumns - 1)) / numColumns;
@@ -217,7 +217,7 @@ export default function ShopScreen() {
                 ))}
               </View>
             )}
-            <Text style={styles.flagLabel} numberOfLines={1}>
+            <Text style={styles.flagLabel} numberOfLines={1} ellipsizeMode="tail">
               {item.name}
             </Text>
           </Pressable>
@@ -533,27 +533,33 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderCurve: "continuous",
     overflow: "hidden",
-    backgroundColor: colors.surface,
+    backgroundColor: "rgba(255,255,255,0.06)",
+    flexDirection: "row",
     alignItems: "center",
-    paddingBottom: spacing.xs,
+    gap: 10,
+    padding: 10,
   },
   flagImage: {
-    width: "100%",
-    aspectRatio: 4 / 3,
+    width: 52,
+    height: 36,
+    borderRadius: 6,
+    borderCurve: "continuous",
   },
   flagColorPreview: {
-    width: "100%",
-    aspectRatio: 4 / 3,
+    width: 52,
+    height: 36,
+    borderRadius: 6,
+    borderCurve: "continuous",
     flexDirection: "row",
+    overflow: "hidden",
   },
   colorStripe: {
     flex: 1,
   },
   flagLabel: {
-    color: colors.textSecondary,
-    fontSize: 11,
-    marginTop: 2,
-    paddingHorizontal: 4,
+    color: "rgba(255,255,255,0.7)",
+    fontSize: 13,
+    flex: 1,
   },
   applyBtn: {
     marginTop: spacing.lg,
