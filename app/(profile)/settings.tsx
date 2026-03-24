@@ -1,10 +1,12 @@
-import { View, Text, Pressable, Alert, StyleSheet } from "react-native";
+import { View, Text, Pressable, Alert, StyleSheet, useWindowDimensions } from "react-native";
 import { useRouter } from "expo-router";
 import { colors, spacing } from "@/expo/theme";
 import { getStorage } from "@/services/StorageService";
 
 export default function SettingsSheet() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 600;
 
   const handleReset = () => {
     Alert.alert(
@@ -32,7 +34,7 @@ export default function SettingsSheet() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isDesktop && { maxWidth: 600, alignSelf: 'center', width: '100%' }]}>
       <Text style={styles.title}>Paramètres</Text>
 
       <View style={styles.section}>
