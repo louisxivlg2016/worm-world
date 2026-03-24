@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import { Slot, usePathname, useRouter } from "expo-router";
 import { ThemeProvider, DarkTheme } from "@react-navigation/native";
 import { colors } from "@/expo/theme";
 import { GameStateProvider, useGameState } from "@/context/GameStateContext";
+import { spacetimeService } from "@/services/SpacetimeService";
 
 const appTheme = {
   ...DarkTheme,
@@ -24,6 +26,15 @@ const tabs = [
 ] as const;
 
 export default function RootLayout() {
+  // Connect to SpacetimeDB on app start
+  useEffect(() => {
+    spacetimeService.connect().then(() => {
+      console.log("[App/Web] SpacetimeDB connected");
+    }).catch((err) => {
+      console.error("[App/Web] SpacetimeDB connection failed:", err);
+    });
+  }, []);
+
   return (
     <ThemeProvider value={appTheme}>
       <GameStateProvider>
