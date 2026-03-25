@@ -2404,47 +2404,51 @@ export function useGameEngine(
         // Listen for remote player updates
         spacetimeService.updateCallbacks({
           onRemotePlayerUpdate: (identityHex: string, data: any) => {
+            // Remove dead players
+            if (!data.alive) {
+              s.remotePlayers.delete(identityHex)
+              return
+            }
+
             let rp = s.remotePlayers.get(identityHex)
             if (!rp) {
-              // Parse skin if available
               let remoteSkin = playerSkin
               try { if (data.skinJson) remoteSkin = JSON.parse(data.skinJson) } catch {}
               rp = createWorm(data.x, data.y, remoteSkin, data.name || 'Player', false)
               rp.isPlayer = false
               s.remotePlayers.set(identityHex, rp)
-              console.log('[MP] New remote player:', identityHex, data.name)
             }
 
-            // Smooth interpolation: move head toward new position
+            // Smooth interpolation
             const head = rp.segments[0]
-            const dx = data.x - head.x
-            const dy = data.y - head.y
-            head.x += dx * 0.3
-            head.y += dy * 0.3
+            head.x += (data.x - head.x) * 0.3
+            head.y += (data.y - head.y) * 0.3
             rp.angle = data.angle
             rp.score = data.score
             rp.alive = data.alive
             rp.name = data.name || 'Player'
             rp.boosting = data.boosting
 
-            // Update body segments to follow head (trail behind)
+            // Body follows head
             for (let i = 1; i < rp.segments.length; i++) {
               const prev = rp.segments[i - 1]
               const seg = rp.segments[i]
               const sdx = prev.x - seg.x
               const sdy = prev.y - seg.y
-              const dist = Math.sqrt(sdx * sdx + sdy * sdy)
-              if (dist > 12) {
+              if (sdx * sdx + sdy * sdy > 144) {
                 seg.x += sdx * 0.3
                 seg.y += sdy * 0.3
               }
             }
 
-            // Match segment count roughly
-            const targetSegs = data.segmentsCount || 80
+            // Match segment count — grow AND shrink
+            const targetSegs = Math.max(10, Math.min(data.segmentsCount || 80, 500))
             while (rp.segments.length < targetSegs) {
               const last = rp.segments[rp.segments.length - 1]
               rp.segments.push({ x: last.x, y: last.y })
+            }
+            if (rp.segments.length > targetSegs) {
+              rp.segments.length = targetSegs
             }
           },
           onRemotePlayerLeft: (identityHex: string) => {
