@@ -38,6 +38,14 @@ const HEAD_IMAGES: Record<string, string> = {
   queen: '/heads/queen.png',
   king: '/heads/king.png',
   dragon: '/heads/dragon.png',
+  cat: '/heads/cat.png',
+  dog: '/heads/dog.png',
+  panda: '/heads/panda.png',
+  fox: '/heads/fox.png',
+  penguin: '/heads/penguin.png',
+  robot: '/heads/robot.png',
+  alien: '/heads/alien.png',
+  ninja: '/heads/ninja.png',
 }
 for (const ev of _EVENTS_FOR_HEADS) {
   for (const c of ev.costumes) {
@@ -59,6 +67,14 @@ function loadBodyTexture(src: string): HTMLImageElement | null {
 
 const BODY_TEXTURES: Record<string, string> = {
   dragon: '/heads/dragon-body.png',
+  cat: '/heads/cat-body.png',
+  dog: '/heads/dog-body.png',
+  panda: '/heads/panda-body.png',
+  fox: '/heads/fox-body.png',
+  penguin: '/heads/penguin-body.png',
+  robot: '/heads/robot-body.png',
+  alien: '/heads/alien-body.png',
+  ninja: '/heads/ninja-body.png',
 }
 for (const ev of _EVENTS_FOR_HEADS) {
   for (const c of ev.costumes) {
@@ -2196,6 +2212,14 @@ export function useGameEngine(
     { headType: 'dragon', bodyTexture: '/heads/dragon-body.png' },
     { headType: 'stpatrick', bodyTexture: '/heads/stpatrick-body.png' },
     { headType: 'santa', bodyTexture: '/heads/santa-body.png' },
+    { headType: 'cat' as any, bodyTexture: '/heads/cat-body.png' },
+    { headType: 'dog' as any, bodyTexture: '/heads/dog-body.png' },
+    { headType: 'panda' as any, bodyTexture: '/heads/panda-body.png' },
+    { headType: 'fox' as any, bodyTexture: '/heads/fox-body.png' },
+    { headType: 'penguin' as any, bodyTexture: '/heads/penguin-body.png' },
+    { headType: 'robot' as any, bodyTexture: '/heads/robot-body.png' },
+    { headType: 'alien' as any, bodyTexture: '/heads/alien-body.png' },
+    { headType: 'ninja' as any, bodyTexture: '/heads/ninja-body.png' },
   ]
 
   const spawnAIWorm = useCallback((forceSmall?: boolean) => {

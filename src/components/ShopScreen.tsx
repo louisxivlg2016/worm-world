@@ -215,6 +215,14 @@ const HEAD_OPTIONS: { id: string; label: string; preview: string; bodyTexture?: 
   { id: 'queen', label: 'Reine', preview: '/heads/queen.png' },
   { id: 'king', label: 'Roi', preview: '/heads/king.png' },
   { id: 'dragon', label: 'Dragon', preview: '/heads/dragon.png', bodyTexture: '/heads/dragon-body.png' },
+  { id: 'cat', label: 'Chat', preview: '/heads/cat.png', bodyTexture: '/heads/cat-body.png' },
+  { id: 'dog', label: 'Chien', preview: '/heads/dog.png', bodyTexture: '/heads/dog-body.png' },
+  { id: 'panda', label: 'Panda', preview: '/heads/panda.png', bodyTexture: '/heads/panda-body.png' },
+  { id: 'fox', label: 'Renard', preview: '/heads/fox.png', bodyTexture: '/heads/fox-body.png' },
+  { id: 'penguin', label: 'Pingouin', preview: '/heads/penguin.png', bodyTexture: '/heads/penguin-body.png' },
+  { id: 'robot', label: 'Robot', preview: '/heads/robot.png', bodyTexture: '/heads/robot-body.png' },
+  { id: 'alien', label: 'Alien', preview: '/heads/alien.png', bodyTexture: '/heads/alien-body.png' },
+  { id: 'ninja', label: 'Ninja', preview: '/heads/ninja.png', bodyTexture: '/heads/ninja-body.png' },
   ...GAME_EVENTS.flatMap(e => {
     const locked = getStorage().getItem(e.unlockKey) !== 'true'
     return e.costumes.map(c => ({
