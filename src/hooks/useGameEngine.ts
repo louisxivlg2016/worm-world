@@ -2419,10 +2419,10 @@ export function useGameEngine(
               s.remotePlayers.set(identityHex, rp)
             }
 
-            // Smooth head interpolation
+            // Snap head to server position (fast, no lag)
             const head = rp.segments[0]
-            head.x += (data.x - head.x) * 0.5
-            head.y += (data.y - head.y) * 0.5
+            head.x = data.x
+            head.y = data.y
             rp.angle = data.angle
             rp.score = data.score
             rp.alive = data.alive
@@ -2636,7 +2636,7 @@ export function useGameEngine(
       s.activeEffects = s.activeEffects.filter(e => e.expiresAt > now)
 
       checkCollisions(
-        [s.player, ...s.aiWorms],
+        [s.player, ...s.aiWorms, ...s.remotePlayers.values()],
         s.foods,
         s.particles,
         () => {
