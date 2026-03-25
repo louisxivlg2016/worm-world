@@ -99,6 +99,14 @@ function getHeadOptions(): HeadOption[] {
     { id: "queen", label: "Reine", locked: false },
     { id: "king", label: "Roi", locked: false },
     { id: "dragon", label: "Dragon", locked: false },
+    { id: "cat", label: "Chat 🐱", locked: false },
+    { id: "dog", label: "Chien 🐶", locked: false },
+    { id: "panda", label: "Panda 🐼", locked: false },
+    { id: "fox", label: "Renard 🦊", locked: false },
+    { id: "penguin", label: "Pingouin 🐧", locked: false },
+    { id: "robot", label: "Robot 🤖", locked: false },
+    { id: "alien", label: "Alien 👽", locked: false },
+    { id: "ninja", label: "Ninja 🥷", locked: false },
   ];
   const eventHeads = GAME_EVENTS.flatMap((e) => {
     const locked = getStorage().getItem(e.unlockKey) !== "true";
