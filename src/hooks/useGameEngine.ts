@@ -2419,25 +2419,28 @@ export function useGameEngine(
               s.remotePlayers.set(identityHex, rp)
             }
 
-            // Smooth interpolation
+            // Smooth head interpolation
             const head = rp.segments[0]
-            head.x += (data.x - head.x) * 0.3
-            head.y += (data.y - head.y) * 0.3
+            head.x += (data.x - head.x) * 0.5
+            head.y += (data.y - head.y) * 0.5
             rp.angle = data.angle
             rp.score = data.score
             rp.alive = data.alive
             rp.name = data.name || 'Player'
             rp.boosting = data.boosting
 
-            // Body follows head
+            // Body follows head — same gap logic as local worm
+            const gap = BASE_SEGMENT_GAP + Math.min(Math.pow(Math.max(rp.segments.length - 30, 0) / 50, 2) * 6, 10)
             for (let i = 1; i < rp.segments.length; i++) {
               const prev = rp.segments[i - 1]
               const seg = rp.segments[i]
-              const sdx = prev.x - seg.x
-              const sdy = prev.y - seg.y
-              if (sdx * sdx + sdy * sdy > 144) {
-                seg.x += sdx * 0.3
-                seg.y += sdy * 0.3
+              const dx = prev.x - seg.x
+              const dy = prev.y - seg.y
+              const dist = Math.sqrt(dx * dx + dy * dy)
+              if (dist > gap) {
+                const ratio = gap / dist
+                seg.x = prev.x - dx * ratio
+                seg.y = prev.y - dy * ratio
               }
             }
 
