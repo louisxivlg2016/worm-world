@@ -163,7 +163,7 @@ export default function LobbyScreen() {
           maxLength={30}
         />
         <View style={styles.modeRow}>
-          {(["battle", "ffa"] as GameMode[]).map((m) => (
+          {(["battle"] as GameMode[]).map((m) => (
             <Pressable
               key={m}
               onPress={() => setGameMode(m)}
