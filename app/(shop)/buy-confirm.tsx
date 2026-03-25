@@ -1,10 +1,11 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { colors, spacing } from "@/expo/theme";
-import { getStorage } from "@/services/StorageService";
+import { useGameState } from "@/context/GameStateContext";
 
 export default function BuyConfirmSheet() {
   const router = useRouter();
+  const { totalCoins, applySkin } = useGameState();
   const params = useLocalSearchParams<{
     price: string;
     flag: string;
@@ -14,32 +15,20 @@ export default function BuyConfirmSheet() {
   }>();
 
   const price = parseInt(params.price ?? "0", 10);
-  const currentCoins = (() => {
-    try {
-      return parseInt(getStorage().getItem("playerCoins") ?? "0", 10) || 0;
-    } catch {
-      return 0;
-    }
-  })();
-  const canAfford = currentCoins >= price;
+  const canAfford = totalCoins >= price;
 
   const handleConfirm = () => {
-    if (!canAfford) return;
-    try {
-      const storage = getStorage();
-      const newBalance = currentCoins - price;
-      storage.setItem("playerCoins", String(newBalance));
-
-      const skinData = {
-        colors: JSON.parse(params.colors ?? "[]"),
-        headType: params.headType ?? "default",
-        bodyStyle: params.bodyStyle ?? "circles",
-        flag: params.flag ?? null,
-      };
-      storage.setItem("currentSkin", JSON.stringify(skinData));
-    } catch (e) {
-      console.error("Failed to save skin:", e);
-    }
+    if (!canAfford && price > 0) return;
+    const skinColors = (() => { try { return JSON.parse(params.colors ?? "[]"); } catch { return ["#888", "#999", "#888", "#999"]; } })();
+    applySkin({
+      colors: skinColors,
+      eye: "#fff",
+      name: "Custom",
+      headType: params.headType as any,
+      bodyStyle: (params.bodyStyle as any) ?? "circles",
+      isFlag: !!(params.flag),
+      bodyTexture: params.flag ? undefined : undefined,
+    }, price);
     router.back();
   };
 
@@ -60,7 +49,7 @@ export default function BuyConfirmSheet() {
         <View style={styles.balanceRow}>
           <Text style={styles.balanceLabel}>Solde actuel</Text>
           <Text style={[styles.balanceValue, !canAfford && styles.balanceInsufficient]}>
-            {currentCoins} {"\u{1FA99}"}
+            {totalCoins} 🪙
           </Text>
         </View>
       )}

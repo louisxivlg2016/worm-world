@@ -13,6 +13,7 @@ import {
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useRouter } from "expo-router";
 import { colors, spacing } from "@/expo/theme";
+import { useGameState } from "@/context/GameStateContext";
 import { FLAG_IMAGES } from "@/assets/flags";
 import { SKINS } from "@/types/game";
 import { getStorage } from "@/services/StorageService";
@@ -139,13 +140,7 @@ export default function ShopScreen() {
   const [bodyStyle, setBodyStyle] = useState<"circles" | "tube">("circles");
   const [selectedFlag, setSelectedFlag] = useState<string | null>(null);
 
-  const coins = (() => {
-    try {
-      return parseInt(getStorage().getItem("playerCoins") ?? "0", 10) || 0;
-    } catch {
-      return 0;
-    }
-  })();
+  const { totalCoins: coins } = useGameState();
 
   const headOptions = useMemo(() => getHeadOptions(), []);
 
