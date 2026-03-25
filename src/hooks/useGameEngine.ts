@@ -2410,21 +2410,16 @@ export function useGameEngine(
               return
             }
 
-            // Parse remote skin
-            let remoteSkin = playerSkin
-            try { if (data.skinJson && data.skinJson !== '{}') remoteSkin = JSON.parse(data.skinJson) } catch {}
-
             let rp = s.remotePlayers.get(identityHex)
             if (!rp) {
+              let remoteSkin = playerSkin
+              try { if (data.skinJson) remoteSkin = JSON.parse(data.skinJson) } catch {}
               rp = createWorm(data.x, data.y, remoteSkin, data.name || 'Player', false)
               rp.isPlayer = false
               s.remotePlayers.set(identityHex, rp)
             }
 
-            // Update skin every time (in case it changed)
-            rp.skin = remoteSkin
-
-            // Snap head to server position
+            // Snap head to server position (fast, no lag)
             const head = rp.segments[0]
             head.x = data.x
             head.y = data.y
