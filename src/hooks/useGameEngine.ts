@@ -297,7 +297,7 @@ function createChest(): Chest {
 
 function createWorm(x: number, y: number, skin: WormSkin, name: string, isPlayer: boolean): Worm {
   const segments: Segment[] = []
-  const len = 80
+  const len = isPlayer ? 20 : 80
   for (let i = 0; i < len; i++) {
     segments.push({ x: x - i * BASE_SEGMENT_GAP, y })
   }
