@@ -2342,6 +2342,21 @@ export function useGameEngine(
     if (s.roomSlug && typeof window !== 'undefined') {
       try {
         const { spacetimeService } = require('@/services/SpacetimeService')
+        console.log('[MP] Setting up multiplayer, roomSlug:', s.roomSlug, 'roomId:', s.roomId, 'connected:', !!(spacetimeService as any).conn)
+
+        // Make sure we're connected and subscribed
+        if (!(spacetimeService as any).connected) {
+          console.log('[MP] Not connected, attempting connect...')
+          spacetimeService.connect().then(() => {
+            console.log('[MP] Connected, subscribing to game data...')
+            const rid = spacetimeService.getCurrentRoomId()
+            if (rid) spacetimeService.subscribeToGameData(rid)
+          }).catch((e: any) => console.error('[MP] Connect failed:', e))
+        } else {
+          const rid = spacetimeService.getCurrentRoomId()
+          console.log('[MP] Already connected, currentRoomId:', rid)
+          if (rid) spacetimeService.subscribeToGameData(rid)
+        }
 
         // Start broadcasting our state at 12Hz
         spacetimeService.startUpdateLoop(() => {
@@ -2367,19 +2382,49 @@ export function useGameEngine(
           onRemotePlayerUpdate: (identityHex: string, data: any) => {
             let rp = s.remotePlayers.get(identityHex)
             if (!rp) {
-              rp = createWorm(data.x, data.y, playerSkin, data.name || 'Player', false)
+              // Parse skin if available
+              let remoteSkin = playerSkin
+              try { if (data.skinJson) remoteSkin = JSON.parse(data.skinJson) } catch {}
+              rp = createWorm(data.x, data.y, remoteSkin, data.name || 'Player', false)
               rp.isPlayer = false
               s.remotePlayers.set(identityHex, rp)
+              console.log('[MP] New remote player:', identityHex, data.name)
             }
-            rp.segments[0].x = data.x
-            rp.segments[0].y = data.y
+
+            // Smooth interpolation: move head toward new position
+            const head = rp.segments[0]
+            const dx = data.x - head.x
+            const dy = data.y - head.y
+            head.x += dx * 0.3
+            head.y += dy * 0.3
             rp.angle = data.angle
             rp.score = data.score
             rp.alive = data.alive
             rp.name = data.name || 'Player'
             rp.boosting = data.boosting
+
+            // Update body segments to follow head (trail behind)
+            for (let i = 1; i < rp.segments.length; i++) {
+              const prev = rp.segments[i - 1]
+              const seg = rp.segments[i]
+              const sdx = prev.x - seg.x
+              const sdy = prev.y - seg.y
+              const dist = Math.sqrt(sdx * sdx + sdy * sdy)
+              if (dist > 12) {
+                seg.x += sdx * 0.3
+                seg.y += sdy * 0.3
+              }
+            }
+
+            // Match segment count roughly
+            const targetSegs = data.segmentsCount || 80
+            while (rp.segments.length < targetSegs) {
+              const last = rp.segments[rp.segments.length - 1]
+              rp.segments.push({ x: last.x, y: last.y })
+            }
           },
           onRemotePlayerLeft: (identityHex: string) => {
+            console.log('[MP] Remote player left:', identityHex)
             s.remotePlayers.delete(identityHex)
           },
         })
