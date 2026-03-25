@@ -68,8 +68,8 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
   const [totalCoins, setTotalCoins] = useState(() => {
     const saved = getStorage().getItem("totalCoins");
     if (!saved) {
-      getStorage().setItem("totalCoins", "20000");
-      return 20000;
+      getStorage().setItem("totalCoins", "500");
+      return 500;
     }
     return parseInt(saved, 10) || 0;
   });
