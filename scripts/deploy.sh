@@ -16,6 +16,14 @@ find "$DIST_REPO" -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
 # Copy new build
 cp -r "$SRC_REPO/dist/"* "$DIST_REPO/"
 
+# Add Vercel config for clean URLs (serve play.html at /play etc)
+cat > "$DIST_REPO/vercel.json" << 'VEOF'
+{
+  "cleanUrls": true,
+  "trailingSlash": false
+}
+VEOF
+
 echo "=== Committing and pushing ==="
 cd "$DIST_REPO"
 HASH=$(cd "$SRC_REPO" && git rev-parse --short HEAD)
