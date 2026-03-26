@@ -201,7 +201,13 @@ class SpacetimeService {
           resolve(null)
         }
       }, 5000)
-      console.log('[SpacetimeDB] calling reducers.createRoom...')
+      console.log('[SpacetimeDB] calling reducers.createRoom...', { name, isPublic, gameMode, maxPlayers })
+
+      // Listen for reducer result
+      this.conn!.reducers.onCreateRoom((_ctx: any, _name: string, _isPublic: boolean, _gameMode: string, _maxPlayers: number) => {
+        console.log('[SpacetimeDB] createRoom reducer completed')
+      })
+
       this.conn!.reducers.createRoom({ name, isPublic, gameMode, maxPlayers })
     })
   }
