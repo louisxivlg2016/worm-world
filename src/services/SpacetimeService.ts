@@ -91,8 +91,9 @@ class SpacetimeService {
 
   private setupTableCallbacks(conn: DbConnection) {
     conn.db.room.onInsert((_ctx: EventContext, room: Room) => {
+      console.log('[SpacetimeDB] room.onInsert fired!', room.slug, 'host:', room.host?.toHexString?.(), 'myId:', this.identity?.toHexString?.())
       this.callbacks.onRoomListChanged?.()
-      if (this.pendingCreateResolve && this.identity && room.host.isEqual(this.identity)) {
+      if (this.pendingCreateResolve) {
         const resolve = this.pendingCreateResolve
         this.pendingCreateResolve = null
         this.currentRoomId = room.id
@@ -202,13 +203,16 @@ class SpacetimeService {
         }
       }, 5000)
       console.log('[SpacetimeDB] calling reducers.createRoom...', { name, isPublic, gameMode, maxPlayers })
+      console.log('[SpacetimeDB] conn state:', { connected: this.connected, identity: this.identity?.toHexString?.() })
+      console.log('[SpacetimeDB] rooms in cache:', Array.from(this.conn!.db.room.iter()).length)
 
-      // Listen for reducer result
-      this.conn!.reducers.onCreateRoom((_ctx: any, _name: string, _isPublic: boolean, _gameMode: string, _maxPlayers: number) => {
-        console.log('[SpacetimeDB] createRoom reducer completed')
-      })
-
-      this.conn!.reducers.createRoom({ name, isPublic, gameMode, maxPlayers })
+      try {
+        this.conn!.reducers.createRoom({ name, isPublic, gameMode, maxPlayers })
+        console.log('[SpacetimeDB] createRoom reducer called successfully')
+      } catch (e) {
+        console.error('[SpacetimeDB] createRoom reducer THREW:', e)
+        resolve(null)
+      }
     })
   }
 
