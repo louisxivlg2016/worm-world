@@ -381,20 +381,20 @@ function findFoodHotspot(x: number, y: number, range: number, foods: Food[]) {
 interface EffectMods { speedMult: number; magnetRange: number }
 const NO_EFFECTS: EffectMods = { speedMult: 1, magnetRange: 0 }
 
-function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], particles: Particle[], playerCoinsRef: { value: number }, foodGrid?: SpatialGrid, effects?: EffectMods, flyingCoins?: FlyingCoin[], camera?: Camera, canvasW?: number, canvasH?: number) {
+function updateWorm(worm: Worm, dt: number, foods: Food[], coins: Coin[], particles: Particle[], playerCoinsRef: { value: number }, foodGrid?: SpatialGrid, effects?: EffectMods, flyingCoins?: FlyingCoin[], camera?: Camera, canvasW?: number, canvasH?: number) {
   if (!worm.alive) return
-  if (worm.invincible > 0) worm.invincible--
+  if (worm.invincible > 0) worm.invincible -= dt
 
   // Boost
   if (worm.boosting && worm.boostEnergy > 0 && worm.segments.length > 10) {
-    worm.boostEnergy -= 0.5
+    worm.boostEnergy -= 0.5 * dt
     if (worm.boostEnergy <= 0) worm.boosting = false
-    if (Math.random() < 0.03 && worm.segments.length > 10) {
+    if (Math.random() < 0.03 * dt && worm.segments.length > 10) {
       const tail = worm.segments.pop()!
       foods.push({ ...createFood(tail.x + (Math.random() - 0.5) * 20, tail.y + (Math.random() - 0.5) * 20, false), fromDeath: false })
     }
   } else if (!worm.boosting) {
-    worm.boostEnergy = Math.min(100, worm.boostEnergy + 0.15)
+    worm.boostEnergy = Math.min(100, worm.boostEnergy + 0.15 * dt)
   }
 
   // Smooth turning
@@ -408,11 +408,11 @@ function updateWorm(worm: Worm, _dt: number, foods: Food[], coins: Coin[], parti
   } else {
     turnMult = 1.8 + (worm.aiSkill || 0.5) * 1.2
   }
-  worm.angle += angleDiff * turnRate * turnMult
+  worm.angle += angleDiff * turnRate * turnMult * dt
 
   // Move head
   const eff = effects ?? NO_EFFECTS
-  const speed = getWormSpeed(worm) * eff.speedMult
+  const speed = getWormSpeed(worm) * eff.speedMult * dt
   const head = worm.segments[0]
   head.x += Math.cos(worm.angle) * speed
   head.y += Math.sin(worm.angle) * speed
