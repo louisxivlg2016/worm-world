@@ -4,7 +4,16 @@ import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { colors, spacing } from "@/expo/theme";
 import { getStorage } from "@/services/StorageService";
-import { allLanguages } from "@/i18n";
+const allLanguages: Record<string, string> = {
+  fr: "Français",
+  en: "English",
+  es: "Español",
+  it: "Italiano",
+  ru: "Русский",
+  zh: "中文",
+  ar: "العربية",
+  hi: "हिन्दी",
+};
 
 export default function SettingsSheet() {
   const router = useRouter();
