@@ -12,7 +12,6 @@ interface RacePageProps {
 const BOT_COLORS = [
   ["#00ccff", "#0088ff", "#0055cc", "#00ccff"],
   ["#7cff00", "#44cc00", "#228800", "#7cff00"],
-  ["#ff6b35", "#ffaa00", "#cc4400", "#ff6b35"],
   ["#cc33ff", "#8833ff", "#6600cc", "#cc33ff"],
 ];
 
@@ -86,7 +85,6 @@ export default function RacePage({ onPlay, onClose, playerColors }: RacePageProp
       <WormOnTrack colors={BOT_COLORS[0]} trackY={TRACK_Y[1]} progress={0} segCount={5} />
       <WormOnTrack colors={BOT_COLORS[1]} trackY={TRACK_Y[2]} progress={0} segCount={5} />
       <WormOnTrack colors={BOT_COLORS[2]} trackY={TRACK_Y[3]} progress={0} segCount={5} />
-      <WormOnTrack colors={BOT_COLORS[3]} trackY={TRACK_Y[4]} progress={0} segCount={5} />
 
       {/* Buttons */}
       <div style={{
