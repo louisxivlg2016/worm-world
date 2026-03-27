@@ -2288,7 +2288,10 @@ export function useGameEngine(
     // Preload body texture if the skin has one
     if (playerSkin.bodyTexture) loadBodyTexture(playerSkin.bodyTexture)
 
-    const isCoinsMode = (gameMode ?? 'ffa') === 'coins'
+    // Set gameMode BEFORE spawning AI (affects their size/score)
+    s.gameMode = gameMode ?? 'ffa'
+
+    const isCoinsMode = s.gameMode === 'coins'
 
     s.usedAINames = []
     s.aiWorms = []
@@ -2357,7 +2360,6 @@ export function useGameEngine(
     s.keys = { up: false, down: false, left: false, right: false }
     s.roomSlug = roomSlug ?? null
     s.roomId = roomId ?? null
-    s.gameMode = gameMode ?? 'ffa'
     s.localBattleDeaths = 0
     s.playerKills = 0
     s.isGameOver = false
