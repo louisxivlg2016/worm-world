@@ -1,4 +1,4 @@
-import { View, Text, Pressable, useWindowDimensions, Image } from "react-native";
+import { View, Text, Pressable, useWindowDimensions } from "react-native";
 import { useRouter } from "expo-router";
 import { useGameState } from "@/context/GameStateContext";
 import { colors, spacing } from "@/expo/theme";
@@ -32,12 +32,15 @@ export default function RaceScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: "#2a1205" }}>
-      {/* Background image */}
-      <Image
-        source={{ uri: "/course-bg.png" }}
-        style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, opacity: 0.3 }}
-        resizeMode="cover"
-      />
+      {/* Background image via CSS */}
+      <View style={{
+        position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
+        opacity: 0.4,
+        // @ts-ignore web-only
+        backgroundImage: "url(/course-bg.png)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      } as any} />
 
       <View style={{
         flex: 1, alignItems: "center", justifyContent: "center",
