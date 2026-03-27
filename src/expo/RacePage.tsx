@@ -1,6 +1,6 @@
 "use dom";
 
-import courseImg from "../../assets/course-bg.jpg";
+import { COURSE_IMG } from "./courseBase64";
 
 interface RacePageProps {
   onPlay?: () => void;
@@ -11,19 +11,20 @@ interface RacePageProps {
 export default function RacePage({ onPlay, onClose }: RacePageProps) {
   return (
     <div style={{
-      position: "relative", width: "100%", height: "100%",
-      background: "#3a1a0a", overflow: "hidden",
+      width: "100vw", height: "100vh",
+      position: "fixed", top: 0, left: 0,
+      background: "#3a1a0a",
+      zIndex: 9999,
     }}>
       <img
-        src={courseImg}
-        alt="Grand Prix"
+        src={COURSE_IMG}
         style={{
           width: "100%", height: "100%",
           objectFit: "fill", display: "block",
         }}
       />
       <div style={{
-        position: "absolute", bottom: 20, left: 0, right: 0,
+        position: "absolute", bottom: 30, left: 0, right: 0,
         display: "flex", flexDirection: "column", alignItems: "center", gap: 10,
       }}>
         <button
