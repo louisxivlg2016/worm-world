@@ -18,7 +18,7 @@ const BOT_COLORS = [
 
 // Track Y positions as % of image height (measured from the image)
 const TRACK_Y = [34, 43.5, 53, 62.5, 72];
-const TRACK_START_X = 22; // % from left where tracks begin
+const TRACK_START_X = 30; // % from left where tracks begin
 
 function WormOnTrack({ colors, trackY, progress, segCount }: {
   colors: string[]; trackY: number; progress: number; segCount: number;
