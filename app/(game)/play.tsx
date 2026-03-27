@@ -9,12 +9,21 @@ export default function PlayScreen() {
   const router = useRouter();
   const { playerName, playerSkin, roomSlug, roomId, gameMode, seed, handleDeath, handleEventWin, setIsPlaying } = useGameState();
 
+  console.log('[PlayScreen] render, gameMode:', gameMode, 'playerName:', playerName);
+
+  // Don't render until gameMode is set (prevents first render with stale "ffa")
+  if (!playerName) {
+    console.log('[PlayScreen] waiting for state...');
+    return null;
+  }
+
   const event = getEventByMode(gameMode);
 
   const onDeath = useCallback((score: number, length: number, coins: number, kills: number) => {
+    console.log('[PlayScreen] onDeath called, score:', score, 'gameMode:', gameMode);
     handleDeath(score, length, coins, kills);
     router.replace("/(game)/dead");
-  }, [handleDeath, router]);
+  }, [handleDeath, router, gameMode]);
 
   const onWin = useCallback(() => {
     if (event) handleEventWin(event.unlockKey);
