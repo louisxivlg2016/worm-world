@@ -10,40 +10,57 @@ interface RacePageProps {
 }
 
 const BOT_COLORS = [
-  ["#ff3366", "#ff6b9d", "#cc0044", "#ff3366"],
   ["#00ccff", "#0088ff", "#0055cc", "#00ccff"],
   ["#7cff00", "#44cc00", "#228800", "#7cff00"],
   ["#ff6b35", "#ffaa00", "#cc4400", "#ff6b35"],
   ["#cc33ff", "#8833ff", "#6600cc", "#cc33ff"],
 ];
 
-const BOT_PROGRESS = [0, 18, 32, 55, 10]; // % along track
+// Track Y positions as % of image height (measured from the image)
+const TRACK_Y = [34, 43.5, 53, 62.5, 72];
 
-function Worm({ colors, x, y, segments = 8, size = 8 }: { colors: string[]; x: number; y: number; segments?: number; size?: number }) {
-  const segs = [];
-  for (let i = segments - 1; i >= 0; i--) {
-    segs.push(
-      <div key={i} style={{
-        position: "absolute",
-        left: x - i * (size + 2),
-        top: y - size / 2,
-        width: size,
-        height: size,
-        borderRadius: "50%",
-        backgroundColor: colors[i % colors.length],
-        boxShadow: i === 0 ? "0 2px 4px rgba(0,0,0,0.3)" : "none",
-        zIndex: segments - i,
-      }} />
-    );
-  }
-  // Eyes on head
-  segs.push(
-    <div key="eye1" style={{ position: "absolute", left: x + 1, top: y - size / 2 + 1, width: 4, height: 4, borderRadius: "50%", backgroundColor: "white", zIndex: segments + 1 }} />,
-    <div key="eye2" style={{ position: "absolute", left: x + 1, top: y + size / 2 - 5, width: 4, height: 4, borderRadius: "50%", backgroundColor: "white", zIndex: segments + 1 }} />,
-    <div key="pupil1" style={{ position: "absolute", left: x + 2, top: y - size / 2 + 2, width: 2, height: 2, borderRadius: "50%", backgroundColor: "#111", zIndex: segments + 2 }} />,
-    <div key="pupil2" style={{ position: "absolute", left: x + 2, top: y + size / 2 - 4, width: 2, height: 2, borderRadius: "50%", backgroundColor: "#111", zIndex: segments + 2 }} />,
+function WormOnTrack({ colors, trackY, progress, segCount }: {
+  colors: string[]; trackY: number; progress: number; segCount: number;
+}) {
+  const size = 22;
+  const gap = size + 4;
+  return (
+    <div style={{
+      position: "absolute",
+      top: `${trackY}%`,
+      left: `${8 + progress * 0.55}%`,
+      transform: "translateY(-50%)",
+      display: "flex",
+      flexDirection: "row-reverse",
+      alignItems: "center",
+    }}>
+      {/* Head with eyes */}
+      <div style={{
+        width: size, height: size, borderRadius: "50%",
+        backgroundColor: colors[0],
+        position: "relative",
+        boxShadow: "0 2px 6px rgba(0,0,0,0.4)",
+        zIndex: 10,
+        flexShrink: 0,
+      }}>
+        <div style={{ position: "absolute", top: 3, right: 3, width: 7, height: 7, borderRadius: "50%", backgroundColor: "white" }} />
+        <div style={{ position: "absolute", bottom: 3, right: 3, width: 7, height: 7, borderRadius: "50%", backgroundColor: "white" }} />
+        <div style={{ position: "absolute", top: 5, right: 4, width: 4, height: 4, borderRadius: "50%", backgroundColor: "#111" }} />
+        <div style={{ position: "absolute", bottom: 5, right: 4, width: 4, height: 4, borderRadius: "50%", backgroundColor: "#111" }} />
+      </div>
+      {/* Body segments */}
+      {Array.from({ length: segCount }).map((_, i) => (
+        <div key={i} style={{
+          width: size - 2, height: size - 2, borderRadius: "50%",
+          backgroundColor: colors[(i + 1) % colors.length],
+          marginRight: -6,
+          boxShadow: "inset 0 -3px 4px rgba(0,0,0,0.15), inset 0 2px 3px rgba(255,255,255,0.15)",
+          flexShrink: 0,
+          zIndex: segCount - i,
+        }} />
+      ))}
+    </div>
   );
-  return <>{segs}</>;
 }
 
 export default function RacePage({ onPlay, onClose, playerColors }: RacePageProps) {
@@ -58,28 +75,21 @@ export default function RacePage({ onPlay, onClose, playerColors }: RacePageProp
       zIndex: 9999,
       overflow: "hidden",
     }}>
-      {/* Background image */}
       <img
         src={COURSE_IMG}
         style={{ width: "100%", height: "100%", objectFit: "fill", display: "block" }}
       />
 
-      {/* Worms on tracks */}
-      <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}>
-        {/* Player worm - track 1 (top) */}
-        <Worm colors={pColors} x={120} y={Math.floor(100 * 0.37)} segments={6} size={10} />
+      {/* Player worm - track 1 */}
+      <WormOnTrack colors={pColors} trackY={TRACK_Y[0]} progress={0} segCount={8} />
 
-        {/* Bot worms on tracks 2-5 */}
-        {BOT_COLORS.map((colors, i) => {
-          const trackY = Math.floor(100 * (0.445 + i * 0.113));
-          const progressX = 80 + (BOT_PROGRESS[i] / 100) * 600;
-          return (
-            <Worm key={i} colors={colors} x={progressX} y={trackY} segments={6 + i * 2} size={9} />
-          );
-        })}
-      </div>
+      {/* Bot worms - tracks 2-5 */}
+      <WormOnTrack colors={BOT_COLORS[0]} trackY={TRACK_Y[1]} progress={20} segCount={10} />
+      <WormOnTrack colors={BOT_COLORS[1]} trackY={TRACK_Y[2]} progress={35} segCount={12} />
+      <WormOnTrack colors={BOT_COLORS[2]} trackY={TRACK_Y[3]} progress={55} segCount={14} />
+      <WormOnTrack colors={BOT_COLORS[3]} trackY={TRACK_Y[4]} progress={10} segCount={9} />
 
-      {/* Bottom buttons */}
+      {/* Buttons */}
       <div style={{
         position: "absolute", bottom: 20, left: 0, right: 0,
         display: "flex", flexDirection: "column", alignItems: "center", gap: 10,
