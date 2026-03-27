@@ -2283,6 +2283,7 @@ export function useGameEngine(
     const px = (Math.random() - 0.5) * WORLD_SIZE * 0.5
     const py = (Math.random() - 0.5) * WORLD_SIZE * 0.5
     s.player = createWorm(px, py, playerSkin, playerName, true)
+    s.player.invincible = 180 // 3 seconds of spawn protection
 
     // Preload body texture if the skin has one
     if (playerSkin.bodyTexture) loadBodyTexture(playerSkin.bodyTexture)
