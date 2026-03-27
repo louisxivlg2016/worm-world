@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { useGameState } from "@/context/GameStateContext";
 import { getStorage } from "@/services/StorageService";
 
-const courseBg = require("../../public/course-bg.jpg");
+const courseBg = require("../../assets/course-bg.jpg");
 
 export default function RaceScreen() {
   const router = useRouter();
