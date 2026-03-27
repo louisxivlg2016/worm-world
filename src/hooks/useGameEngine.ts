@@ -2249,7 +2249,7 @@ export function useGameEngine(
     // Smarter AI: higher base skill
     w.aiSkill = 0.45 + Math.random() * 0.5 // 0.45-0.95 (was 0.35-0.9)
 
-    if (!forceSmall) {
+    if (!forceSmall && s.gameMode !== 'race') {
       // Varied sizes: 30% tiny, 30% medium, 25% large, 15% massive
       const roll = Math.random()
       let extraSegs: number
