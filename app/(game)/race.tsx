@@ -28,6 +28,7 @@ export default function RaceScreen() {
       <RacePage
         onPlay={handlePlay}
         onClose={handleClose}
+        playerColors={JSON.stringify(activeSkin.colors)}
         dom={{ style: { flex: 1, width: "100%", height: "100%" } }}
       />
     </View>
