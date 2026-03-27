@@ -1,9 +1,7 @@
-import { View, Text, Pressable, ImageBackground } from "react-native";
+import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useGameState } from "@/context/GameStateContext";
 import { getStorage } from "@/services/StorageService";
-
-const courseBg = require("../../assets/course-bg.jpg");
 
 export default function RaceScreen() {
   const router = useRouter();
@@ -20,8 +18,18 @@ export default function RaceScreen() {
   };
 
   return (
-    <ImageBackground source={courseBg} style={{ flex: 1, width: "100%", height: "100%" }} resizeMode="stretch">
-      {/* Bottom buttons overlay */}
+    <View style={{ flex: 1, backgroundColor: "#3a1a0a" }}>
+      {/* @ts-ignore - img is web-only */}
+      <img
+        src={"/course-bg.jpg"}
+        alt=""
+        style={{
+          position: "absolute" as any, top: 0, left: 0,
+          width: "100%", height: "100%",
+          objectFit: "fill" as any,
+        }}
+      />
+
       <View style={{
         position: "absolute", bottom: 80, left: 0, right: 0,
         alignItems: "center", gap: 12, padding: 20,
@@ -47,6 +55,6 @@ export default function RaceScreen() {
           <Text style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>✕ Fermer</Text>
         </Pressable>
       </View>
-    </ImageBackground>
+    </View>
   );
 }
