@@ -1,7 +1,8 @@
-import { View, Text, Pressable, Image, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useGameState } from "@/context/GameStateContext";
 import { getStorage } from "@/services/StorageService";
+import RaceImage from "@/expo/RaceImage";
 
 export default function RaceScreen() {
   const router = useRouter();
@@ -19,11 +20,12 @@ export default function RaceScreen() {
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require("../../assets/course-bg.jpg")}
-        style={styles.bgImage}
-      />
+      {/* Background image via "use dom" */}
+      <View style={styles.bgWrapper}>
+        <RaceImage dom={{ style: { flex: 1, width: "100%", height: "100%" } }} />
+      </View>
 
+      {/* Buttons overlay */}
       <View style={styles.buttons}>
         <Pressable onPress={handlePlay} style={styles.playBtn}>
           <Text style={styles.playText}>Jouer</Text>
@@ -41,43 +43,19 @@ export default function RaceScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#3a1a0a",
-  },
-  bgImage: {
-    width: "100%",
-    height: "100%",
-    resizeMode: "stretch",
-  },
+  container: { flex: 1, backgroundColor: "#3a1a0a" },
+  bgWrapper: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 },
   buttons: {
-    position: "absolute",
-    bottom: 80,
-    left: 0,
-    right: 0,
-    alignItems: "center",
-    gap: 12,
-    padding: 20,
+    position: "absolute", bottom: 80, left: 0, right: 0,
+    alignItems: "center", gap: 12, padding: 20,
   },
   playBtn: {
-    paddingVertical: 16,
-    paddingHorizontal: 60,
-    borderRadius: 50,
-    borderCurve: "continuous",
+    paddingVertical: 16, paddingHorizontal: 60,
+    borderRadius: 50, borderCurve: "continuous",
     backgroundColor: "#4CAF50",
     boxShadow: "0 4px 20px rgba(76,175,80,0.6)",
   },
-  playText: {
-    color: "white",
-    fontSize: 22,
-    fontWeight: "900",
-    letterSpacing: 5,
-  },
-  closeBtn: {
-    paddingVertical: 8,
-  },
-  closeText: {
-    color: "rgba(255,255,255,0.5)",
-    fontSize: 13,
-  },
+  playText: { color: "white", fontSize: 22, fontWeight: "900", letterSpacing: 5 },
+  closeBtn: { paddingVertical: 8 },
+  closeText: { color: "rgba(255,255,255,0.5)", fontSize: 13 },
 });
