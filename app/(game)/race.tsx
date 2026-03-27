@@ -20,7 +20,7 @@ export default function RaceScreen() {
   };
 
   return (
-    <ImageBackground source={courseBg} style={{ flex: 1 }} resizeMode="cover">
+    <ImageBackground source={courseBg} style={{ flex: 1, width: "100%", height: "100%" }} resizeMode="stretch">
       {/* Bottom buttons overlay */}
       <View style={{
         position: "absolute", bottom: 80, left: 0, right: 0,
