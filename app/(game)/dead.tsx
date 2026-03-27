@@ -2,12 +2,18 @@ import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useGameState } from "@/context/GameStateContext";
+import { getStorage } from "@/services/StorageService";
 import { colors, spacing } from "@/expo/theme";
 
 export default function DeadScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const { deathInfo, playerName, playerSkin, gameMode, roomSlug, roomId, seed, startGame } = useGameState();
+
+  // Save race progress
+  if (gameMode === "race" && deathInfo?.score) {
+    try { getStorage().setItem("lastRaceScore", String(deathInfo.score)); } catch {}
+  }
 
   const retry = () => {
     startGame(playerName, playerSkin, gameMode, roomSlug, roomId, seed);

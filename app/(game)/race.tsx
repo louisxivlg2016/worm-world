@@ -14,6 +14,11 @@ export default function RaceScreen() {
   })();
   const activeSkin = customSkin ?? playerSkin;
 
+  // Read last race score
+  const lastRaceScore = (() => {
+    try { return parseInt(getStorage().getItem("lastRaceScore") ?? "0", 10) || 0; } catch { return 0; }
+  })();
+
   const handlePlay = useCallback(() => {
     startGame(playerName, activeSkin, "race" as any);
     router.push({ pathname: "/(game)/play", params: { mode: "race" } });
@@ -29,6 +34,7 @@ export default function RaceScreen() {
         onPlay={handlePlay}
         onClose={handleClose}
         playerColors={JSON.stringify(activeSkin.colors)}
+        playerScore={lastRaceScore}
         dom={{ style: { flex: 1, width: "100%", height: "100%" } }}
       />
     </View>

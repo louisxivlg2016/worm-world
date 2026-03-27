@@ -6,6 +6,7 @@ interface RacePageProps {
   onPlay?: () => void;
   onClose?: () => void;
   playerColors?: string;
+  playerScore?: number; // 0-500, how far along the track
   dom?: import("expo/dom").DOMProps;
 }
 
@@ -63,9 +64,21 @@ function WormOnTrack({ colors, trackY, progress, segCount }: {
   );
 }
 
-export default function RacePage({ onPlay, onClose, playerColors }: RacePageProps) {
+export default function RacePage({ onPlay, onClose, playerColors, playerScore = 0 }: RacePageProps) {
   let pColors = ["#ff3366", "#ff6b35", "#ffd700", "#7cff00"];
   try { if (playerColors) pColors = JSON.parse(playerColors); } catch {}
+
+  // Player progress as % (0-100), score 500 = 100%
+  const playerProgress = Math.min((playerScore / 500) * 100, 100);
+
+  // Bots stay at 0 until player has played, then randomize behind player
+  const botProgress = playerScore > 0
+    ? [
+        Math.min(playerProgress * 0.7 + Math.random() * 10, 95),
+        Math.min(playerProgress * 0.5 + Math.random() * 15, 90),
+        Math.min(playerProgress * 0.3 + Math.random() * 10, 85),
+      ]
+    : [0, 0, 0];
 
   return (
     <div style={{
@@ -80,11 +93,11 @@ export default function RacePage({ onPlay, onClose, playerColors }: RacePageProp
         style={{ width: "100%", height: "100%", objectFit: "fill", display: "block" }}
       />
 
-      {/* All worms at start line */}
-      <WormOnTrack colors={pColors} trackY={TRACK_Y[0]} progress={0} segCount={5} />
-      <WormOnTrack colors={BOT_COLORS[0]} trackY={TRACK_Y[1]} progress={0} segCount={5} />
-      <WormOnTrack colors={BOT_COLORS[1]} trackY={TRACK_Y[2]} progress={0} segCount={5} />
-      <WormOnTrack colors={BOT_COLORS[2]} trackY={TRACK_Y[3]} progress={0} segCount={5} />
+      {/* Worms on tracks — position based on score */}
+      <WormOnTrack colors={pColors} trackY={TRACK_Y[0]} progress={playerProgress} segCount={5 + Math.floor(playerProgress / 15)} />
+      <WormOnTrack colors={BOT_COLORS[0]} trackY={TRACK_Y[1]} progress={botProgress[0]} segCount={5 + Math.floor(botProgress[0] / 15)} />
+      <WormOnTrack colors={BOT_COLORS[1]} trackY={TRACK_Y[2]} progress={botProgress[1]} segCount={5 + Math.floor(botProgress[1] / 15)} />
+      <WormOnTrack colors={BOT_COLORS[2]} trackY={TRACK_Y[3]} progress={botProgress[2]} segCount={5 + Math.floor(botProgress[2] / 15)} />
 
       {/* Buttons */}
       <div style={{

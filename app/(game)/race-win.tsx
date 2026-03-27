@@ -2,16 +2,21 @@ import { View, Text, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useGameState } from "@/context/GameStateContext";
+import { getStorage } from "@/services/StorageService";
 import { colors, spacing } from "@/expo/theme";
 
 export default function RaceWinScreen() {
   const { t } = useTranslation();
   const router = useRouter();
-  const { addCoins } = useGameState();
+  const { addCoins, deathInfo } = useGameState();
+
+  // Save race score so the race screen shows progress
+  const score = deathInfo?.score ?? 500;
+  try { getStorage().setItem("lastRaceScore", String(score)); } catch {}
 
   const handleClaim = () => {
     addCoins(100);
-    router.dismissAll();
+    router.replace("/(game)/race");
   };
 
   return (
