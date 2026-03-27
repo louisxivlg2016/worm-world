@@ -1,4 +1,4 @@
-import { View, Text, Pressable } from "react-native";
+import { View, Text, Pressable, Image, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 import { useGameState } from "@/context/GameStateContext";
 import { getStorage } from "@/services/StorageService";
@@ -18,43 +18,66 @@ export default function RaceScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#3a1a0a" }}>
-      {/* @ts-ignore - img is web-only */}
-      <img
-        src={"/course-bg.jpg"}
-        alt=""
-        style={{
-          position: "absolute" as any, top: 0, left: 0,
-          width: "100%", height: "100%",
-          objectFit: "fill" as any,
-        }}
+    <View style={styles.container}>
+      <Image
+        source={require("../../assets/course-bg.jpg")}
+        style={styles.bgImage}
       />
 
-      <View style={{
-        position: "absolute", bottom: 80, left: 0, right: 0,
-        alignItems: "center", gap: 12, padding: 20,
-      }}>
-        <Pressable
-          onPress={handlePlay}
-          style={{
-            paddingVertical: 16, paddingHorizontal: 60,
-            borderRadius: 50, borderCurve: "continuous",
-            backgroundColor: "#4CAF50",
-            boxShadow: "0 4px 20px rgba(76,175,80,0.6)",
-          }}
-        >
-          <Text style={{ color: "white", fontSize: 22, fontWeight: "900", letterSpacing: 5 }}>
-            Jouer
-          </Text>
+      <View style={styles.buttons}>
+        <Pressable onPress={handlePlay} style={styles.playBtn}>
+          <Text style={styles.playText}>Jouer</Text>
         </Pressable>
 
         <Pressable
           onPress={() => router.canGoBack() ? router.back() : router.replace("/")}
-          style={{ paddingVertical: 8 }}
+          style={styles.closeBtn}
         >
-          <Text style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>✕ Fermer</Text>
+          <Text style={styles.closeText}>✕ Fermer</Text>
         </Pressable>
       </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#3a1a0a",
+  },
+  bgImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "stretch",
+  },
+  buttons: {
+    position: "absolute",
+    bottom: 80,
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    gap: 12,
+    padding: 20,
+  },
+  playBtn: {
+    paddingVertical: 16,
+    paddingHorizontal: 60,
+    borderRadius: 50,
+    borderCurve: "continuous",
+    backgroundColor: "#4CAF50",
+    boxShadow: "0 4px 20px rgba(76,175,80,0.6)",
+  },
+  playText: {
+    color: "white",
+    fontSize: 22,
+    fontWeight: "900",
+    letterSpacing: 5,
+  },
+  closeBtn: {
+    paddingVertical: 8,
+  },
+  closeText: {
+    color: "rgba(255,255,255,0.5)",
+    fontSize: 13,
+  },
+});
