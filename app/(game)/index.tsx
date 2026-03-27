@@ -135,7 +135,7 @@ export default function HomeScreen() {
 
       {/* Race mode */}
       <Pressable
-        onPress={() => { startGame(getPlayerName(), activeSkin, "race" as any); router.push("/(game)/play"); }}
+        onPress={() => router.push("/(game)/race")}
         style={{
           width: "100%", paddingVertical: 14, borderRadius: 50, borderCurve: "continuous",
           backgroundColor: "#228B22", alignItems: "center",

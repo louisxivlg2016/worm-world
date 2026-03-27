@@ -10,6 +10,7 @@ export default function GameLayout() {
       }}
     >
       <Stack.Screen name="index" />
+      <Stack.Screen name="race" />
       <Stack.Screen name="play" options={{ gestureEnabled: false }} />
       <Stack.Screen
         name="dead"
