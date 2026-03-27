@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, Pressable, Alert, StyleSheet, ScrollView, useWindowDimensions } from "react-native";
+import { View, Text, Pressable, Alert, StyleSheet, useWindowDimensions } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { colors, spacing } from "@/expo/theme";
@@ -56,10 +56,7 @@ export default function SettingsSheet() {
   };
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={[styles.content, isDesktop && { maxWidth: 600, alignSelf: "center", width: "100%" }]}
-    >
+    <View style={[styles.container, isDesktop && { maxWidth: 600, alignSelf: "center", width: "100%" }]}>
       <Text style={styles.title}>{t("settings")}</Text>
 
       {/* Language */}
@@ -99,8 +96,7 @@ export default function SettingsSheet() {
         <Text style={styles.closeBtnText}>{t("close")}</Text>
       </Pressable>
 
-      <View style={{ height: spacing.xl }} />
-    </ScrollView>
+    </View>
   );
 }
 
@@ -108,8 +104,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.surface,
-  },
-  content: {
     padding: spacing.lg,
     gap: spacing.lg,
   },
