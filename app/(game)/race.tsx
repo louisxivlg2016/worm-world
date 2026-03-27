@@ -16,7 +16,7 @@ export default function RaceScreen() {
 
   const handlePlay = useCallback(() => {
     startGame(playerName, activeSkin, "race" as any);
-    router.push("/(game)/play");
+    router.push({ pathname: "/(game)/play", params: { mode: "race" } });
   }, [startGame, playerName, activeSkin, router]);
 
   const handleClose = useCallback(() => {

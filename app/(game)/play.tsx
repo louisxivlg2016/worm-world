@@ -1,29 +1,24 @@
 import { useCallback } from "react";
 import { View } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import GamePlay from "@/expo/GamePlay";
 import { useGameState } from "@/context/GameStateContext";
 import { getEventByMode } from "@/config/events";
+import type { GameMode } from "@/types/game";
 
 export default function PlayScreen() {
   const router = useRouter();
-  const { playerName, playerSkin, roomSlug, roomId, gameMode, seed, handleDeath, handleEventWin, setIsPlaying } = useGameState();
+  const params = useLocalSearchParams<{ mode?: string }>();
+  const { playerName, playerSkin, roomSlug, roomId, gameMode: ctxGameMode, seed, handleDeath, handleEventWin, setIsPlaying } = useGameState();
 
-  console.log('[PlayScreen] render, gameMode:', gameMode, 'playerName:', playerName);
-
-  // Don't render until gameMode is set (prevents first render with stale "ffa")
-  if (!playerName) {
-    console.log('[PlayScreen] waiting for state...');
-    return null;
-  }
-
+  // Use route param if available, otherwise context
+  const gameMode = (params.mode as GameMode) || ctxGameMode || "ffa";
   const event = getEventByMode(gameMode);
 
   const onDeath = useCallback((score: number, length: number, coins: number, kills: number) => {
-    console.log('[PlayScreen] onDeath called, score:', score, 'gameMode:', gameMode);
     handleDeath(score, length, coins, kills);
     router.replace("/(game)/dead");
-  }, [handleDeath, router, gameMode]);
+  }, [handleDeath, router]);
 
   const onWin = useCallback(() => {
     if (event) handleEventWin(event.unlockKey);
@@ -43,7 +38,7 @@ export default function PlayScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: "#000" }}>
       <GamePlay
-        playerName={playerName}
+        playerName={playerName || "Player"}
         playerSkin={JSON.stringify(playerSkin)}
         roomSlug={roomSlug}
         roomId={roomId}

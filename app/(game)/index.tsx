@@ -34,12 +34,12 @@ export default function HomeScreen() {
 
   const play = (mode: "ffa" | "coins") => {
     startGame(getPlayerName(), activeSkin, mode);
-    router.push("/(game)/play");
+    router.push({ pathname: "/(game)/play", params: { mode } });
   };
 
   const playEvent = (eventId: string) => {
     startGame(getPlayerName(), activeSkin, eventId as any);
-    router.push("/(game)/play");
+    router.push({ pathname: "/(game)/play", params: { mode: eventId } });
   };
 
   return (
