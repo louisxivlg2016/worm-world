@@ -133,7 +133,7 @@ export default function RaceScreen() {
           </Pressable>
 
           {/* Close */}
-          <Pressable onPress={() => router.back()} style={{ alignItems: "center", paddingVertical: 8 }}>
+          <Pressable onPress={() => router.canGoBack() ? router.back() : router.replace("/")} style={{ alignItems: "center", paddingVertical: 8 }}>
             <Text style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>✕ Fermer</Text>
           </Pressable>
         </View>
