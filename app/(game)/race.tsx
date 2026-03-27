@@ -24,10 +24,9 @@ export default function RaceScreen() {
         position: "absolute", top: 0, left: 0, right: 0, bottom: 0,
         // @ts-ignore
         backgroundImage: "url(/course-bg.jpg)",
-        backgroundSize: "contain",
+        backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundRepeat: "no-repeat",
-        backgroundColor: "#5a3a2a",
       } as any} />
 
       {/* Bottom buttons overlay */}
