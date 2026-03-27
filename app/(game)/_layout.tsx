@@ -30,6 +30,15 @@ export default function GameLayout() {
         }}
       />
       <Stack.Screen
+        name="race-win"
+        options={{
+          presentation: "formSheet",
+          sheetAllowedDetents: [0.5],
+          sheetGrabberVisible: true,
+          contentStyle: { backgroundColor: "transparent" },
+        }}
+      />
+      <Stack.Screen
         name="edit-username"
         options={{
           presentation: "formSheet",

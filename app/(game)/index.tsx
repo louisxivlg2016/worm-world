@@ -133,6 +133,20 @@ export default function HomeScreen() {
         </Text>
       </Pressable>
 
+      {/* Race mode */}
+      <Pressable
+        onPress={() => { startGame(getPlayerName(), activeSkin, "race" as any); router.push("/(game)/play"); }}
+        style={{
+          width: "100%", paddingVertical: 14, borderRadius: 50, borderCurve: "continuous",
+          backgroundColor: "#228B22", alignItems: "center",
+          boxShadow: "0 6px 25px rgba(34,139,34,0.4)",
+        }}
+      >
+        <Text style={{ color: "white", fontSize: 16, fontWeight: "800", letterSpacing: 2 }}>
+          🏁 Grand Prix
+        </Text>
+      </Pressable>
+
       {/* Event modes */}
       {activeEvents.length > 0 && (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ maxHeight: 50 }}>

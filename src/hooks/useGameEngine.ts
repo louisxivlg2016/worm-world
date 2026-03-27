@@ -2732,6 +2732,25 @@ export function useGameEngine(
         return
       }
 
+      // Race mode win condition: first to 500 points
+      if (s.gameMode === 'race' && !s.isGameOver) {
+        if (s.player.score >= 500) {
+          s.isGameOver = true
+          s.gameRunning = false
+          callbacksRef.current.onWin?.()
+          return
+        }
+        // Check if any AI reached 500 first
+        for (const ai of s.aiWorms) {
+          if (ai.score >= 500) {
+            s.isGameOver = true
+            s.gameRunning = false
+            callbacksRef.current.onDeath(s.player.score, s.player.segments.length, s.playerCoins, s.playerKills)
+            return
+          }
+        }
+      }
+
       // UI updates
       if (s.frameCount % 5 === 0) {
         callbacksRef.current.onScoreUpdate(s.gameMode === 'coins' ? s.playerCoins : s.player.score)

@@ -147,7 +147,7 @@ export interface Camera {
   zoom: number
 }
 
-export type GameMode = 'battle' | 'ctf' | 'ffa' | 'coins'
+export type GameMode = 'battle' | 'ctf' | 'ffa' | 'coins' | 'race'
   | 'stpatrick' | 'noel' | 'newyear' | 'valentine' | 'easter' | 'halloween' | 'summer'
   | 'carnival' | 'holi' | 'mayday' | 'bastille' | 'july4th' | 'muertos' | 'diwali' | 'reveillon' | 'cny' | 'thanksgiving' | 'eid'
 export type GameScreen = 'menu' | 'lobby' | 'shop' | 'profile' | 'playing' | 'dead' | 'event-win'

@@ -18,8 +18,13 @@ export default function PlayScreen() {
 
   const onWin = useCallback(() => {
     if (event) handleEventWin(event.unlockKey);
-    router.replace("/(game)/event-win");
-  }, [event, handleEventWin, router]);
+    if (gameMode === 'race') {
+      setIsPlaying(false);
+      router.replace("/(game)/race-win");
+    } else {
+      router.replace("/(game)/event-win");
+    }
+  }, [event, handleEventWin, gameMode, setIsPlaying, router]);
 
   const onBack = useCallback(() => {
     setIsPlaying(false);
