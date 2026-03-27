@@ -80,14 +80,12 @@ export default function RacePage({ onPlay, onClose, playerColors }: RacePageProp
         style={{ width: "100%", height: "100%", objectFit: "fill", display: "block" }}
       />
 
-      {/* Player worm - track 1 */}
-      <WormOnTrack colors={pColors} trackY={TRACK_Y[0]} progress={0} segCount={8} />
-
-      {/* Bot worms - tracks 2-5 */}
-      <WormOnTrack colors={BOT_COLORS[0]} trackY={TRACK_Y[1]} progress={20} segCount={10} />
-      <WormOnTrack colors={BOT_COLORS[1]} trackY={TRACK_Y[2]} progress={35} segCount={12} />
-      <WormOnTrack colors={BOT_COLORS[2]} trackY={TRACK_Y[3]} progress={55} segCount={14} />
-      <WormOnTrack colors={BOT_COLORS[3]} trackY={TRACK_Y[4]} progress={10} segCount={9} />
+      {/* All worms at start line */}
+      <WormOnTrack colors={pColors} trackY={TRACK_Y[0]} progress={0} segCount={5} />
+      <WormOnTrack colors={BOT_COLORS[0]} trackY={TRACK_Y[1]} progress={0} segCount={5} />
+      <WormOnTrack colors={BOT_COLORS[1]} trackY={TRACK_Y[2]} progress={0} segCount={5} />
+      <WormOnTrack colors={BOT_COLORS[2]} trackY={TRACK_Y[3]} progress={0} segCount={5} />
+      <WormOnTrack colors={BOT_COLORS[3]} trackY={TRACK_Y[4]} progress={0} segCount={5} />
 
       {/* Buttons */}
       <div style={{
