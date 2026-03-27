@@ -41,7 +41,7 @@ export default function PlayScreen() {
         gameMode={gameMode}
         seed={seed}
         onDeath={onDeath}
-        onWin={event ? onWin : undefined}
+        onWin={(event || gameMode === 'race') ? onWin : undefined}
         onBack={onBack}
         dom={{ style: { flex: 1, width: "100%", height: "100%" } }}
       />

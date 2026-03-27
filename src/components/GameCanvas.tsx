@@ -106,6 +106,33 @@ export function GameCanvas({
         ))}
       </div>
 
+      {/* Race HUD */}
+      {gameMode === 'race' && (
+        <div style={styles.raceHud}>
+          <div style={styles.raceTitle}>🏁 Grand Prix — 500 pts</div>
+          {leaderboard.slice(0, 5).map((entry, i) => {
+            const progress = Math.min((entry.score / 500) * 100, 100)
+            return (
+              <div key={i} style={styles.raceLane}>
+                <span style={{ ...styles.raceName, ...(entry.isPlayer ? { color: '#ffd700', fontWeight: 700 } : {}) }}>
+                  {entry.isPlayer ? '⭐' : ''} {entry.name}
+                </span>
+                <div style={styles.raceBarBg}>
+                  <div style={{
+                    ...styles.raceBarFill,
+                    width: `${progress}%`,
+                    background: entry.isPlayer
+                      ? 'linear-gradient(90deg, #ff3366, #ffd700)'
+                      : 'linear-gradient(90deg, #666, #999)',
+                  }} />
+                </div>
+                <span style={styles.raceScore}>{entry.score}</span>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
       {/* Controls hint */}
       {showHint && (
         <div style={styles.controlsHint}>{t('controlsHint')}</div>
@@ -219,5 +246,58 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: 'center',
     letterSpacing: 1,
     pointerEvents: 'none',
+  },
+  raceHud: {
+    position: 'fixed',
+    top: 60, left: 10,
+    background: 'rgba(0,0,0,0.6)',
+    borderRadius: 14,
+    padding: '12px 16px',
+    zIndex: 25,
+    backdropFilter: 'blur(8px)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    minWidth: 260,
+    pointerEvents: 'none',
+  },
+  raceTitle: {
+    color: '#ffd700',
+    fontFamily: "'Bungee', cursive",
+    fontSize: 14,
+    marginBottom: 8,
+    textAlign: 'center',
+    letterSpacing: 1,
+  },
+  raceLane: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  raceName: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 12,
+    width: 70,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
+  raceBarBg: {
+    flex: 1,
+    height: 10,
+    borderRadius: 5,
+    background: 'rgba(255,255,255,0.1)',
+    overflow: 'hidden',
+  },
+  raceBarFill: {
+    height: '100%',
+    borderRadius: 5,
+    transition: 'width 0.3s ease',
+  },
+  raceScore: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 11,
+    width: 35,
+    textAlign: 'right',
+    fontVariant: 'tabular-nums',
   },
 }
