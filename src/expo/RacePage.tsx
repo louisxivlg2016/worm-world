@@ -113,16 +113,17 @@ export default function RacePage({ onPlay, onClose, onPlayLabel, onCloseLabel, p
         }}
       />
 
-      {/* Play button image (bottom center) */}
+      {/* Play button image — replaces the Jouer button in the image */}
       <img
         src={PLAY_BTN_IMG}
         onClick={() => onPlay?.()}
         style={{
-          position: "absolute", bottom: "3%", left: "50%",
+          position: "absolute", bottom: "5%", left: "50%",
           transform: "translateX(-50%)",
-          width: "18%", height: "auto",
+          width: "22%", height: "auto",
           cursor: "pointer",
-          zIndex: 10,
+          zIndex: 20,
+          filter: "drop-shadow(0 4px 8px rgba(0,0,0,0.4))",
         }}
       />
     </div>
