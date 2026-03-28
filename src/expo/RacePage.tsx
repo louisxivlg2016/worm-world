@@ -101,34 +101,28 @@ export default function RacePage({ onPlay, onClose, onPlayLabel, onCloseLabel, p
       <WormOnTrack colors={BOT_COLORS[1]} trackY={TRACK_Y[2]} progress={botProgress[1]} segCount={5 + Math.floor(botProgress[1] / 15)} />
       <WormOnTrack colors={BOT_COLORS[2]} trackY={TRACK_Y[3]} progress={botProgress[2]} segCount={5 + Math.floor(botProgress[2] / 15)} />
 
-      {/* Buttons */}
-      <div style={{
-        position: "absolute", bottom: 20, left: 0, right: 0,
-        display: "flex", flexDirection: "column", alignItems: "center", gap: 10,
-      }}>
-        <button
-          onClick={() => onPlay?.()}
-          style={{
-            padding: "14px 60px", borderRadius: 50, border: "none",
-            backgroundColor: "#4CAF50", color: "white",
-            fontSize: 22, fontWeight: 900, letterSpacing: 5,
-            cursor: "pointer",
-            boxShadow: "0 4px 20px rgba(76,175,80,0.6)",
-          }}
-        >
-          {onPlayLabel || "Jouer"}
-        </button>
-        <button
-          onClick={() => onClose?.()}
-          style={{
-            background: "none", border: "none",
-            color: "rgba(255,255,255,0.5)", fontSize: 13,
-            cursor: "pointer", padding: 8,
-          }}
-        >
-          ✕ {onCloseLabel || "Fermer"}
-        </button>
-      </div>
+      {/* Red X close button — positioned over the X in the image (top right) */}
+      <div
+        onClick={() => onClose?.()}
+        style={{
+          position: "absolute", top: "3%", right: "1%",
+          width: "5%", height: "9%",
+          cursor: "pointer",
+          zIndex: 10,
+        }}
+      />
+
+      {/* Green "Jouer" button — positioned over the Jouer button in the image (bottom center) */}
+      <div
+        onClick={() => onPlay?.()}
+        style={{
+          position: "absolute", bottom: "3%", left: "50%",
+          transform: "translateX(-50%)",
+          width: "20%", height: "8%",
+          cursor: "pointer",
+          zIndex: 10,
+        }}
+      />
     </div>
   );
 }
