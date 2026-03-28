@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
   View,
   Text,
@@ -133,6 +134,7 @@ const COLOR_PALETTE = [
 ];
 
 export default function ShopScreen() {
+  const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const router = useRouter();
   const isDesktop = width >= 600;
@@ -243,7 +245,7 @@ export default function ShopScreen() {
       </View>
 
       {/* Preset Skins */}
-      <Text style={styles.sectionTitle}>Skins</Text>
+      <Text style={styles.sectionTitle}>{t("shopPresets")}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.presetRow}>
         {SKINS.map((skin) => (
           <Pressable
@@ -265,10 +267,10 @@ export default function ShopScreen() {
       </ScrollView>
 
       {/* Head / Costume Selector */}
-      <Text style={styles.sectionTitle}>Tête / Costume</Text>
+      <Text style={styles.sectionTitle}>{t("shopHead")}</Text>
       <TextInput
         style={styles.searchInput}
-        placeholder="Rechercher costume..."
+        placeholder={t("searchCostume")}
         placeholderTextColor={colors.textSecondary}
         value={headSearch}
         onChangeText={setHeadSearch}
@@ -293,7 +295,7 @@ export default function ShopScreen() {
       </ScrollView>
 
       {/* Body Style Toggle */}
-      <Text style={styles.sectionTitle}>Style du corps</Text>
+      <Text style={styles.sectionTitle}>{t("shopBodyStyle")}</Text>
       <View style={styles.toggleRow}>
         {(["circles", "tube"] as const).map((s) => (
           <Pressable
@@ -302,14 +304,14 @@ export default function ShopScreen() {
             style={[styles.toggleBtn, bodyStyle === s && styles.toggleBtnActive]}
           >
             <Text style={[styles.toggleText, bodyStyle === s && styles.toggleTextActive]}>
-              {s === "circles" ? "Cercles" : "Tube"}
+              {s === "circles" ? t("shopCircles") : t("shopTube")}
             </Text>
           </Pressable>
         ))}
       </View>
 
       {/* Color Picker */}
-      <Text style={styles.sectionTitle}>Couleurs</Text>
+      <Text style={styles.sectionTitle}>{t("shopColors")}</Text>
       <View style={styles.slotRow}>
         {selectedColors.map((c, i) => (
           <Pressable
@@ -339,10 +341,10 @@ export default function ShopScreen() {
       </View>
 
       {/* Flag Grid */}
-      <Text style={styles.sectionTitle}>Drapeaux</Text>
+      <Text style={styles.sectionTitle}>{t("shopFlags")}</Text>
       <TextInput
         style={styles.searchInput}
-        placeholder="Rechercher drapeau..."
+        placeholder={t("searchFlag")}
         placeholderTextColor={colors.textSecondary}
         value={flagSearch}
         onChangeText={setFlagSearch}
@@ -364,7 +366,7 @@ export default function ShopScreen() {
         style={[styles.applyBtn, computePrice() > coins && styles.applyBtnDisabled]}
       >
         <Text style={styles.applyBtnText}>
-          {computePrice() > 0 ? `Appliquer (${computePrice()} 🪙)` : "Appliquer"}
+          {computePrice() > 0 ? `${t("shopApply")} (${computePrice()} 🪙)` : t("shopApply")}
         </Text>
       </Pressable>
 

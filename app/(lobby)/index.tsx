@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import {
   View,
   Text,
@@ -28,6 +29,7 @@ type RoomInfo = {
 };
 
 export default function LobbyScreen() {
+  const { t } = useTranslation();
   const router = useRouter();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 600;
@@ -132,7 +134,7 @@ export default function LobbyScreen() {
               {item.memberCount}/{item.maxPlayers}
             </Text>
             <Pressable onPress={() => handleJoin(item.slug)} style={styles.joinSmallBtn}>
-              <Text style={styles.joinSmallText}>Rejoindre</Text>
+              <Text style={styles.joinSmallText}>{t("joinRoom")}</Text>
             </Pressable>
           </View>
         </View>
@@ -153,10 +155,10 @@ export default function LobbyScreen() {
       <View style={[{ flex: 1, gap: spacing.md }, desktopContainerStyle]}>
       {/* Create Room */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Créer une salle</Text>
+        <Text style={styles.sectionTitle}>{t("createRoom")}</Text>
         <TextInput
           style={[styles.input, desktopInputStyle]}
-          placeholder="Nom de la salle..."
+          placeholder={t("roomName")}
           placeholderTextColor={colors.textSecondary}
           value={roomName}
           onChangeText={setRoomName}
@@ -183,18 +185,18 @@ export default function LobbyScreen() {
           {loading ? (
             <ActivityIndicator color={colors.text} />
           ) : (
-            <Text style={styles.createBtnText}>Créer</Text>
+            <Text style={styles.createBtnText}>{t("createRoom")}</Text>
           )}
         </Pressable>
       </View>
 
       {/* Join by Code */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Rejoindre par code</Text>
+        <Text style={styles.sectionTitle}>{t("joinRoom")}</Text>
         <View style={[styles.joinRow, desktopInputStyle]}>
           <TextInput
             style={[styles.input, { flex: 1, marginBottom: 0 }]}
-            placeholder="Code..."
+            placeholder={t("roomCode")}
             placeholderTextColor={colors.textSecondary}
             value={joinSlug}
             onChangeText={setJoinSlug}
@@ -205,21 +207,21 @@ export default function LobbyScreen() {
             onPress={() => handleJoin(joinSlug)}
             style={[styles.joinBtn, loading && styles.btnDisabled]}
           >
-            <Text style={styles.joinBtnText}>Rejoindre</Text>
+            <Text style={styles.joinBtnText}>{t("joinRoom")}</Text>
           </Pressable>
         </View>
       </View>
 
       {/* Public Rooms */}
       <View style={[styles.section, { flex: 1 }]}>
-        <Text style={styles.sectionTitle}>Salles publiques</Text>
+        <Text style={styles.sectionTitle}>{t("publicRooms")}</Text>
         <FlatList
           data={rooms}
           renderItem={renderRoom}
           keyExtractor={(item) => String(item.id)}
           contentContainerStyle={styles.roomList}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>Aucune salle disponible</Text>
+            <Text style={styles.emptyText}>{t("noRooms")}</Text>
           }
         />
       </View>
