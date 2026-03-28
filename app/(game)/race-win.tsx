@@ -27,11 +27,11 @@ export default function RaceWinScreen() {
       <Text style={{ fontSize: 80 }}>🏆</Text>
 
       <Text style={{ color: colors.gold, fontSize: 28, fontWeight: "900", textAlign: "center" }}>
-        Grand Prix gagné !
+        {t("raceWin")}
       </Text>
 
       <Text style={{ color: colors.textSecondary, fontSize: 16, textAlign: "center", maxWidth: 300 }}>
-        Tu as atteint 500 points en premier ! +100 🪙
+        {t("raceWinMsg")} +100 🪙
       </Text>
 
       <Pressable
@@ -43,7 +43,7 @@ export default function RaceWinScreen() {
         }}
       >
         <Text style={{ color: "white", fontSize: 18, fontWeight: "900" }}>
-          Récupérer 🪙 100
+          {t("raceClaim")} 🪙 100
         </Text>
       </Pressable>
     </View>

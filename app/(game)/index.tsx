@@ -143,7 +143,7 @@ export default function HomeScreen() {
         }}
       >
         <Text style={{ color: "white", fontSize: 16, fontWeight: "800", letterSpacing: 2 }}>
-          🏁 Grand Prix
+          🏁 {t("grandPrix")}
         </Text>
       </Pressable>
 

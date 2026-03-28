@@ -1,6 +1,7 @@
 import { View, Text, ScrollView, Pressable, StyleSheet, useWindowDimensions } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { colors, spacing } from "@/expo/theme";
 import { getStorage } from "@/services/StorageService";
 import { GAME_EVENTS } from "@/config/events";
@@ -44,6 +45,7 @@ function StatRow({ icon, label, value, index }: { icon: string; label: string; v
 }
 
 export default function ProfileScreen() {
+  const { t } = useTranslation();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 600;
   const contentMaxWidth = 600;
@@ -85,17 +87,17 @@ export default function ProfileScreen() {
 
       {/* Stats Card */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Statistiques</Text>
-        <StatRow index={0} icon="🏆" label="Meilleur Score" value={stats.bestScore.toLocaleString()} />
-        <StatRow index={1} icon="⏱️" label="Meilleur Temps" value={formatTime(stats.bestTime)} />
-        <StatRow index={2} icon="💀" label="Vaincu" value={String(stats.kills)} />
-        <StatRow index={3} icon="🎮" label="Parties jouées" value={String(stats.gamesPlayed)} />
-        <StatRow index={4} icon="⏳" label="Temps total" value={formatTime(stats.totalPlayTime)} />
+        <Text style={styles.cardTitle}>{t("statistics")}</Text>
+        <StatRow index={0} icon="🏆" label={t("bestScore")} value={stats.bestScore.toLocaleString()} />
+        <StatRow index={1} icon="⏱️" label={t("bestTime")} value={formatTime(stats.bestTime)} />
+        <StatRow index={2} icon="💀" label={t("kills")} value={String(stats.kills)} />
+        <StatRow index={3} icon="🎮" label={t("gamesPlayed")} value={String(stats.gamesPlayed)} />
+        <StatRow index={4} icon="⏳" label={t("totalPlayTime")} value={formatTime(stats.totalPlayTime)} />
       </View>
 
       {/* Costumes Progress Card */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Costumes débloqués</Text>
+        <Text style={styles.cardTitle}>{t("costumesUnlocked")}</Text>
         <View style={[styles.progressBar, desktopProgressStyle]}>
           <View style={[styles.progressFill, { width: `${progressPct}%` }]} />
         </View>
@@ -120,7 +122,7 @@ export default function ProfileScreen() {
         onPress={() => router.push("/(profile)/settings")}
         style={styles.settingsBtn}
       >
-        <Text style={styles.settingsBtnText}>Paramètres</Text>
+        <Text style={styles.settingsBtnText}>{t("settings")}</Text>
       </Pressable>
 
       <View style={{ height: spacing.xxl }} />

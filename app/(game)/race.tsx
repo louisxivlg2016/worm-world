@@ -1,12 +1,14 @@
 import { useCallback } from "react";
 import { View } from "react-native";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import { useGameState } from "@/context/GameStateContext";
 import { getStorage } from "@/services/StorageService";
 import RacePage from "@/expo/RacePage";
 
 export default function RaceScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { startGame, playerSkin, customSkin } = useGameState();
 
   const playerName = (() => {
@@ -35,6 +37,8 @@ export default function RaceScreen() {
         onClose={handleClose}
         playerColors={JSON.stringify(activeSkin.colors)}
         playerScore={lastRaceScore}
+        onPlayLabel={t("racePlay")}
+        onCloseLabel={t("raceClose")}
         dom={{ style: { flex: 1, width: "100%", height: "100%" } }}
       />
     </View>

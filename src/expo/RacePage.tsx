@@ -5,8 +5,10 @@ import { COURSE_IMG } from "./courseBase64";
 interface RacePageProps {
   onPlay?: () => void;
   onClose?: () => void;
+  onPlayLabel?: string;
+  onCloseLabel?: string;
   playerColors?: string;
-  playerScore?: number; // 0-500, how far along the track
+  playerScore?: number;
   dom?: import("expo/dom").DOMProps;
 }
 
@@ -64,7 +66,7 @@ function WormOnTrack({ colors, trackY, progress, segCount }: {
   );
 }
 
-export default function RacePage({ onPlay, onClose, playerColors, playerScore = 0 }: RacePageProps) {
+export default function RacePage({ onPlay, onClose, onPlayLabel, onCloseLabel, playerColors, playerScore = 0 }: RacePageProps) {
   let pColors = ["#ff3366", "#ff6b35", "#ffd700", "#7cff00"];
   try { if (playerColors) pColors = JSON.parse(playerColors); } catch {}
 
@@ -114,7 +116,7 @@ export default function RacePage({ onPlay, onClose, playerColors, playerScore = 
             boxShadow: "0 4px 20px rgba(76,175,80,0.6)",
           }}
         >
-          Jouer
+          {onPlayLabel || "Jouer"}
         </button>
         <button
           onClick={() => onClose?.()}
@@ -124,7 +126,7 @@ export default function RacePage({ onPlay, onClose, playerColors, playerScore = 
             cursor: "pointer", padding: 8,
           }}
         >
-          ✕ Fermer
+          ✕ {onCloseLabel || "Fermer"}
         </button>
       </div>
     </div>
