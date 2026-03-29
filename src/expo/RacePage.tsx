@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { COURSE_IMG } from "./courseBase64";
 import { PLAY_BTN } from "./playBtnBase64";
 import { CLOSE_BTN } from "./closeBtnBase64";
+import { COUPE_OR, COUPE_ARGENT, COUPE_BRONZE } from "./coupesBase64";
 
 interface RacePageProps {
   onPlay?: () => void;
@@ -130,6 +131,22 @@ export default function RacePage({ onPlay, onClose, onPlayLabel, onCloseLabel, p
       }}>
         ⏱ {countdown}
       </div>
+
+      {/* Trophy cups on the right side of tracks */}
+      {[COUPE_OR, COUPE_ARGENT, COUPE_BRONZE, COUPE_OR].map((cup, i) => (
+        <img
+          key={`cup-${i}`}
+          src={cup}
+          style={{
+            position: "absolute",
+            right: "3%",
+            top: `${TRACK_Y[i] - 5}%`,
+            width: "4%",
+            height: "auto",
+            zIndex: 30,
+          }}
+        />
+      ))}
 
       {/* Worms on tracks — position based on score */}
       <WormOnTrack colors={pColors} trackY={TRACK_Y[0]} progress={playerProgress} segCount={5 + Math.floor(playerProgress / 15)} />

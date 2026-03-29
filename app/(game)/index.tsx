@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, TextInput, ScrollView, Pressable, useWindowDimensions } from "react-native";
+import { View, Text, TextInput, ScrollView, Pressable, useWindowDimensions, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useGameState } from "@/context/GameStateContext";
@@ -106,18 +106,12 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
 
-      {/* Play buttons */}
-      <Pressable
-        onPress={() => play("ffa")}
-        style={{
-          width: "100%", paddingVertical: 16, borderRadius: 50, borderCurve: "continuous",
-          backgroundColor: "#ff3366", alignItems: "center",
-          boxShadow: "0 6px 25px rgba(255,51,102,0.4)",
-        }}
-      >
-        <Text style={{ color: "white", fontSize: 20, fontWeight: "900", letterSpacing: 3 }}>
-          {t("soloPlay")}
-        </Text>
+      {/* Play button */}
+      <Pressable onPress={() => play("ffa")} style={{ width: "100%", alignItems: "center" }}>
+        <Image
+          source={require("../../assets/play-btn.png")}
+          style={{ width: 220, height: 70, resizeMode: "contain" }}
+        />
       </Pressable>
 
       <Pressable
