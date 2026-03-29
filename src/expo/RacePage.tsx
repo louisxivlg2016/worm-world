@@ -2,6 +2,7 @@
 
 import { COURSE_IMG } from "./courseBase64";
 import { PLAY_BTN } from "./playBtnBase64";
+import { CLOSE_BTN } from "./closeBtnBase64";
 
 interface RacePageProps {
   onPlay?: () => void;
@@ -102,31 +103,32 @@ export default function RacePage({ onPlay, onClose, onPlayLabel, onCloseLabel, p
       <WormOnTrack colors={BOT_COLORS[1]} trackY={TRACK_Y[2]} progress={botProgress[1]} segCount={5 + Math.floor(botProgress[1] / 15)} />
       <WormOnTrack colors={BOT_COLORS[2]} trackY={TRACK_Y[3]} progress={botProgress[2]} segCount={5 + Math.floor(botProgress[2] / 15)} />
 
-      {/* Red X close button — positioned over the X in the image (top right) */}
-      <div
+      {/* Red X close button */}
+      <img
+        src={CLOSE_BTN}
+        alt="Close"
         onClick={() => onClose?.()}
         style={{
-          position: "absolute", top: "3%", right: "1%",
-          width: "5%", height: "9%",
+          position: "absolute", top: "3%", right: "2%",
+          width: "60px", height: "60px",
           cursor: "pointer",
-          zIndex: 10,
+          zIndex: 99999,
         }}
       />
 
-      {/* Play button image — on top of the Jouer button in the image */}
+      {/* Play button */}
       <img
         src={PLAY_BTN}
         alt="Play"
         onClick={() => onPlay?.()}
         style={{
           position: "absolute",
-          bottom: "6%",
+          bottom: "12%",
           left: "50%",
           transform: "translateX(-50%)",
           width: "200px",
           cursor: "pointer",
           zIndex: 99999,
-          pointerEvents: "auto",
         }}
       />
     </div>
