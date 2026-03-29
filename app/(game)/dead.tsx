@@ -10,14 +10,20 @@ export default function DeadScreen() {
   const router = useRouter();
   const { deathInfo, playerName, playerSkin, gameMode, roomSlug, roomId, seed, startGame } = useGameState();
 
+  const isRace = gameMode === "race";
+
   // Save race progress
-  if (gameMode === "race" && deathInfo?.score) {
+  if (isRace && deathInfo?.score) {
     try { getStorage().setItem("lastRaceScore", String(deathInfo.score)); } catch {}
   }
 
   const retry = () => {
     startGame(playerName, playerSkin, gameMode, roomSlug, roomId, seed);
-    router.replace("/(game)/play");
+    if (isRace) {
+      router.replace({ pathname: "/(game)/play", params: { mode: "race" } });
+    } else {
+      router.replace("/(game)/play");
+    }
   };
 
   const backToMenu = () => {
@@ -29,34 +35,49 @@ export default function DeadScreen() {
       flex: 1, backgroundColor: colors.surface, padding: spacing.xl,
       alignItems: "center", justifyContent: "center", gap: spacing.lg,
     }}>
-      <Text style={{ color: colors.danger, fontSize: 28, fontWeight: "900", letterSpacing: 3 }}>
-        {t("gameOver")}
-      </Text>
-
-      <Text selectable style={{ color: colors.gold, fontSize: 48, fontWeight: "900", fontVariant: ["tabular-nums"] }}>
-        {deathInfo?.score?.toLocaleString() ?? 0}
-      </Text>
-
-      <View style={{ flexDirection: "row", gap: spacing.xl }}>
-        <View style={{ alignItems: "center" }}>
-          <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{t("length")}</Text>
-          <Text selectable style={{ color: colors.text, fontSize: 20, fontWeight: "700", fontVariant: ["tabular-nums"] }}>
-            {deathInfo?.length ?? 0}
+      {isRace ? (
+        <>
+          <Text style={{ fontSize: 60 }}>😔</Text>
+          <Text style={{ color: colors.danger, fontSize: 24, fontWeight: "900", textAlign: "center" }}>
+            {t("raceLost")}
           </Text>
-        </View>
-        <View style={{ alignItems: "center" }}>
-          <Text style={{ color: colors.textSecondary, fontSize: 12 }}>🪙</Text>
+          <Text style={{ color: colors.textSecondary, fontSize: 15, textAlign: "center", maxWidth: 300 }}>
+            {t("raceLostMsg")}
+          </Text>
           <Text selectable style={{ color: colors.gold, fontSize: 20, fontWeight: "700", fontVariant: ["tabular-nums"] }}>
-            {deathInfo?.coins ?? 0}
+            {t("score")}: {deathInfo?.score?.toLocaleString() ?? 0} / 500
           </Text>
-        </View>
-        <View style={{ alignItems: "center" }}>
-          <Text style={{ color: colors.textSecondary, fontSize: 12 }}>💀</Text>
-          <Text selectable style={{ color: colors.text, fontSize: 20, fontWeight: "700", fontVariant: ["tabular-nums"] }}>
-            {deathInfo?.kills ?? 0}
+        </>
+      ) : (
+        <>
+          <Text style={{ color: colors.danger, fontSize: 28, fontWeight: "900", letterSpacing: 3 }}>
+            {t("gameOver")}
           </Text>
-        </View>
-      </View>
+          <Text selectable style={{ color: colors.gold, fontSize: 48, fontWeight: "900", fontVariant: ["tabular-nums"] }}>
+            {deathInfo?.score?.toLocaleString() ?? 0}
+          </Text>
+          <View style={{ flexDirection: "row", gap: spacing.xl }}>
+            <View style={{ alignItems: "center" }}>
+              <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{t("length")}</Text>
+              <Text selectable style={{ color: colors.text, fontSize: 20, fontWeight: "700", fontVariant: ["tabular-nums"] }}>
+                {deathInfo?.length ?? 0}
+              </Text>
+            </View>
+            <View style={{ alignItems: "center" }}>
+              <Text style={{ color: colors.textSecondary, fontSize: 12 }}>🪙</Text>
+              <Text selectable style={{ color: colors.gold, fontSize: 20, fontWeight: "700", fontVariant: ["tabular-nums"] }}>
+                {deathInfo?.coins ?? 0}
+              </Text>
+            </View>
+            <View style={{ alignItems: "center" }}>
+              <Text style={{ color: colors.textSecondary, fontSize: 12 }}>💀</Text>
+              <Text selectable style={{ color: colors.text, fontSize: 20, fontWeight: "700", fontVariant: ["tabular-nums"] }}>
+                {deathInfo?.kills ?? 0}
+              </Text>
+            </View>
+          </View>
+        </>
+      )}
 
       <Pressable
         onPress={retry}

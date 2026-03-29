@@ -39,7 +39,7 @@ const resources = {
     eventWin: 'Costume débloqué !', eventWinMsg: 'Disponible dans la boutique.',
     tabPlay: 'Jouer', tabShop: 'Boutique', tabMulti: 'Multi', tabProfile: 'Profil',
     language: 'Langue', changeLang: 'Changer de langue',
-    grandPrix: 'Grand Prix', raceDesc: 'Mange pour avancer ! Premier à 500 points gagne.', racePlay: 'Jouer', raceClose: 'Fermer', raceWin: 'Grand Prix gagné !', raceWinMsg: 'Tu as atteint 500 points en premier !', raceClaim: 'Récupérer', statistics: 'Statistiques',
+    grandPrix: 'Grand Prix', raceDesc: 'Mange pour avancer ! Premier à 500 points gagne.', racePlay: 'Jouer', raceClose: 'Fermer', raceWin: 'Grand Prix gagné !', raceWinMsg: 'Tu as atteint 500 points en premier !', raceClaim: 'Récupérer', statistics: 'Statistiques', raceLost: 'Course perdue !', raceLostMsg: 'Un adversaire a atteint 500 points avant toi.',
   }},
   en: { translation: {
     title: 'WORMS ZONE', subtitle: '. I O',
@@ -66,7 +66,7 @@ const resources = {
     eventWin: 'Costume unlocked!', eventWinMsg: 'Available in the shop.',
     tabPlay: 'Play', tabShop: 'Shop', tabMulti: 'Multi', tabProfile: 'Profile',
     language: 'Language', changeLang: 'Change language',
-    grandPrix: 'Grand Prix', raceDesc: 'Eat to advance! First to 500 points wins.', racePlay: 'Play', raceClose: 'Close', raceWin: 'Grand Prix Won!', raceWinMsg: 'You reached 500 points first!', raceClaim: 'Claim', statistics: 'Statistics',
+    grandPrix: 'Grand Prix', raceDesc: 'Eat to advance! First to 500 points wins.', racePlay: 'Play', raceClose: 'Close', raceWin: 'Grand Prix Won!', raceWinMsg: 'You reached 500 points first!', raceClaim: 'Claim', statistics: 'Statistics', raceLost: 'Race lost!', raceLostMsg: 'An opponent reached 500 points before you.',
   }},
   es: { translation: {
     title: 'WORMS ZONE', subtitle: '. I O',
@@ -93,7 +93,7 @@ const resources = {
     eventWin: '¡Disfraz desbloqueado!', eventWinMsg: 'Disponible en la tienda.',
     tabPlay: 'Jugar', tabShop: 'Tienda', tabMulti: 'Multi', tabProfile: 'Perfil',
     language: 'Idioma', changeLang: 'Cambiar idioma',
-    grandPrix: 'Gran Premio', raceDesc: 'Come para avanzar! El primero en llegar a 500 puntos gana.', racePlay: 'Jugar', raceClose: 'Cerrar', raceWin: 'Gran Premio ganado!', raceWinMsg: 'Llegaste primero a 500 puntos!', raceClaim: 'Reclamar', statistics: 'Estadísticas',
+    grandPrix: 'Gran Premio', raceDesc: 'Come para avanzar! El primero en llegar a 500 puntos gana.', racePlay: 'Jugar', raceClose: 'Cerrar', raceWin: 'Gran Premio ganado!', raceWinMsg: 'Llegaste primero a 500 puntos!', raceClaim: 'Reclamar', statistics: 'Estadísticas', raceLost: 'Carrera perdida!', raceLostMsg: 'Un oponente llegó a 500 puntos antes que tú.',
   }},
   it: { translation: {
     title: 'WORMS ZONE', subtitle: '. I O',
@@ -120,7 +120,7 @@ const resources = {
     eventWin: 'Costume sbloccato!', eventWinMsg: 'Disponibile nel negozio.',
     tabPlay: 'Gioca', tabShop: 'Negozio', tabMulti: 'Multi', tabProfile: 'Profilo',
     language: 'Lingua', changeLang: 'Cambia lingua',
-    grandPrix: 'Gran Premio', raceDesc: 'Mangia per avanzare! Il primo a 500 punti vince.', racePlay: 'Gioca', raceClose: 'Chiudi', raceWin: 'Gran Premio vinto!', raceWinMsg: 'Hai raggiunto 500 punti per primo!', raceClaim: 'Riscuoti', statistics: 'Statistiche',
+    grandPrix: 'Gran Premio', raceDesc: 'Mangia per avanzare! Il primo a 500 punti vince.', racePlay: 'Gioca', raceClose: 'Chiudi', raceWin: 'Gran Premio vinto!', raceWinMsg: 'Hai raggiunto 500 punti per primo!', raceClaim: 'Riscuoti', statistics: 'Statistiche', raceLost: 'Corsa persa!', raceLostMsg: 'Un avversario ha raggiunto 500 punti prima di te.',
   }},
   ru: { translation: {
     title: 'WORMS ZONE', subtitle: '. I O',
@@ -147,7 +147,7 @@ const resources = {
     eventWin: 'Костюм разблокирован!', eventWinMsg: 'Доступен в магазине.',
     tabPlay: 'Играть', tabShop: 'Магазин', tabMulti: 'Мульти', tabProfile: 'Профиль',
     language: 'Язык', changeLang: 'Сменить язык',
-    grandPrix: 'Гран-при', raceDesc: 'Ешь чтобы продвигаться! Первый набравший 500 очков побеждает.', racePlay: 'Играть', raceClose: 'Закрыть', raceWin: 'Гран-при выигран!', raceWinMsg: 'Ты первым набрал 500 очков!', raceClaim: 'Забрать', statistics: 'Статистика',
+    grandPrix: 'Гран-при', raceDesc: 'Ешь чтобы продвигаться! Первый набравший 500 очков побеждает.', racePlay: 'Играть', raceClose: 'Закрыть', raceWin: 'Гран-при выигран!', raceWinMsg: 'Ты первым набрал 500 очков!', raceClaim: 'Забрать', statistics: 'Статистика', raceLost: 'Гонка проиграна!', raceLostMsg: 'Противник набрал 500 очков раньше тебя.',
   }},
   zh: { translation: {
     title: 'WORMS ZONE', subtitle: '. I O',
@@ -174,7 +174,7 @@ const resources = {
     eventWin: '装扮已解锁！', eventWinMsg: '可在商店中使用。',
     tabPlay: '游戏', tabShop: '商店', tabMulti: '多人', tabProfile: '资料',
     language: '语言', changeLang: '更改语言',
-    grandPrix: '大奖赛', raceDesc: '吃东西前进！先到500分的获胜。', racePlay: '开始', raceClose: '关闭', raceWin: '大奖赛获胜！', raceWinMsg: '你第一个达到500分！', raceClaim: '领取', statistics: '统计',
+    grandPrix: '大奖赛', raceDesc: '吃东西前进！先到500分的获胜。', racePlay: '开始', raceClose: '关闭', raceWin: '大奖赛获胜！', raceWinMsg: '你第一个达到500分！', raceClaim: '领取', statistics: '统计', raceLost: '比赛失败！', raceLostMsg: '对手先达到了500分。',
   }},
   ar: { translation: {
     title: 'WORMS ZONE', subtitle: '. I O',
@@ -201,7 +201,7 @@ const resources = {
     eventWin: 'تم فتح الزي!', eventWinMsg: 'متاح في المتجر.',
     tabPlay: 'لعب', tabShop: 'متجر', tabMulti: 'متعدد', tabProfile: 'ملف',
     language: 'اللغة', changeLang: 'تغيير اللغة',
-    grandPrix: 'الجائزة الكبرى', raceDesc: 'كل لتتقدم! أول من يصل إلى 500 نقطة يفوز.', racePlay: 'العب', raceClose: 'إغلاق', raceWin: 'فزت بالجائزة الكبرى!', raceWinMsg: 'وصلت أولاً إلى 500 نقطة!', raceClaim: 'استلم', statistics: 'إحصائيات',
+    grandPrix: 'الجائزة الكبرى', raceDesc: 'كل لتتقدم! أول من يصل إلى 500 نقطة يفوز.', racePlay: 'العب', raceClose: 'إغلاق', raceWin: 'فزت بالجائزة الكبرى!', raceWinMsg: 'وصلت أولاً إلى 500 نقطة!', raceClaim: 'استلم', statistics: 'إحصائيات', raceLost: 'خسرت السباق!', raceLostMsg: 'وصل خصم إلى 500 نقطة قبلك.',
   }},
   hi: { translation: {
     title: 'WORMS ZONE', subtitle: '. I O',
@@ -228,7 +228,7 @@ const resources = {
     eventWin: 'पोशाक अनलॉक!', eventWinMsg: 'दुकान में उपलब्ध।',
     tabPlay: 'खेलें', tabShop: 'दुकान', tabMulti: 'मल्टी', tabProfile: 'प्रोफ़ाइल',
     language: 'भाषा', changeLang: 'भाषा बदलें',
-    grandPrix: 'ग्रैंड प्रिक्स', raceDesc: 'आगे बढ़ने के लिए खाएं! 500 अंक पर पहले पहुंचने वाला जीतता है।', racePlay: 'खेलें', raceClose: 'बंद', raceWin: 'ग्रैंड प्रिक्स जीता!', raceWinMsg: 'आप पहले 500 अंक पर पहुंचे!', raceClaim: 'प्राप्त करें', statistics: 'आँकड़े',
+    grandPrix: 'ग्रैंड प्रिक्स', raceDesc: 'आगे बढ़ने के लिए खाएं! 500 अंक पर पहले पहुंचने वाला जीतता है।', racePlay: 'खेलें', raceClose: 'बंद', raceWin: 'ग्रैंड प्रिक्स जीता!', raceWinMsg: 'आप पहले 500 अंक पर पहुंचे!', raceClaim: 'प्राप्त करें', statistics: 'आँकड़े', raceLost: 'दौड़ हार गए!', raceLostMsg: 'एक प्रतिद्वंदी आपसे पहले 500 अंक पर पहुंच गया।',
   }},
 }
 
