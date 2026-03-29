@@ -109,8 +109,8 @@ export default function RacePage({ onPlay, onClose, onPlayLabel, onCloseLabel, p
         alt="Close"
         onClick={() => onClose?.()}
         style={{
-          position: "absolute", top: "3%", right: "2%",
-          width: "60px", height: "60px",
+          position: "absolute", top: "1%", right: "0.5%",
+          width: "55px", height: "55px",
           cursor: "pointer",
           zIndex: 99999,
         }}
