@@ -1,6 +1,7 @@
 "use dom";
 
 import { COURSE_IMG } from "./courseBase64";
+import { PLAY_BTN } from "./playBtnBase64";
 
 interface RacePageProps {
   onPlay?: () => void;
@@ -112,15 +113,17 @@ export default function RacePage({ onPlay, onClose, onPlayLabel, onCloseLabel, p
         }}
       />
 
-      {/* Clickable zone over the Jouer button in the image */}
-      <div
+      {/* Play button image */}
+      <img
+        src={PLAY_BTN}
+        alt="Play"
         onClick={() => onPlay?.()}
         style={{
-          position: "absolute", bottom: "3%", left: "50%",
+          position: "absolute", bottom: "2%", left: "50%",
           transform: "translateX(-50%)",
-          width: "22%", height: "8%",
+          height: "10%", width: "auto",
           cursor: "pointer",
-          zIndex: 10,
+          zIndex: 20,
         }}
       />
     </div>
