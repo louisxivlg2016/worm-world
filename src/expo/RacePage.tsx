@@ -82,7 +82,7 @@ function useCountdown(startTime: number) {
       setTimeLeft(`${h}h ${m}m`);
     };
     update();
-    const interval = setInterval(update, 60000);
+    const interval = setInterval(update, 10000);
     return () => clearInterval(interval);
   }, [startTime]);
   return timeLeft;
@@ -118,15 +118,19 @@ export default function RacePage({ onPlay, onClose, onPlayLabel, onCloseLabel, p
         style={{ width: "100%", height: "100%", objectFit: "fill", display: "block" }}
       />
 
-      {/* Live countdown timer — positioned over the "23h 30m" text in image */}
+      {/* Live countdown timer — covers the "23h 30m" text in image */}
       <div style={{
-        position: "absolute", top: "13%", left: "50%",
+        position: "absolute", top: "12%", left: "50%",
         transform: "translateX(-50%)",
-        color: "#d4a87a", fontSize: "1.4vw", fontWeight: 700,
-        textShadow: "0 1px 3px rgba(0,0,0,0.3)",
+        backgroundColor: "rgba(80,40,30,0.95)",
+        padding: "4px 20px",
+        borderRadius: 8,
+        color: "#e8c8a0", fontSize: "2vw", fontWeight: 700,
+        textShadow: "0 1px 3px rgba(0,0,0,0.5)",
         zIndex: 50,
         fontFamily: "serif",
-        letterSpacing: 1,
+        letterSpacing: 2,
+        whiteSpace: "nowrap",
       }}>
         ⏱ {countdown}
       </div>
