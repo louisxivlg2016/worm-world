@@ -37,6 +37,7 @@ export default function RaceScreen() {
         onClose={handleClose}
         playerColors={JSON.stringify(activeSkin.colors)}
         playerScore={lastRaceScore}
+        raceStartTime={(() => { try { return parseInt(getStorage().getItem("raceStartTime") ?? "0", 10) || 0; } catch { return 0; } })()}
         onPlayLabel={t("racePlay")}
         onCloseLabel={t("raceClose")}
         dom={{ style: { flex: 1, width: "100%", height: "100%" } }}

@@ -12,11 +12,14 @@ export default function RaceWinScreen() {
 
   // Save race score so the race screen shows progress
   const score = deathInfo?.score ?? 500;
-  try { getStorage().setItem("lastRaceScore", String(score)); } catch {}
+  try {
+    getStorage().setItem("lastRaceScore", String(score));
+    getStorage().setItem("raceWon", "true");
+  } catch {}
 
   const handleClaim = () => {
     addCoins(100);
-    router.replace("/(game)/race");
+    router.replace("/");
   };
 
   return (

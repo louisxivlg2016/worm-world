@@ -1,5 +1,6 @@
 "use dom";
 
+import { useState, useEffect } from "react";
 import { COURSE_IMG } from "./courseBase64";
 import { PLAY_BTN } from "./playBtnBase64";
 import { CLOSE_BTN } from "./closeBtnBase64";
@@ -11,6 +12,7 @@ interface RacePageProps {
   onCloseLabel?: string;
   playerColors?: string;
   playerScore?: number;
+  raceStartTime?: number; // timestamp when race started (for 24h countdown)
   dom?: import("expo/dom").DOMProps;
 }
 
@@ -68,7 +70,26 @@ function WormOnTrack({ colors, trackY, progress, segCount }: {
   );
 }
 
-export default function RacePage({ onPlay, onClose, onPlayLabel, onCloseLabel, playerColors, playerScore = 0 }: RacePageProps) {
+function useCountdown(startTime: number) {
+  const [timeLeft, setTimeLeft] = useState("");
+  useEffect(() => {
+    const update = () => {
+      const DAY = 24 * 60 * 60 * 1000;
+      const end = startTime + DAY;
+      const remaining = Math.max(0, end - Date.now());
+      const h = Math.floor(remaining / (60 * 60 * 1000));
+      const m = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+      setTimeLeft(`${h}h ${m}m`);
+    };
+    update();
+    const interval = setInterval(update, 60000);
+    return () => clearInterval(interval);
+  }, [startTime]);
+  return timeLeft;
+}
+
+export default function RacePage({ onPlay, onClose, onPlayLabel, onCloseLabel, playerColors, playerScore = 0, raceStartTime = 0 }: RacePageProps) {
+  const countdown = useCountdown(raceStartTime || Date.now());
   let pColors = ["#ff3366", "#ff6b35", "#ffd700", "#7cff00"];
   try { if (playerColors) pColors = JSON.parse(playerColors); } catch {}
 
@@ -96,6 +117,19 @@ export default function RacePage({ onPlay, onClose, onPlayLabel, onCloseLabel, p
         src={COURSE_IMG}
         style={{ width: "100%", height: "100%", objectFit: "fill", display: "block" }}
       />
+
+      {/* Live countdown timer — positioned over the "23h 30m" text in image */}
+      <div style={{
+        position: "absolute", top: "13%", left: "50%",
+        transform: "translateX(-50%)",
+        color: "#d4a87a", fontSize: "1.4vw", fontWeight: 700,
+        textShadow: "0 1px 3px rgba(0,0,0,0.3)",
+        zIndex: 50,
+        fontFamily: "serif",
+        letterSpacing: 1,
+      }}>
+        ⏱ {countdown}
+      </div>
 
       {/* Worms on tracks — position based on score */}
       <WormOnTrack colors={pColors} trackY={TRACK_Y[0]} progress={playerProgress} segCount={5 + Math.floor(playerProgress / 15)} />

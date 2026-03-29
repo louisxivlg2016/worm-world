@@ -133,19 +133,62 @@ export default function HomeScreen() {
         </Text>
       </Pressable>
 
-      {/* Race mode */}
-      <Pressable
-        onPress={() => router.push("/(game)/race")}
-        style={{
-          width: "100%", paddingVertical: 14, borderRadius: 50, borderCurve: "continuous",
-          backgroundColor: "#228B22", alignItems: "center",
-          boxShadow: "0 6px 25px rgba(34,139,34,0.4)",
-        }}
-      >
-        <Text style={{ color: "white", fontSize: 16, fontWeight: "800", letterSpacing: 2 }}>
-          🏁 {t("grandPrix")}
-        </Text>
-      </Pressable>
+      {/* Race mode — only show if available */}
+      {(() => {
+        const now = Date.now();
+        let raceStart = 0;
+        let raceWon = false;
+        try {
+          raceStart = parseInt(getStorage().getItem("raceStartTime") ?? "0", 10) || 0;
+          raceWon = getStorage().getItem("raceWon") === "true";
+        } catch {}
+
+        const elapsed = now - raceStart;
+        const DAY = 24 * 60 * 60 * 1000;
+        const WEEK = 7 * DAY;
+
+        // If race was won or expired (24h), cooldown 1 week
+        const raceExpired = raceStart > 0 && elapsed > DAY;
+        const inCooldown = (raceWon || raceExpired) && elapsed < WEEK;
+
+        if (inCooldown) {
+          const cooldownEnd = raceStart + WEEK;
+          const remaining = cooldownEnd - now;
+          const days = Math.floor(remaining / DAY);
+          const hours = Math.floor((remaining % DAY) / (60 * 60 * 1000));
+          return (
+            <View style={{ width: "100%", paddingVertical: 14, borderRadius: 50, borderCurve: "continuous", backgroundColor: "rgba(255,255,255,0.05)", alignItems: "center" }}>
+              <Text style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>
+                🏁 {t("grandPrix")} — {days}j {hours}h
+              </Text>
+            </View>
+          );
+        }
+
+        return (
+          <Pressable
+            onPress={() => {
+              // Start 24h timer when first entering
+              if (!raceStart || raceExpired || raceWon) {
+                try {
+                  getStorage().setItem("raceStartTime", String(now));
+                  getStorage().removeItem("raceWon");
+                } catch {}
+              }
+              router.push("/(game)/race");
+            }}
+            style={{
+              width: "100%", paddingVertical: 14, borderRadius: 50, borderCurve: "continuous",
+              backgroundColor: "#228B22", alignItems: "center",
+              boxShadow: "0 6px 25px rgba(34,139,34,0.4)",
+            }}
+          >
+            <Text style={{ color: "white", fontSize: 16, fontWeight: "800", letterSpacing: 2 }}>
+              🏁 {t("grandPrix")}
+            </Text>
+          </Pressable>
+        );
+      })()}
 
       {/* Event modes */}
       {activeEvents.length > 0 && (

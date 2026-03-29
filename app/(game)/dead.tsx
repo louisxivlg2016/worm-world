@@ -79,27 +79,31 @@ export default function DeadScreen() {
         </>
       )}
 
-      <Pressable
-        onPress={retry}
-        style={{
-          width: "100%", paddingVertical: 16, borderRadius: 50, borderCurve: "continuous",
-          backgroundColor: "#ff3366", alignItems: "center",
-          boxShadow: "0 6px 25px rgba(255,51,102,0.4)",
-        }}
-      >
-        <Text style={{ color: "white", fontSize: 18, fontWeight: "900", letterSpacing: 3 }}>
-          {t("retry")}
-        </Text>
-      </Pressable>
+      {!isRace && (
+        <Pressable
+          onPress={retry}
+          style={{
+            width: "100%", paddingVertical: 16, borderRadius: 50, borderCurve: "continuous",
+            backgroundColor: "#ff3366", alignItems: "center",
+            boxShadow: "0 6px 25px rgba(255,51,102,0.4)",
+          }}
+        >
+          <Text style={{ color: "white", fontSize: 18, fontWeight: "900", letterSpacing: 3 }}>
+            {t("retry")}
+          </Text>
+        </Pressable>
+      )}
 
       <Pressable
         onPress={backToMenu}
         style={{
           width: "100%", paddingVertical: 14, borderRadius: 50, borderCurve: "continuous",
-          borderWidth: 2, borderColor: "rgba(255,255,255,0.3)", alignItems: "center",
+          backgroundColor: isRace ? "#ff3366" : "transparent",
+          borderWidth: isRace ? 0 : 2, borderColor: "rgba(255,255,255,0.3)", alignItems: "center",
+          boxShadow: isRace ? "0 6px 25px rgba(255,51,102,0.4)" : "none",
         }}
       >
-        <Text style={{ color: colors.text, fontSize: 16, fontWeight: "600" }}>
+        <Text style={{ color: colors.text, fontSize: 16, fontWeight: isRace ? "900" : "600" }}>
           {t("back")}
         </Text>
       </Pressable>
