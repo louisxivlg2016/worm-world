@@ -5,6 +5,7 @@ import {
   Text,
   TextInput,
   FlatList,
+  ScrollView,
   Pressable,
   StyleSheet,
   ActivityIndicator,
@@ -73,7 +74,9 @@ export default function LobbyScreen() {
   }, []);
 
   const { startGame, customSkin, playerSkin, playerName: ctxName } = useGameState();
-  const activeSkin = customSkin ?? playerSkin ?? SKINS[0];
+  const [selectedSkinIdx, setSelectedSkinIdx] = useState(0);
+  const skinChoices = SKINS;
+  const activeSkin = customSkin ?? skinChoices[selectedSkinIdx] ?? SKINS[0];
   const savedName = (() => { try { return getStorage().getItem("playerName") ?? ""; } catch { return ""; } })();
   const myName = ctxName || savedName || `Guest${Math.floor(Math.random() * 999)}`;
 
@@ -153,6 +156,36 @@ export default function LobbyScreen() {
   return (
     <View style={styles.container}>
       <View style={[{ flex: 1, gap: spacing.md }, desktopContainerStyle]}>
+      {/* Skin selector */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Personnage</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            {skinChoices.map((skin, i) => (
+              <Pressable
+                key={i}
+                onPress={() => setSelectedSkinIdx(i)}
+                style={{
+                  width: 50, height: 50, borderRadius: 25,
+                  backgroundColor: skin.colors[0],
+                  borderWidth: 3, borderCurve: "continuous",
+                  borderColor: selectedSkinIdx === i ? colors.gold : "rgba(255,255,255,0.15)",
+                  boxShadow: selectedSkinIdx === i ? "0 0 12px rgba(255,215,0,0.5)" : "none",
+                  alignItems: "center", justifyContent: "center",
+                }}
+              >
+                {selectedSkinIdx === i && (
+                  <View style={{ flexDirection: "row", gap: 3 }}>
+                    <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: "white" }} />
+                    <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: "white" }} />
+                  </View>
+                )}
+              </Pressable>
+            ))}
+          </View>
+        </ScrollView>
+      </View>
+
       {/* Create Room */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t("createRoom")}</Text>
