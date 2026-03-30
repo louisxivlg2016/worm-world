@@ -238,7 +238,7 @@ export default function RacePage({
         onClick={() => onPlay?.()}
         style={{
           position: "absolute",
-          bottom: "12%",
+          bottom: "8%",
           left: "50%",
           transform: "translateX(-50%)",
           width: "200px",
