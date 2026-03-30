@@ -183,13 +183,14 @@ export default function RacePage({
       <div
         style={{
           position: "absolute",
-          top: "11.2%",
-          left: "5.1%",
+          top: "1.2%",
+          right: "0.7%",
           display: "flex",
           alignItems: "flex-start",
           gap: "10px",
           zIndex: 99998,
           pointerEvents: "none",
+          flexDirection: "row-reverse",
         }}
       >
         <img
