@@ -184,7 +184,7 @@ export default function RacePage({
         style={{
           position: "absolute",
           top: "4px",
-          right: "4px",
+          right: "64px",
           display: "flex",
           alignItems: "flex-start",
           gap: "8px",
