@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { COURSE_IMG } from "./courseBase64";
-import { PLAY_BTN } from "./playBtnBase64";
 import { CLOSE_BTN } from "./closeBtnBase64";
 import { INFO_BTN, BULLE_IMG } from "./infoBtnBase64";
-import { COUPE_OR, COUPE_ARGENT, COUPE_BRONZE } from "./coupesBase64";
 
 interface RacePageProps {
   onPlay?: () => void;
@@ -26,8 +24,8 @@ const BOT_COLORS = [
 ];
 
 // Track Y positions as % of image height (measured from the image)
-const TRACK_Y = [32, 42, 52, 62, 72.5];
-const TRACK_START_X = 30; // % from left where tracks begin
+const TRACK_Y = [43, 53.5, 64, 74.5];
+const TRACK_START_X = 18; // % from left where tracks begin
 
 function WormOnTrack({ colors, trackY, progress, segCount }: {
   colors: string[]; trackY: number; progress: number; segCount: number;
@@ -38,7 +36,7 @@ function WormOnTrack({ colors, trackY, progress, segCount }: {
     <div style={{
       position: "absolute",
       top: `${trackY}%`,
-      left: `${TRACK_START_X + progress * 0.5}%`,
+      left: `${TRACK_START_X + progress * 0.48}%`,
       transform: "translateY(-50%)",
       display: "flex",
       flexDirection: "row-reverse",
@@ -133,7 +131,7 @@ export default function RacePage({
 
       {/* Live countdown timer */}
       <div style={{
-        position: "absolute", top: "14%", left: "50%",
+        position: "absolute", top: "4%", left: "50%",
         transform: "translateX(-50%)",
         color: "#c8a878", fontSize: "1.6vw", fontWeight: 600,
         textShadow: "0 1px 2px rgba(0,0,0,0.4)",
@@ -143,22 +141,6 @@ export default function RacePage({
       }}>
         ⏱ {countdown}
       </div>
-
-      {/* Trophy cups on the right side of tracks */}
-      {[COUPE_OR, COUPE_ARGENT, COUPE_BRONZE, COUPE_OR].map((cup, i) => (
-        <img
-          key={`cup-${i}`}
-          src={cup}
-          style={{
-            position: "absolute",
-            right: "3%",
-            top: `${TRACK_Y[i] - 5}%`,
-            width: "4%",
-            height: "auto",
-            zIndex: 30,
-          }}
-        />
-      ))}
 
       {/* Worms on tracks — position based on score */}
       <WormOnTrack colors={pColors} trackY={TRACK_Y[0]} progress={playerProgress} segCount={5 + Math.floor(playerProgress / 15)} />
@@ -248,17 +230,16 @@ export default function RacePage({
         )}
       </div>
 
-      {/* Play button */}
-      <img
-        src={PLAY_BTN}
-        alt="Play"
+      {/* Play button — invisible overlay on the PLAY area in the background */}
+      <div
         onClick={() => onPlay?.()}
         style={{
           position: "absolute",
-          bottom: "12%",
+          bottom: "2%",
           left: "50%",
           transform: "translateX(-50%)",
-          width: "200px",
+          width: "180px",
+          height: "50px",
           cursor: "pointer",
           zIndex: 99999,
         }}
