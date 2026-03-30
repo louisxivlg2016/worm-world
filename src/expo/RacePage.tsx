@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { COURSE_IMG } from "./courseBase64";
+import { PLAY_BTN } from "./playBtnBase64";
 import { CLOSE_BTN } from "./closeBtnBase64";
 import { INFO_BTN, BULLE_IMG } from "./infoBtnBase64";
 
@@ -230,16 +231,17 @@ export default function RacePage({
         )}
       </div>
 
-      {/* Play button — invisible overlay on the PLAY area in the background */}
-      <div
+      {/* Play button */}
+      <img
+        src={PLAY_BTN}
+        alt="Play"
         onClick={() => onPlay?.()}
         style={{
           position: "absolute",
-          bottom: "2%",
+          bottom: "12%",
           left: "50%",
           transform: "translateX(-50%)",
-          width: "180px",
-          height: "50px",
+          width: "200px",
           cursor: "pointer",
           zIndex: 99999,
         }}
