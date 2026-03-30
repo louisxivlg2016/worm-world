@@ -35,6 +35,7 @@ export function GameCanvas({
   const [boostEnergy, setBoostEnergy] = useState(100)
   const [leaderboard, setLeaderboard] = useState<{ name: string; score: number; isPlayer: boolean }[]>([])
   const [showHint, setShowHint] = useState(true)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
 
   const callbacks: GameEngineCallbacks = {
     onScoreUpdate: setScore,
@@ -91,7 +92,7 @@ export function GameCanvas({
       {/* Leaderboard */}
       <div style={styles.leaderboard}>
         <h3 style={styles.lbTitle}>&#x1F3C6; {t('topWorms')}</h3>
-        {leaderboard.map((entry, i) => (
+        {(isMobile ? leaderboard.slice(0, 3) : leaderboard).map((entry, i) => (
           <div
             key={i}
             style={{

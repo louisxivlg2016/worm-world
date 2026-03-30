@@ -140,10 +140,11 @@ export default function HomeScreen() {
         const elapsed = now - raceStart;
         const DAY = 24 * 60 * 60 * 1000;
         const WEEK = 7 * DAY;
+        const isDev = (process.env.VITE_DEV_MODE || process.env.EXPO_PUBLIC_DEV_MODE) === 'true';
 
-        // If race was won or expired (24h), cooldown 1 week
+        // If race was won or expired (24h), cooldown 1 week (skip in dev)
         const raceExpired = raceStart > 0 && elapsed > DAY;
-        const inCooldown = (raceWon || raceExpired) && elapsed < WEEK;
+        const inCooldown = !isDev && (raceWon || raceExpired) && elapsed < WEEK;
 
         if (inCooldown) {
           const cooldownEnd = raceStart + WEEK;
@@ -159,14 +160,16 @@ export default function HomeScreen() {
           );
         }
 
+        const needsReset = raceExpired || raceWon;
+
         return (
           <Pressable
             onPress={() => {
-              // Start 24h timer when first entering
-              if (!raceStart || raceExpired || raceWon) {
+              if (!raceStart || needsReset) {
                 try {
                   getStorage().setItem("raceStartTime", String(now));
                   getStorage().removeItem("raceWon");
+                  getStorage().removeItem("lastRaceScore");
                 } catch {}
               }
               router.push("/(game)/race");

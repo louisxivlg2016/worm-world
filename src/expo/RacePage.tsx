@@ -239,7 +239,7 @@ export default function RacePage({
         style={{
           position: "absolute",
           bottom: "8%",
-          left: "50%",
+          left: "52%",
           transform: "translateX(-50%)",
           width: "200px",
           cursor: "pointer",

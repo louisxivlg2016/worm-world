@@ -1,0 +1,56 @@
+name: Deploy to dist
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build Expo web
+        run: bunx expo export --platform web
+        env:
+          VITE_PLATFORM_SDK: dev
+          EXPO_PUBLIC_DEV_MODE: "false"
+          VITE_DEV_MODE: "false"
+
+      - name: Deploy to dist repo
+        env:
+          DIST_DEPLOY_KEY: ${{ secrets.DIST_DEPLOY_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$DIST_DEPLOY_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+          git clone git@github.com:louisxivlg2016/worm-world-dist.git /tmp/dist-repo
+
+          # Clean old files (except .git)
+          find /tmp/dist-repo -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+
+          # Copy new build
+          cp -r dist/* /tmp/dist-repo/
+
+          # Add Vercel config
+          cat > /tmp/dist-repo/vercel.json << 'VEOF'
+          {
+            "cleanUrls": true,
+            "trailingSlash": false
+          }
+          VEOF
+
+          cd /tmp/dist-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          HASH=$(echo "$GITHUB_SHA" | cut -c1-7)
+          git add -A
+          git commit -m "Build from $HASH" || echo "Nothing to commit"
+          git push origin main
