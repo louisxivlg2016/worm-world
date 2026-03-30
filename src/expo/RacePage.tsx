@@ -183,11 +183,11 @@ export default function RacePage({
       <div
         style={{
           position: "absolute",
-          top: "3%",
-          left: "2%",
+          top: "11.2%",
+          left: "5.1%",
           display: "flex",
           alignItems: "flex-start",
-          gap: "14px",
+          gap: "10px",
           zIndex: 99998,
           pointerEvents: "none",
         }}
@@ -197,11 +197,12 @@ export default function RacePage({
           alt="Info"
           onClick={() => setIsInfoOpen((current) => !current)}
           style={{
-            width: "54px",
-            height: "54px",
+            width: "48px",
+            height: "48px",
             cursor: "pointer",
             pointerEvents: "auto",
             flexShrink: 0,
+            display: "block",
           }}
         />
 
@@ -210,8 +211,8 @@ export default function RacePage({
             style={{
               position: "relative",
               width: "min(46vw, 340px)",
-              minWidth: "min(230px, calc(100vw - 96px))",
-              maxWidth: "calc(100vw - 96px)",
+              minWidth: "min(230px, calc(100vw - 84px))",
+              maxWidth: "calc(100vw - 84px)",
               aspectRatio: "660 / 552",
               pointerEvents: "auto",
             }}
