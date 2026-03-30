@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { COURSE_IMG } from "./courseBase64";
 import { PLAY_BTN } from "./playBtnBase64";
 import { CLOSE_BTN } from "./closeBtnBase64";
+import { INFO_BTN, BULLE_IMG } from "./infoBtnBase64";
 import { COUPE_OR, COUPE_ARGENT, COUPE_BRONZE } from "./coupesBase64";
 
 interface RacePageProps {
@@ -14,6 +15,7 @@ interface RacePageProps {
   playerColors?: string;
   playerScore?: number;
   raceStartTime?: number; // timestamp when race started (for 24h countdown)
+  raceInfoText?: string;
   dom?: import("expo/dom").DOMProps;
 }
 
@@ -89,8 +91,18 @@ function useCountdown(startTime: number) {
   return timeLeft;
 }
 
-export default function RacePage({ onPlay, onClose, onPlayLabel, onCloseLabel, playerColors, playerScore = 0, raceStartTime = 0 }: RacePageProps) {
+export default function RacePage({
+  onPlay,
+  onClose,
+  onPlayLabel,
+  onCloseLabel,
+  playerColors,
+  playerScore = 0,
+  raceStartTime = 0,
+  raceInfoText,
+}: RacePageProps) {
   const countdown = useCountdown(raceStartTime || Date.now());
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
   let pColors = ["#ff3366", "#ff6b35", "#ffd700", "#7cff00"];
   try { if (playerColors) pColors = JSON.parse(playerColors); } catch {}
 
@@ -166,6 +178,73 @@ export default function RacePage({ onPlay, onClose, onPlayLabel, onCloseLabel, p
           zIndex: 99999,
         }}
       />
+
+      {/* Info bubble toggle */}
+      <div
+        style={{
+          position: "absolute",
+          top: "3%",
+          left: "2%",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: "14px",
+          zIndex: 99998,
+          pointerEvents: "none",
+        }}
+      >
+        <img
+          src={INFO_BTN}
+          alt="Info"
+          onClick={() => setIsInfoOpen((current) => !current)}
+          style={{
+            width: "54px",
+            height: "54px",
+            cursor: "pointer",
+            pointerEvents: "auto",
+            flexShrink: 0,
+          }}
+        />
+
+        {isInfoOpen && (
+          <div
+            style={{
+              position: "relative",
+              width: "min(46vw, 340px)",
+              minWidth: "min(230px, calc(100vw - 96px))",
+              maxWidth: "calc(100vw - 96px)",
+              aspectRatio: "660 / 552",
+              pointerEvents: "auto",
+            }}
+          >
+            <img
+              src={BULLE_IMG}
+              alt="Race information"
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "block",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                inset: "18% 16% 20% 18%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                color: "#4b260d",
+                fontSize: "clamp(12px, 1.05vw, 18px)",
+                fontWeight: 700,
+                lineHeight: 1.32,
+                whiteSpace: "pre-line",
+              }}
+            >
+              {raceInfoText}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Play button */}
       <img

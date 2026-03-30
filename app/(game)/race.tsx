@@ -40,6 +40,7 @@ export default function RaceScreen() {
         raceStartTime={(() => { try { return parseInt(getStorage().getItem("raceStartTime") ?? "0", 10) || 0; } catch { return 0; } })()}
         onPlayLabel={t("racePlay")}
         onCloseLabel={t("raceClose")}
+        raceInfoText={t("raceInfo")}
         dom={{ style: { flex: 1, width: "100%", height: "100%" } }}
       />
     </View>
