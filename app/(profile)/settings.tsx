@@ -73,8 +73,9 @@ export default function SettingsSheet() {
   };
 
   return (
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
     <ScrollView
-      style={{ flex: 1, backgroundColor: colors.background }}
+      style={{ flex: 1 }}
       contentContainerStyle={[
         styles.container,
         isDesktop && { maxWidth: 500, alignSelf: "center", width: "100%" },
@@ -161,6 +162,7 @@ export default function SettingsSheet() {
 
       <View style={{ height: 40 }} />
     </ScrollView>
+    </View>
   );
 }
 
