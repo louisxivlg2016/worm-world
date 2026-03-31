@@ -17,11 +17,8 @@ export default function ProfileLayout() {
       <Stack.Screen
         name="settings"
         options={{
-          presentation: "formSheet",
-          sheetAllowedDetents: [0.75, 1.0],
-          sheetGrabberVisible: true,
-          contentStyle: { backgroundColor: "transparent" },
-          title: "Paramètres",
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
         }}
       />
     </Stack>
