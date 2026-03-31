@@ -1284,6 +1284,20 @@ function preloadFoodImages() {
 }
 preloadFoodImages()
 
+// Food style setting — read from storage
+let currentFoodStyle: 'images' | 'circles' | 'emojis' = 'images'
+function loadFoodStyle() {
+  try {
+    const s = (typeof localStorage !== 'undefined' ? localStorage : null)?.getItem('foodStyle')
+    if (s === 'circles' || s === 'emojis') currentFoodStyle = s
+    else currentFoodStyle = 'images'
+  } catch { currentFoodStyle = 'images' }
+}
+loadFoodStyle()
+
+// Circle food colors
+const CIRCLE_COLORS = ['#ff3366','#00ccff','#7cff00','#ff6b35','#ffd700','#cc33ff','#ff69b4','#00ff88','#ff4444','#44bbff']
+
 // Diamond rendering for coins mode — realistic brilliant cut
 const DIAMOND_COLORS = [
   { h: 210, s: 90, name: 'sapphire' },   // blue sapphire
@@ -1524,7 +1538,7 @@ function drawFood(ctx: CanvasRenderingContext2D, foods: Food[], camera: Camera, 
       if (age >= 50) decayAlpha = Math.max(0, 1 - (age - 50) / 70)
     }
 
-    // Draw diamond or food image
+    // Draw diamond or food based on style
     const diamondIdx = (f as any)._diamondIdx as number | undefined
     if (diamondIdx !== undefined && diamondCanvases[diamondIdx]) {
       // Diamond sparkle glow
@@ -1540,6 +1554,21 @@ function drawFood(ctx: CanvasRenderingContext2D, foods: Food[], camera: Camera, 
       }
       if (decayAlpha < 1) ctx.globalAlpha = decayAlpha
       ctx.drawImage(diamondCanvases[diamondIdx], p.x - size / 2, p.y - size / 2, size, size)
+      if (decayAlpha < 1) ctx.globalAlpha = 1
+    } else if (currentFoodStyle === 'circles') {
+      if (decayAlpha < 1) ctx.globalAlpha = decayAlpha
+      const colorIdx = Math.abs(Math.round(f.x * 7 + f.y * 3)) % CIRCLE_COLORS.length
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, size * 0.45, 0, Math.PI * 2)
+      ctx.fillStyle = CIRCLE_COLORS[colorIdx]
+      ctx.fill()
+      if (decayAlpha < 1) ctx.globalAlpha = 1
+    } else if (currentFoodStyle === 'emojis') {
+      if (decayAlpha < 1) ctx.globalAlpha = decayAlpha
+      ctx.font = `${size}px serif`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(f.emoji, p.x, p.y)
       if (decayAlpha < 1) ctx.globalAlpha = 1
     } else if (f.img && foodImgCache.has(f.img)) {
       const img = foodImgCache.get(f.img)!
@@ -2273,6 +2302,7 @@ export function useGameEngine(
   }, [getUniqueAIName])
 
   const startGame = useCallback((playerName: string, playerSkin: WormSkin, roomSlug?: string, roomId?: string, gameMode?: GameMode, seed?: number) => {
+    loadFoodStyle()
     const s = stateRef.current
     const canvas = canvasRef.current
     if (!canvas) return

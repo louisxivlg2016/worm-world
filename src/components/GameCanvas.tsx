@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameEngine, type GameEngineCallbacks } from '@/hooks/useGameEngine'
 import type { GameMode, WormSkin } from '@/types/game'
@@ -51,10 +51,18 @@ export function GameCanvas({
   useEffect(() => {
     startGame(playerName, playerSkin, roomSlug, roomId, gameMode, seed)
 
+    // Background music
+    const audio = new Audio('/music.mp3')
+    audio.loop = true
+    audio.volume = 0.35
+    audio.play().catch(() => {})
+
     const hintTimer = setTimeout(() => setShowHint(false), 5000)
 
     return () => {
       stopGame()
+      audio.pause()
+      audio.currentTime = 0
       clearTimeout(hintTimer)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps

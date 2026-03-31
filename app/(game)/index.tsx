@@ -43,18 +43,30 @@ export default function HomeScreen() {
   };
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: colors.background }}
-      contentContainerStyle={{
-        alignItems: "center",
-        padding: spacing.lg,
-        gap: spacing.md,
-        maxWidth: isDesktop ? 500 : undefined,
-        alignSelf: isDesktop ? "center" : undefined,
-        width: isDesktop ? "100%" : undefined,
-      }}
-      contentInsetAdjustmentBehavior="automatic"
-    >
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      {/* Settings button — top left */}
+      <Pressable
+        onPress={() => router.push("/(profile)/settings")}
+        style={{ position: "absolute", top: 12, left: 12, zIndex: 100 }}
+      >
+        <Image
+          source={require("../../assets/settings-btn.png")}
+          style={{ width: 50, height: 50 }}
+        />
+      </Pressable>
+
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          alignItems: "center",
+          padding: spacing.lg,
+          gap: spacing.md,
+          maxWidth: isDesktop ? 500 : undefined,
+          alignSelf: isDesktop ? "center" : undefined,
+          width: isDesktop ? "100%" : undefined,
+        }}
+        contentInsetAdjustmentBehavior="automatic"
+      >
       {/* Title */}
       <Text style={{ color: colors.gold, fontSize: 36, fontWeight: "900", letterSpacing: 4, marginTop: spacing.xl }}>
         {t("title")}
@@ -212,5 +224,6 @@ export default function HomeScreen() {
 
       <View style={{ height: spacing.xl }} />
     </ScrollView>
+    </View>
   );
 }
