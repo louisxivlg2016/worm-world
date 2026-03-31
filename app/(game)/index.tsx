@@ -46,7 +46,7 @@ export default function HomeScreen() {
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       {/* Settings button — top left */}
       <Pressable
-        onPress={() => router.push("/(profile)/settings")}
+        onPress={() => router.push("/(game)/settings")}
         style={{ position: "absolute", top: 12, left: 12, zIndex: 100 }}
       >
         <Image
