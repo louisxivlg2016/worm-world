@@ -156,7 +156,7 @@ export default function SettingsSheet() {
       </View>
 
       {/* Back button */}
-      <Pressable onPress={() => router.back()} style={styles.closeBtn}>
+      <Pressable onPress={() => { if (typeof window !== "undefined") window.location.href = "/"; else router.back(); }} style={styles.closeBtn}>
         <Text style={styles.closeBtnText}>← {t("close")}</Text>
       </Pressable>
 

@@ -44,17 +44,6 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      {/* Settings button — top left */}
-      <Pressable
-        onPress={() => { if (typeof window !== "undefined") window.location.href = "/settings"; else router.push("/settings" as any); }}
-        style={{ position: "absolute", top: 12, left: 12, zIndex: 100 }}
-      >
-        <Image
-          source={require("../../assets/settings-btn.png")}
-          style={{ width: 50, height: 50 }}
-        />
-      </Pressable>
-
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
@@ -67,6 +56,17 @@ export default function HomeScreen() {
         }}
         contentInsetAdjustmentBehavior="automatic"
       >
+      {/* Settings button */}
+      <Pressable
+        onPress={() => { if (typeof window !== "undefined") window.location.href = "/settings"; else router.push("/settings" as any); }}
+        style={{ position: "absolute", top: 0, left: 0, zIndex: 100 }}
+      >
+        <Image
+          source={require("../../assets/settings-btn.png")}
+          style={{ width: 50, height: 50 }}
+        />
+      </Pressable>
+
       {/* Title */}
       <Text style={{ color: colors.gold, fontSize: 36, fontWeight: "900", letterSpacing: 4, marginTop: spacing.xl }}>
         {t("title")}
