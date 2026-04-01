@@ -180,35 +180,12 @@ export default function SettingsPage() {
           <View style={{ height: 80 }} />
         </ScrollView>
       ) : (
-        /* Food tab */
-        <View style={[styles.foodTabContainer, isDesktop && { maxWidth: 700, alignSelf: "center", width: "100%" }]}>
-          {/* Left: pack list */}
-          <ScrollView style={styles.foodList} contentContainerStyle={{ gap: 8, padding: 12 }}>
-            {FOOD_PACKS.map((pack) => {
-              const active = foodStyle === pack.id;
-              return (
-                <Pressable
-                  key={pack.id}
-                  onPress={() => handleFoodStyle(pack.id)}
-                  style={[styles.packItem, active && styles.packItemActive]}
-                >
-                  <Text style={{ fontSize: 30 }}>{pack.icon}</Text>
-                  <Text style={[styles.packName, active && { color: colors.gold }]}>{pack.name}</Text>
-                  {active && <View style={styles.packCheck}><Text style={{ fontSize: 10, color: "#000" }}>✓</Text></View>}
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-
-          {/* Right: preview image */}
-          <View style={styles.previewArea}>
-            <Image
-              source={{ uri: "/food-preview.jpg" }}
-              style={{ width: "100%", height: "100%", borderRadius: 16 }}
-              resizeMode="contain"
-            />
-          </View>
-        </View>
+        /* Food tab — full screen image */
+        <Image
+          source={{ uri: "/food-preview.jpg" }}
+          style={{ flex: 1, width: "100%" as any, height: "100%" as any }}
+          resizeMode="cover"
+        />
       )}
     </View>
   );
