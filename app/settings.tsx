@@ -200,30 +200,13 @@ export default function SettingsPage() {
             })}
           </ScrollView>
 
-          {/* Right: preview */}
+          {/* Right: preview image */}
           <View style={styles.previewArea}>
-            <Text style={styles.previewTitle}>{selectedPack.name}</Text>
-            <View style={styles.previewBox}>
-              {selectedPack.isCircles ? (
-                <View style={styles.previewGrid}>
-                  {CIRCLE_COLORS.map((c, i) => (
-                    <View key={i} style={[styles.previewCircle, { backgroundColor: c }]} />
-                  ))}
-                </View>
-              ) : selectedPack.isEmojis ? (
-                <View style={styles.previewGrid}>
-                  {EMOJI_FOOD.slice(0, 8).map((e, i) => (
-                    <Text key={i} style={{ fontSize: 32 }}>{e}</Text>
-                  ))}
-                </View>
-              ) : (
-                <View style={styles.previewGrid}>
-                  {selectedPack.items.map((src, i) => (
-                    <Image key={i} source={{ uri: src }} style={styles.previewImg} />
-                  ))}
-                </View>
-              )}
-            </View>
+            <Image
+              source={{ uri: "/food-preview.jpg" }}
+              style={{ width: "100%", height: "100%", borderRadius: 16 }}
+              resizeMode="contain"
+            />
           </View>
         </View>
       )}
