@@ -121,9 +121,6 @@ export default function SettingsPage() {
     <View style={{ flex: 1, height: "100%" as any, backgroundColor: colors.background }}>
       {/* Tab bar */}
       <View style={styles.tabBar}>
-        <Pressable onPress={goBack}>
-          <Image source={require("../assets/close-red-btn.png")} style={{ width: 40, height: 40 }} />
-        </Pressable>
         <Pressable
           onPress={() => setTab("settings")}
           style={[styles.tab, tab === "settings" && styles.tabActive]}
@@ -137,6 +134,10 @@ export default function SettingsPage() {
         >
           <Text style={{ fontSize: 22 }}>🍕</Text>
           <Text style={[styles.tabText, tab === "food" && styles.tabTextActive]}>{t("foodStyleTitle")}</Text>
+        </Pressable>
+        <View style={{ flex: 1 }} />
+        <Pressable onPress={goBack}>
+          <Image source={require("../assets/close-red-btn.png")} style={{ width: 50, height: 50 }} />
         </Pressable>
       </View>
 
