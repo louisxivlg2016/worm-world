@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, Pressable, Alert, ScrollView, StyleSheet, useWindowDimensions } from "react-native";
+import { View, Text, Pressable, Alert, ScrollView, Image, StyleSheet, useWindowDimensions } from "react-native";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { colors, spacing } from "@/expo/theme";
@@ -16,27 +16,62 @@ const allLanguages: Record<string, { name: string; flag: string }> = {
   hi: { name: "हिन्दी", flag: "🇮🇳" },
 };
 
-const FOOD_CIRCLE_COLORS = ["#ff3366", "#00ccff", "#7cff00", "#ff6b35", "#ffd700", "#cc33ff"];
+// Food packs with their items
+const FOOD_PACKS = [
+  {
+    id: "classic",
+    name: "Classique",
+    icon: "🍔",
+    items: ["/food/burger.png", "/food/pizza.png", "/food/donut.png", "/food/hot-dog.png", "/food/muffin.png", "/food/sushi.png"],
+    free: true,
+  },
+  {
+    id: "fruits",
+    name: "Fruits",
+    icon: "🍓",
+    items: ["/food/fraise.png", "/food/banane.png", "/food/pomme.png", "/food/gateau.png", "/food/susette.png", "/food/poulet.png"],
+    free: true,
+  },
+  {
+    id: "circles",
+    name: "Cercles",
+    icon: "●",
+    items: [],
+    free: true,
+    isCircles: true,
+  },
+  {
+    id: "emojis",
+    name: "Emojis",
+    icon: "😋",
+    items: [],
+    free: true,
+    isEmojis: true,
+  },
+];
+
+const CIRCLE_COLORS = ["#ff3366", "#00ccff", "#7cff00", "#ff6b35", "#ffd700", "#cc33ff", "#ff69b4", "#00ff88"];
+const EMOJI_FOOD = ["🍖", "🍗", "🍕", "🍔", "🍩", "🍓", "🍌", "🍎", "🍣", "🌭", "🧁", "🍰"];
 
 export default function SettingsPage() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 600;
+  const [tab, setTab] = useState<"settings" | "food">("settings");
   const [currentLang, setCurrentLang] = useState(i18n.language?.split("-")[0] || "fr");
   const [foodStyle, setFoodStyle] = useState(() => {
-    try { return getStorage().getItem("foodStyle") || "images"; } catch { return "images"; }
+    try { return getStorage().getItem("foodStyle") || "classic"; } catch { return "classic"; }
   });
 
-  const foodStyles = [
-    { id: "images", label: t("foodImages") },
-    { id: "circles", label: t("foodCircles") },
-    { id: "emojis", label: t("foodEmojis") },
-  ];
-
-  const handleFoodStyle = (style: string) => {
-    setFoodStyle(style);
-    try { getStorage().setItem("foodStyle", style); } catch {}
+  const handleFoodStyle = (packId: string) => {
+    setFoodStyle(packId);
+    // Map pack id to engine food style
+    const styleMap: Record<string, string> = { classic: "images", fruits: "images", circles: "circles", emojis: "emojis" };
+    try {
+      getStorage().setItem("foodStyle", styleMap[packId] || "images");
+      getStorage().setItem("foodPack", packId);
+    } catch {}
   };
 
   const handleChangeLang = (lang: string) => {
@@ -80,116 +115,157 @@ export default function SettingsPage() {
     else router.back();
   };
 
+  const selectedPack = FOOD_PACKS.find((p) => p.id === foodStyle) || FOOD_PACKS[0];
+
   return (
     <View style={{ flex: 1, height: "100%" as any, backgroundColor: colors.background }}>
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={[
-          styles.container,
-          isDesktop && { maxWidth: 500, alignSelf: "center", width: "100%" },
-        ]}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={{ fontSize: 40 }}>⚙️</Text>
-          <Text style={styles.title}>{t("settings")}</Text>
-        </View>
-
-        {/* Food style */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>🍕 {t("foodStyleTitle")}</Text>
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            {foodStyles.map((fs) => {
-              const active = foodStyle === fs.id;
-              return (
-                <Pressable
-                  key={fs.id}
-                  onPress={() => handleFoodStyle(fs.id)}
-                  style={[styles.foodCard, active && styles.foodCardActive]}
-                >
-                  <View style={{ height: 36, justifyContent: "center", alignItems: "center" }}>
-                    {fs.id === "images" && <Text style={{ fontSize: 28 }}>🍔🍕🍩</Text>}
-                    {fs.id === "circles" && (
-                      <View style={{ flexDirection: "row", gap: 4 }}>
-                        {FOOD_CIRCLE_COLORS.slice(0, 4).map((c, i) => (
-                          <View key={i} style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: c }} />
-                        ))}
-                      </View>
-                    )}
-                    {fs.id === "emojis" && <Text style={{ fontSize: 28 }}>🍖🍗🍌</Text>}
-                  </View>
-                  <Text style={[styles.foodLabel, active && { color: colors.gold }]}>{fs.label}</Text>
-                  {active && (
-                    <View style={styles.checkBadge}><Text style={{ fontSize: 12 }}>✓</Text></View>
-                  )}
-                </Pressable>
-              );
-            })}
-          </View>
-        </View>
-
-        {/* Language */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>🌍 {t("language")}</Text>
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
-            {Object.entries(allLanguages).map(([code, { name, flag }]) => {
-              const active = currentLang === code;
-              return (
-                <Pressable
-                  key={code}
-                  onPress={() => handleChangeLang(code)}
-                  style={[styles.langBtn, active && styles.langBtnActive]}
-                >
-                  <Text style={{ fontSize: 20 }}>{flag}</Text>
-                  <Text style={[styles.langText, active && { color: colors.text }]}>{name}</Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        </View>
-
-        {/* Danger zone */}
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>⚠️ {t("resetData")}</Text>
-          <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{t("resetWarning")}</Text>
-          <Pressable onPress={handleReset} style={styles.dangerBtn}>
-            <Text style={{ color: colors.danger, fontWeight: "700", fontSize: 15 }}>🗑 {t("resetData")}</Text>
-          </Pressable>
-        </View>
-
-        {/* Back button */}
-        <Pressable onPress={goBack} style={styles.closeBtn}>
-          <Text style={{ color: colors.text, fontWeight: "700", fontSize: 16, letterSpacing: 1 }}>← {t("close")}</Text>
+      {/* Tab bar */}
+      <View style={styles.tabBar}>
+        <Pressable onPress={goBack} style={styles.backBtn}>
+          <Text style={{ fontSize: 20 }}>←</Text>
         </Pressable>
+        <Pressable
+          onPress={() => setTab("settings")}
+          style={[styles.tab, tab === "settings" && styles.tabActive]}
+        >
+          <Text style={{ fontSize: 22 }}>⚙️</Text>
+          <Text style={[styles.tabText, tab === "settings" && styles.tabTextActive]}>{t("settings")}</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => setTab("food")}
+          style={[styles.tab, tab === "food" && styles.tabActive]}
+        >
+          <Text style={{ fontSize: 22 }}>🍕</Text>
+          <Text style={[styles.tabText, tab === "food" && styles.tabTextActive]}>{t("foodStyleTitle")}</Text>
+        </Pressable>
+      </View>
 
-        <View style={{ height: 80 }} />
-      </ScrollView>
+      {tab === "settings" ? (
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={[
+            styles.container,
+            isDesktop && { maxWidth: 500, alignSelf: "center", width: "100%" },
+          ]}
+        >
+          {/* Language */}
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>🌍 {t("language")}</Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+              {Object.entries(allLanguages).map(([code, { name, flag }]) => {
+                const active = currentLang === code;
+                return (
+                  <Pressable
+                    key={code}
+                    onPress={() => handleChangeLang(code)}
+                    style={[styles.langBtn, active && styles.langBtnActive]}
+                  >
+                    <Text style={{ fontSize: 20 }}>{flag}</Text>
+                    <Text style={[styles.langText, active && { color: colors.text }]}>{name}</Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+
+          {/* Danger zone */}
+          <View style={styles.card}>
+            <Text style={styles.sectionTitle}>⚠️ {t("resetData")}</Text>
+            <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{t("resetWarning")}</Text>
+            <Pressable onPress={handleReset} style={styles.dangerBtn}>
+              <Text style={{ color: colors.danger, fontWeight: "700", fontSize: 15 }}>🗑 {t("resetData")}</Text>
+            </Pressable>
+          </View>
+
+          <View style={{ height: 80 }} />
+        </ScrollView>
+      ) : (
+        /* Food tab */
+        <View style={[styles.foodTabContainer, isDesktop && { maxWidth: 700, alignSelf: "center", width: "100%" }]}>
+          {/* Left: pack list */}
+          <ScrollView style={styles.foodList} contentContainerStyle={{ gap: 8, padding: 12 }}>
+            {FOOD_PACKS.map((pack) => {
+              const active = foodStyle === pack.id;
+              return (
+                <Pressable
+                  key={pack.id}
+                  onPress={() => handleFoodStyle(pack.id)}
+                  style={[styles.packItem, active && styles.packItemActive]}
+                >
+                  <Text style={{ fontSize: 30 }}>{pack.icon}</Text>
+                  <Text style={[styles.packName, active && { color: colors.gold }]}>{pack.name}</Text>
+                  {active && <View style={styles.packCheck}><Text style={{ fontSize: 10, color: "#000" }}>✓</Text></View>}
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+
+          {/* Right: preview */}
+          <View style={styles.previewArea}>
+            <Text style={styles.previewTitle}>{selectedPack.name}</Text>
+            <View style={styles.previewBox}>
+              {selectedPack.isCircles ? (
+                <View style={styles.previewGrid}>
+                  {CIRCLE_COLORS.map((c, i) => (
+                    <View key={i} style={[styles.previewCircle, { backgroundColor: c }]} />
+                  ))}
+                </View>
+              ) : selectedPack.isEmojis ? (
+                <View style={styles.previewGrid}>
+                  {EMOJI_FOOD.slice(0, 8).map((e, i) => (
+                    <Text key={i} style={{ fontSize: 32 }}>{e}</Text>
+                  ))}
+                </View>
+              ) : (
+                <View style={styles.previewGrid}>
+                  {selectedPack.items.map((src, i) => (
+                    <Image key={i} source={{ uri: src }} style={styles.previewImg} />
+                  ))}
+                </View>
+              )}
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { padding: spacing.lg, gap: spacing.md },
-  header: { alignItems: "center", gap: 4, marginTop: spacing.lg, marginBottom: spacing.sm },
-  title: { color: colors.gold, fontSize: 26, fontWeight: "900", letterSpacing: 3, textTransform: "uppercase" },
+  // Tab bar
+  tabBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.1)",
+    backgroundColor: "rgba(255,255,255,0.03)",
+  },
+  backBtn: {
+    width: 40, height: 40, borderRadius: 10,
+    alignItems: "center", justifyContent: "center",
+    backgroundColor: "rgba(255,255,255,0.06)",
+  },
+  tab: {
+    flexDirection: "row", alignItems: "center", gap: 6,
+    paddingVertical: 10, paddingHorizontal: 16,
+    borderRadius: 12, borderCurve: "continuous",
+  },
+  tabActive: {
+    backgroundColor: "rgba(255,215,0,0.12)",
+  },
+  tabText: { color: colors.textSecondary, fontSize: 14, fontWeight: "600" },
+  tabTextActive: { color: colors.gold },
+  // Cards
   card: {
     backgroundColor: "rgba(255,255,255,0.05)", borderRadius: 20, borderCurve: "continuous",
     padding: spacing.lg, gap: spacing.md, borderWidth: 1, borderColor: "rgba(255,255,255,0.08)",
   },
   sectionTitle: { color: colors.text, fontSize: 15, fontWeight: "700" },
-  foodCard: {
-    flex: 1, alignItems: "center", gap: 8, paddingVertical: 14, paddingHorizontal: 8,
-    borderRadius: 16, borderCurve: "continuous", backgroundColor: "rgba(255,255,255,0.04)",
-    borderWidth: 2, borderColor: "rgba(255,255,255,0.08)",
-  },
-  foodCardActive: {
-    backgroundColor: "rgba(255,215,0,0.1)", borderColor: "rgba(255,215,0,0.5)",
-  },
-  foodLabel: { color: colors.textSecondary, fontSize: 12, fontWeight: "700", textTransform: "uppercase" },
-  checkBadge: {
-    position: "absolute", top: 6, right: 6, width: 20, height: 20, borderRadius: 10,
-    backgroundColor: colors.gold, alignItems: "center", justifyContent: "center",
-  },
+  // Language
   langBtn: {
     flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 10, paddingHorizontal: 14,
     borderRadius: 12, borderCurve: "continuous", backgroundColor: "rgba(255,255,255,0.04)",
@@ -197,14 +273,61 @@ const styles = StyleSheet.create({
   },
   langBtnActive: { backgroundColor: "rgba(124,58,237,0.2)", borderColor: "rgba(124,58,237,0.5)" },
   langText: { color: colors.textSecondary, fontSize: 14, fontWeight: "600" },
+  // Danger
   dangerBtn: {
     paddingVertical: 14, borderRadius: 14, borderCurve: "continuous",
     backgroundColor: "rgba(255,51,102,0.15)", borderWidth: 1.5, borderColor: "rgba(255,51,102,0.3)",
     alignItems: "center",
   },
-  closeBtn: {
-    paddingVertical: 16, borderRadius: 50, borderCurve: "continuous",
-    backgroundColor: "rgba(124,58,237,0.2)", borderWidth: 1.5, borderColor: "rgba(124,58,237,0.4)",
-    alignItems: "center",
+  // Food tab
+  foodTabContainer: {
+    flex: 1, flexDirection: "row",
+  },
+  foodList: {
+    width: 130,
+    borderRightWidth: 1,
+    borderRightColor: "rgba(255,255,255,0.1)",
+    backgroundColor: "rgba(255,255,255,0.02)",
+  },
+  packItem: {
+    alignItems: "center", gap: 4,
+    paddingVertical: 14, paddingHorizontal: 8,
+    borderRadius: 14, borderCurve: "continuous",
+    borderWidth: 2, borderColor: "rgba(255,255,255,0.08)",
+    backgroundColor: "rgba(255,255,255,0.03)",
+  },
+  packItemActive: {
+    backgroundColor: "rgba(255,215,0,0.12)",
+    borderColor: "rgba(255,215,0,0.5)",
+  },
+  packName: { color: colors.textSecondary, fontSize: 11, fontWeight: "700", textAlign: "center" },
+  packCheck: {
+    position: "absolute", top: 4, right: 4, width: 16, height: 16, borderRadius: 8,
+    backgroundColor: colors.gold, alignItems: "center", justifyContent: "center",
+  },
+  // Preview
+  previewArea: {
+    flex: 1, padding: spacing.lg, gap: spacing.md,
+  },
+  previewTitle: {
+    color: colors.gold, fontSize: 18, fontWeight: "800", letterSpacing: 1, textAlign: "center",
+  },
+  previewBox: {
+    flex: 1,
+    backgroundColor: "rgba(255,255,255,0.04)",
+    borderRadius: 20, borderCurve: "continuous",
+    borderWidth: 1, borderColor: "rgba(255,255,255,0.1)",
+    padding: spacing.lg,
+    justifyContent: "center", alignItems: "center",
+  },
+  previewGrid: {
+    flexDirection: "row", flexWrap: "wrap", gap: 16,
+    justifyContent: "center", alignItems: "center",
+  },
+  previewImg: {
+    width: 50, height: 50,
+  },
+  previewCircle: {
+    width: 30, height: 30, borderRadius: 15,
   },
 });
