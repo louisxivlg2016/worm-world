@@ -121,8 +121,8 @@ export default function SettingsPage() {
     <View style={{ flex: 1, height: "100%" as any, backgroundColor: colors.background }}>
       {/* Tab bar */}
       <View style={styles.tabBar}>
-        <Pressable onPress={goBack} style={styles.backBtn}>
-          <Text style={{ fontSize: 20 }}>←</Text>
+        <Pressable onPress={goBack}>
+          <Image source={require("../assets/close-red-btn.png")} style={{ width: 40, height: 40 }} />
         </Pressable>
         <Pressable
           onPress={() => setTab("settings")}
