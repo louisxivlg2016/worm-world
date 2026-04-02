@@ -91,7 +91,7 @@ export default function SettingsPage() {
         storage.removeItem("customSkin");
         storage.removeItem("playerSkin");
       } catch {}
-      window.location.href = "/";
+      router.back();
       return;
     }
     Alert.alert(t("resetData"), t("resetConfirm"), [
@@ -111,8 +111,7 @@ export default function SettingsPage() {
   };
 
   const goBack = () => {
-    if (typeof window !== "undefined") window.location.href = "/";
-    else router.back();
+    router.back();
   };
 
   const selectedPack = FOOD_PACKS.find((p) => p.id === foodStyle) || FOOD_PACKS[0];

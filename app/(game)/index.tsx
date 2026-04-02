@@ -58,7 +58,7 @@ export default function HomeScreen() {
       >
       {/* Settings button */}
       <Pressable
-        onPress={() => { if (typeof window !== "undefined") window.location.href = "/settings"; else router.push("/settings" as any); }}
+        onPress={() => router.push("/settings" as any)}
         style={{ position: "absolute", top: 0, left: 0, zIndex: 100 }}
       >
         <Image
