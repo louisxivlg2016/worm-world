@@ -1029,10 +1029,10 @@ const shopStyles: Record<string, React.CSSProperties> = {
     whiteSpace: 'nowrap',
   },
   flagPreview: {
-    width: 52,
-    height: 36,
+    width: 44,
+    height: 44,
     objectFit: 'cover',
-    borderRadius: 6,
+    borderRadius: '50%',
     border: '1px solid rgba(255,255,255,0.15)',
     flexShrink: 0,
   },

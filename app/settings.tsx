@@ -111,7 +111,8 @@ export default function SettingsPage() {
   };
 
   const goBack = () => {
-    router.back();
+    if (router.canGoBack()) router.back();
+    else router.replace("/(game)" as any);
   };
 
   const selectedPack = FOOD_PACKS.find((p) => p.id === foodStyle) || FOOD_PACKS[0];
@@ -135,9 +136,11 @@ export default function SettingsPage() {
           <Text style={[styles.tabText, tab === "food" && styles.tabTextActive]}>{t("foodStyleTitle")}</Text>
         </Pressable>
         <View style={{ flex: 1 }} />
-        <Pressable onPress={goBack}>
-          <Image source={require("../assets/close-red-btn.png")} style={{ width: 50, height: 50 }} />
-        </Pressable>
+        {tab === "settings" && (
+          <Pressable onPress={goBack}>
+            <Image source={require("../assets/close-red-btn.png")} style={{ width: 50, height: 50 }} />
+          </Pressable>
+        )}
       </View>
 
       {tab === "settings" ? (
@@ -180,12 +183,20 @@ export default function SettingsPage() {
           <View style={{ height: 80 }} />
         </ScrollView>
       ) : (
-        /* Food tab — full screen image */
-        <Image
-          source={{ uri: "/food-preview.jpg" }}
-          style={{ flex: 1, width: "100%" as any, height: "100%" as any }}
-          resizeMode="cover"
-        />
+        /* Food tab — full screen image with close button over the drawn X */
+        <View style={{ flex: 1 }}>
+          <Image
+            source={{ uri: "/food-preview.jpg" }}
+            style={{ flex: 1, width: "100%" as any, height: "100%" as any }}
+            resizeMode="cover"
+          />
+          <Pressable onPress={() => setTab("settings")} style={{ position: "absolute", top: "-0.5%", right: "5.5%" }}>
+            <Image source={require("../assets/close-red-btn.png")} style={{ width: 65, height: 65 }} />
+          </Pressable>
+          <Pressable onPress={() => {}} style={{ position: "absolute", top: "76%", left: "49%", width: "17%", height: "16%" }}>
+            <Image source={require("../assets/buy-btn.png")} style={{ width: "100%" as any, height: "100%" as any, resizeMode: "stretch" }} />
+          </Pressable>
+        </View>
       )}
     </View>
   );
