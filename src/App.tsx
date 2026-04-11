@@ -43,9 +43,8 @@ export function AppInner() {
   const [totalCoins, setTotalCoins] = useState(() => {
     const saved = getStorage().getItem('totalCoins')
     if (!saved) {
-      // Dev: start with 20000 coins
-      getStorage().setItem('totalCoins', '20000')
-      return 20000
+      getStorage().setItem('totalCoins', '9000')
+      return 9000
     }
     return parseInt(saved, 10) || 0
   })

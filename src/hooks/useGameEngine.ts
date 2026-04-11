@@ -1198,8 +1198,27 @@ function drawBackground(ctx: CanvasRenderingContext2D, camera: Camera, w: number
     grd.addColorStop(0, event.bgGradient[0])
     grd.addColorStop(1, event.bgGradient[1])
   } else {
-    grd.addColorStop(0, '#1a5c8a')
-    grd.addColorStop(1, '#0e3a5c')
+    const bgThemes: Record<string, [string, string]> = {
+      ocean: ['#1a5c8a', '#0e3a5c'],
+      forest: ['#1a6b3a', '#0e3d22'],
+      sunset: ['#8a3a1a', '#5c1e0e'],
+      purple: ['#5c1a8a', '#360e5c'],
+      night: ['#1a1a3a', '#0a0a1e'],
+      red: ['#8a1a1a', '#5c0e0e'],
+      pink: ['#8a1a6b', '#5c0e45'],
+      gold: ['#8a7a1a', '#5c500e'],
+      cyan: ['#1a8a8a', '#0e5c5c'],
+      grey: ['#4a4a4a', '#2a2a2a'],
+      lime: ['#4a8a1a', '#2e5c0e'],
+      black: ['#111111', '#000000'],
+    }
+    let userBg: [string, string] = ['#1a5c8a', '#0e3a5c']
+    try {
+      const saved = (typeof localStorage !== 'undefined' ? localStorage : null)?.getItem('gameBgColor')
+      if (saved && bgThemes[saved]) userBg = bgThemes[saved]
+    } catch {}
+    grd.addColorStop(0, userBg[0])
+    grd.addColorStop(1, userBg[1])
   }
   ctx.fillStyle = grd
   ctx.fillRect(0, 0, w, h)
@@ -2065,6 +2084,58 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   ctx.fillText(worm.name, np.x, np.y)
 }
 
+function drawCelebrationBubble(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: number, h: number) {
+  let emoji = '😜'
+  try {
+    const saved = (typeof localStorage !== 'undefined' ? localStorage : null)?.getItem('celebrationEmoji')
+    if (saved) emoji = saved
+  } catch {}
+
+  const head = worm.segments[0]
+  const radius = getWormRadius(worm)
+  const hp = worldToScreen(head.x, head.y - radius - 45, camera, w, h)
+
+  const z = camera.zoom
+  const bw = 40 * z, bh = 36 * z, br = 12 * z
+
+  // Pulsing animation
+  const pulse = 1 + Math.sin(Date.now() * 0.003) * 0.05
+  const cx = hp.x, cy = hp.y
+
+  ctx.save()
+  ctx.scale(pulse, pulse)
+  const sx = cx / pulse, sy = cy / pulse
+
+  // Speech bubble
+  ctx.fillStyle = '#fff'
+  ctx.strokeStyle = '#4a9cd6'
+  ctx.lineWidth = 2.5 * z
+  ctx.beginPath()
+  ctx.moveTo(sx - bw / 2 + br, sy - bh / 2)
+  ctx.lineTo(sx + bw / 2 - br, sy - bh / 2)
+  ctx.quadraticCurveTo(sx + bw / 2, sy - bh / 2, sx + bw / 2, sy - bh / 2 + br)
+  ctx.lineTo(sx + bw / 2, sy + bh / 2 - br)
+  ctx.quadraticCurveTo(sx + bw / 2, sy + bh / 2, sx + bw / 2 - br, sy + bh / 2)
+  ctx.lineTo(sx + 5 * z, sy + bh / 2)
+  ctx.lineTo(sx, sy + bh / 2 + 10 * z)
+  ctx.lineTo(sx - 5 * z, sy + bh / 2)
+  ctx.lineTo(sx - bw / 2 + br, sy + bh / 2)
+  ctx.quadraticCurveTo(sx - bw / 2, sy + bh / 2, sx - bw / 2, sy + bh / 2 - br)
+  ctx.lineTo(sx - bw / 2, sy - bh / 2 + br)
+  ctx.quadraticCurveTo(sx - bw / 2, sy - bh / 2, sx - bw / 2 + br, sy - bh / 2)
+  ctx.closePath()
+  ctx.fill()
+  ctx.stroke()
+
+  // Emoji
+  ctx.font = `${Math.round(22 * z)}px serif`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillStyle = '#000'
+  ctx.fillText(emoji, sx, sy)
+  ctx.restore()
+}
+
 function drawParticles(ctx: CanvasRenderingContext2D, particles: Particle[], camera: Camera, w: number, h: number) {
   for (const p of particles) {
     const sp = worldToScreen(p.x, p.y, camera, w, h)
@@ -2118,7 +2189,7 @@ function drawMinimap(
   aiWorms: Worm[],
   remotePlayers: Map<string, Worm>,
 ) {
-  const w = 160, h = 160
+  const w = mc.canvas.width, h = mc.canvas.height
   mc.clearRect(0, 0, w, h)
   mc.fillStyle = 'rgba(0,0,0,0.3)'
   mc.fillRect(0, 0, w, h)
@@ -2751,7 +2822,13 @@ export function useGameEngine(
         drawWorm(ctx, rp, s.camera, canvas.width, canvas.height)
       }
 
-      if (s.player.alive) drawWorm(ctx, s.player, s.camera, canvas.width, canvas.height)
+      if (s.player.alive) {
+        drawWorm(ctx, s.player, s.camera, canvas.width, canvas.height)
+        // Celebration emoji bubble when player is big
+        if (s.player.segments.length >= 50) {
+          drawCelebrationBubble(ctx, s.player, s.camera, canvas.width, canvas.height)
+        }
+      }
 
       // Active potion effect indicators
       drawActiveEffects(ctx, s.activeEffects, canvas.width)

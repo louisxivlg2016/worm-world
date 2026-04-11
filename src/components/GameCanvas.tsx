@@ -36,6 +36,13 @@ export function GameCanvas({
   const [leaderboard, setLeaderboard] = useState<{ name: string; score: number; isPlayer: boolean }[]>([])
   const [showHint, setShowHint] = useState(true)
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+  const [minimapSize] = useState(() => {
+    const sizes: Record<string, number> = { tiny: 80, small: 120, medium: 160, large: 200, xlarge: 250 }
+    try {
+      const saved = (typeof localStorage !== 'undefined' ? localStorage : null)?.getItem('minimapSize')
+      return saved && sizes[saved] ? sizes[saved] : 160
+    } catch { return 160 }
+  })
 
   const callbacks: GameEngineCallbacks = {
     onScoreUpdate: setScore,
@@ -92,9 +99,9 @@ export function GameCanvas({
       {/* Minimap */}
       <canvas
         ref={minimapRef}
-        width={160}
-        height={160}
-        style={styles.minimap}
+        width={minimapSize}
+        height={minimapSize}
+        style={{ ...styles.minimap, width: minimapSize, height: minimapSize }}
       />
 
       {/* Leaderboard */}
