@@ -475,6 +475,12 @@ const DEV_MODE = (process.env.VITE_DEV_MODE || process.env.EXPO_PUBLIC_DEV_MODE)
 export function isEventActive(event: GameEvent): boolean {
   if (DEV_MODE) return true
 
+  // On localhost (dev server), show all events regardless of date so they can be tested
+  if (typeof window !== 'undefined') {
+    const host = window.location?.hostname || ''
+    if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.')) return true
+  }
+
   const today = new Date()
   // All events use exact dates — festivals only show on their actual days
   const WINDOW_DAYS = 0
