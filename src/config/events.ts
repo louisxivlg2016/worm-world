@@ -304,6 +304,7 @@ export const GAME_EVENTS: GameEvent[] = [
     id: 'july4th',
     label: '4 Juillet',
     emoji: '🗽',
+    currencyImage: '/july4th-coin.png',
     costumes: [
       { id: 'july4th', label: 'Étoile', preview: '/heads/july4th.png', bodyTexture: '/heads/july4th-body.png' },
       { id: 'july4th2', label: 'Uncle Sam', preview: '/heads/july4th2.png', bodyTexture: '/heads/july4th2-body.png' },
