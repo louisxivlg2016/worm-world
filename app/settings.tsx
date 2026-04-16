@@ -658,8 +658,7 @@ export default function SettingsPage() {
   };
 
   const goBack = () => {
-    if (router.canGoBack()) router.back();
-    else router.replace("/(game)" as any);
+    router.replace("/" as any);
   };
 
   const selectedPack = FOOD_PACKS.find((p) => p.id === foodStyle) || FOOD_PACKS[0];
