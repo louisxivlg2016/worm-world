@@ -198,27 +198,25 @@ export default function HomeScreen() {
         );
       })()}
 
-      {/* Event modes */}
+      {/* Event modes - all festivals shown, wrap to multiple rows */}
       {activeEvents.length > 0 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ maxHeight: 50 }}>
-          <View style={{ flexDirection: "row", gap: 8 }}>
-            {activeEvents.map((event) => (
-              <Pressable
-                key={event.id}
-                onPress={() => playEvent(event.id)}
-                style={{
-                  paddingHorizontal: 20, paddingVertical: 10, borderRadius: 30, borderCurve: "continuous",
-                  background: event.btnGradient as any, backgroundColor: event.aiColors[0],
-                  boxShadow: event.btnShadow,
-                }}
-              >
-                <Text style={{ color: "white", fontSize: 14, fontWeight: "700" }}>
-                  {event.emoji} {event.label}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </ScrollView>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, justifyContent: "center", paddingHorizontal: spacing.sm }}>
+          {activeEvents.map((event) => (
+            <Pressable
+              key={event.id}
+              onPress={() => playEvent(event.id)}
+              style={{
+                paddingHorizontal: 16, paddingVertical: 10, borderRadius: 30, borderCurve: "continuous",
+                background: event.btnGradient as any, backgroundColor: event.aiColors[0],
+                boxShadow: event.btnShadow,
+              }}
+            >
+              <Text style={{ color: "white", fontSize: 13, fontWeight: "700" }}>
+                {event.emoji} {event.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
       )}
 
       <View style={{ height: spacing.xl }} />
