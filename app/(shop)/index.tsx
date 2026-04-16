@@ -10,6 +10,7 @@ import {
   Pressable,
   StyleSheet,
   useWindowDimensions,
+  Alert,
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useRouter } from "expo-router";
@@ -127,6 +128,7 @@ function getHeadOptions(): HeadOption[] {
       id: c.id,
       label: `${c.label} ${e.emoji}`,
       locked,
+      unlockKey: e.unlockKey as string | undefined,
     }));
   });
   return [...base, ...eventHeads];
@@ -163,9 +165,21 @@ export default function ShopScreen() {
   const [bodyStyle, setBodyStyle] = useState<"circles" | "tube">("circles");
   const [selectedFlag, setSelectedFlag] = useState<string | null>(null);
 
-  const { totalCoins: coins } = useGameState();
+  const { totalCoins: coins, totalGems: gems, unlockEventCostume } = useGameState();
+  const [, setUnlockTick] = useState(0);
 
-  const headOptions = useMemo(() => getHeadOptions(), []);
+  const headOptions = useMemo(() => getHeadOptions(), [gems]);
+
+  const handleUnlockEvent = useCallback((unlockKey: string) => {
+    const EVENT_COSTUME_COST = 30;
+    if (gems < EVENT_COSTUME_COST) {
+      if (typeof window !== "undefined") window.alert("Pas assez de gemmes 💎 !");
+      else Alert.alert("Pas assez de gemmes 💎 !");
+      return;
+    }
+    const ok = unlockEventCostume(unlockKey, EVENT_COSTUME_COST);
+    if (ok) setUnlockTick((x) => x + 1);
+  }, [gems, unlockEventCostume]);
 
   const filteredFlags = useMemo(() => {
     if (!flagSearch.trim()) return FLAG_SKINS;
@@ -290,11 +304,22 @@ export default function ShopScreen() {
         value={headSearch}
         onChangeText={setHeadSearch}
       />
+      {/* Gems balance (for event costume purchases) */}
+      <View style={styles.gemsBar}>
+        <Text style={styles.gemsText}>💎 {gems}</Text>
+        <Text style={styles.gemsHint}>Costume événement = 30 💎</Text>
+      </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.headRow}>
         {filteredHeads.map((h) => (
           <Pressable
             key={h.id}
-            onPress={() => !h.locked && setHeadType(h.id)}
+            onPress={() => {
+              if (h.locked && h.unlockKey) {
+                handleUnlockEvent(h.unlockKey);
+              } else if (!h.locked) {
+                setHeadType(h.id);
+              }
+            }}
             style={[
               styles.headItem,
               headType === h.id && styles.headItemSelected,
@@ -302,7 +327,7 @@ export default function ShopScreen() {
             ]}
           >
             <Text style={[styles.headLabel, h.locked && styles.headLabelLocked]}>
-              {h.locked ? "🔒 " : ""}
+              {h.locked ? (h.unlockKey ? "💎 30 " : "🔒 ") : ""}
               {h.label}
             </Text>
           </Pressable>
@@ -467,6 +492,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     marginBottom: spacing.sm,
   },
+  gemsBar: {
+    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    backgroundColor: "rgba(147,197,253,0.12)", borderRadius: 14,
+    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+    marginBottom: spacing.sm,
+    borderWidth: 1, borderColor: "rgba(147,197,253,0.3)",
+  },
+  gemsText: {
+    color: "#60a5fa", fontSize: 18, fontWeight: "800",
+  },
+  gemsHint: {
+    color: colors.textSecondary, fontSize: 12,
+  },
   headItem: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
@@ -482,7 +520,9 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,215,0,0.15)",
   },
   headItemLocked: {
-    opacity: 0.5,
+    opacity: 0.8,
+    borderColor: "rgba(147,197,253,0.5)",
+    backgroundColor: "rgba(147,197,253,0.1)",
   },
   headLabel: {
     color: colors.text,

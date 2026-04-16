@@ -28,6 +28,12 @@ interface GameStateValue {
   addCoins: (amount: number) => void;
   spendCoins: (amount: number) => void;
 
+  // Gems (event currency)
+  totalGems: number;
+  addGems: (amount: number) => void;
+  spendGems: (amount: number) => void;
+  unlockEventCostume: (unlockKey: string, cost: number) => boolean;
+
   // Room/multiplayer
   roomSlug: string | undefined;
   roomId: string | undefined;
@@ -73,6 +79,14 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
     }
     return parseInt(saved, 10) || 0;
   });
+  const [totalGems, setTotalGems] = useState(() => {
+    const saved = getStorage().getItem("totalGems");
+    if (!saved) {
+      getStorage().setItem("totalGems", "50");
+      return 50;
+    }
+    return parseInt(saved, 10) || 0;
+  });
   const [roomSlug, setRoomSlug] = useState<string | undefined>();
   const [roomId, setRoomId] = useState<string | undefined>();
   const [gameMode, setGameMode] = useState<GameMode>("ffa");
@@ -97,6 +111,35 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const addGems = useCallback((amount: number) => {
+    setTotalGems(prev => {
+      const next = prev + amount;
+      getStorage().setItem("totalGems", String(next));
+      return next;
+    });
+  }, []);
+
+  const spendGems = useCallback((amount: number) => {
+    setTotalGems(prev => {
+      const next = Math.max(0, prev - amount);
+      getStorage().setItem("totalGems", String(next));
+      return next;
+    });
+  }, []);
+
+  const unlockEventCostume = useCallback((unlockKey: string, cost: number) => {
+    let success = false;
+    setTotalGems(prev => {
+      if (prev < cost) return prev;
+      const next = prev - cost;
+      getStorage().setItem("totalGems", String(next));
+      getStorage().setItem(unlockKey, "true");
+      success = true;
+      return next;
+    });
+    return success;
+  }, []);
+
   const setRoomInfo = useCallback((slug?: string, id?: string, mode?: GameMode, s?: number) => {
     setRoomSlug(slug);
     setRoomId(id);
@@ -118,6 +161,15 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
   const handleDeath = useCallback((score: number, length: number, coins: number, kills: number) => {
     setDeathInfo({ score, length, coins, kills });
     addCoins(coins);
+    // Award gems: 1 per kill + 1 per 100 score points
+    const gemReward = kills + Math.floor(score / 100);
+    if (gemReward > 0) {
+      setTotalGems(prev => {
+        const next = prev + gemReward;
+        getStorage().setItem("totalGems", String(next));
+        return next;
+      });
+    }
     const elapsed = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
     const stats = loadStats();
     stats.bestScore = Math.max(stats.bestScore, score);
@@ -130,7 +182,12 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
   }, [addCoins]);
 
   const handleEventWin = useCallback((unlockKey: string) => {
-    getStorage().setItem(unlockKey, "true");
+    // Reaching the event milestone now awards gems instead of auto-unlocking
+    setTotalGems(prev => {
+      const next = prev + 50;
+      getStorage().setItem("totalGems", String(next));
+      return next;
+    });
     setWonEventUnlockKey(unlockKey);
     setIsPlaying(false);
   }, []);
@@ -150,6 +207,7 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
       playerSkin, setPlayerSkin,
       customSkin, setCustomSkin,
       totalCoins, addCoins, spendCoins,
+      totalGems, addGems, spendGems, unlockEventCostume,
       roomSlug, roomId, gameMode, seed, setRoomInfo,
       deathInfo,
       startGame, handleDeath, handleEventWin, applySkin,
