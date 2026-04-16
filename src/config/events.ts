@@ -200,6 +200,7 @@ export const GAME_EVENTS: GameEvent[] = [
     id: 'eid',
     label: 'Eid',
     emoji: '🌙',
+    currencyImage: '/eid-coin.png',
     costumes: [
       { id: 'eid', label: 'Croissant', preview: '/heads/eid.png', bodyTexture: '/heads/eid-body.png' },
       { id: 'eid2', label: 'Fanous', preview: '/heads/eid2.png', bodyTexture: '/heads/eid2-body.png' },
