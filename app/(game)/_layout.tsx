@@ -8,6 +8,7 @@ export default function GameLayout() {
         headerShown: false,
         contentStyle: { backgroundColor: colors.background },
       }}
+      initialRouteName="index"
     >
       <Stack.Screen name="index" />
       <Stack.Screen name="settings" />

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { translateFlag } from '@/i18n/flagNames'
 import { SKINS, type WormSkin } from '@/types/game'
 import ukFlagBody from '../../drapeau/angleterre.png'
 import franceFlagBody from '../../drapeau/france.png'
@@ -174,6 +175,9 @@ import syrieFlagBody from '../../drapeau/syrie.png'
 import tadjikistanFlagBody from '../../drapeau/tadjikistan.png'
 import taiwanFlagBody from '../../drapeau/taiwan.png'
 import turkmenistanFlagBody from '../../drapeau/turkmenistan.png'
+import ouzbekistanFlagBody from '../../drapeau/ouzbekistan.png'
+import malaisieFlagBody from '../../drapeau/malaisie.png'
+import yemenFlagBody from '../../drapeau/yemen.png'
 
 // New Oceania flags
 import fidjiFlagBody from '../../drapeau/fidji.png'
@@ -404,6 +408,9 @@ const FLAG_SKINS: FlagSkin[] = [
   { name: 'Tadjikistan', preview: tadjikistanFlagBody, bodyTexture: tadjikistanFlagBody, colors: ['#CE1126', '#FFFFFF', '#007A3D', '#CE1126'] },
   { name: 'Taiwan', preview: taiwanFlagBody, bodyTexture: taiwanFlagBody, colors: ['#FE0000', '#000095', '#FFFFFF', '#FE0000'] },
   { name: 'Turkmenistan', preview: turkmenistanFlagBody, bodyTexture: turkmenistanFlagBody, colors: ['#00843D', '#CE1126', '#00843D', '#00843D'] },
+  { name: 'Ouzbekistan', preview: ouzbekistanFlagBody, bodyTexture: ouzbekistanFlagBody, colors: ['#1EB53A', '#FFFFFF', '#0099B5', '#CE1126'] },
+  { name: 'Malaisie', preview: malaisieFlagBody, bodyTexture: malaisieFlagBody, colors: ['#CC0001', '#FFFFFF', '#010066', '#FFCC00'] },
+  { name: 'Yemen', preview: yemenFlagBody, bodyTexture: yemenFlagBody, colors: ['#CE1126', '#FFFFFF', '#000000', '#CE1126'] },
   // Oceania
   { name: 'Australie', preview: australiaFlagBody, bodyTexture: australiaFlagBody, colors: ['#00008B', '#FF0000', '#FFFFFF', '#00008B'] },
   { name: 'Nouvelle-Zelande', preview: newZealandFlagBody, bodyTexture: newZealandFlagBody, colors: ['#00247D', '#CC142B', '#FFFFFF', '#00247D'] },
@@ -474,7 +481,8 @@ interface ShopScreenProps {
 }
 
 export function ShopScreen({ currentSkin, playerCoins, onApply, onBack }: ShopScreenProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const lang = (i18n.language || 'fr').split('-')[0]
   const [colors, setColors] = useState<string[]>(['#888888', '#999999', '#888888', '#999999'])
   const [headType, setHeadType] = useState('default')
   const [selectedBodyTexture, setSelectedBodyTexture] = useState<string | undefined>(undefined)
@@ -852,17 +860,24 @@ export function ShopScreen({ currentSkin, playerCoins, onApply, onBack }: ShopSc
           style={shopStyles.searchInput}
         />
         <div className="shop-scroll" style={shopStyles.flagGrid}>
-          {FLAG_SKINS.filter(f => !flagSearch || f.name.toLowerCase().includes(flagSearch.toLowerCase())).map((f, i) => (
-            <div
-              key={i}
-              style={shopStyles.flagItem}
-              onClick={() => applyFlag(f.colors, f.bodyTexture)}
-              title={f.name}
-            >
-              <img src={f.preview} alt={f.name} style={shopStyles.flagPreview} />
-              <span style={shopStyles.flagName}>{f.name}</span>
-            </div>
-          ))}
+          {FLAG_SKINS.filter(f => {
+            if (!flagSearch) return true
+            const q = flagSearch.toLowerCase()
+            return f.name.toLowerCase().includes(q) || translateFlag(f.name, lang).toLowerCase().includes(q)
+          }).map((f, i) => {
+            const displayName = translateFlag(f.name, lang)
+            return (
+              <div
+                key={i}
+                style={shopStyles.flagItem}
+                onClick={() => applyFlag(f.colors, f.bodyTexture)}
+                title={displayName}
+              >
+                <img src={f.preview} alt={displayName} style={shopStyles.flagPreview} />
+                <span style={shopStyles.flagName}>{displayName}</span>
+              </div>
+            )
+          })}
         </div>
         {/* Flag body preview */}
         {isFlagSkin && selectedBodyTexture && (

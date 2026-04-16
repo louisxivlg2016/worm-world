@@ -16,6 +16,7 @@ import { useRouter } from "expo-router";
 import { colors, spacing } from "@/expo/theme";
 import { useGameState } from "@/context/GameStateContext";
 import { FLAG_IMAGES } from "@/assets/flags";
+import { translateFlag } from "@/i18n/flagNames";
 import { SKINS } from "@/types/game";
 import { getStorage } from "@/services/StorageService";
 import { GAME_EVENTS } from "@/config/events";
@@ -134,7 +135,8 @@ const COLOR_PALETTE = [
 ];
 
 export default function ShopScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const flagLang = (i18n.language || "fr").split("-")[0];
   const { width } = useWindowDimensions();
   const router = useRouter();
   const isDesktop = width >= 600;
@@ -157,8 +159,10 @@ export default function ShopScreen() {
   const filteredFlags = useMemo(() => {
     if (!flagSearch.trim()) return FLAG_SKINS;
     const q = flagSearch.toLowerCase();
-    return FLAG_SKINS.filter((f) => f.name.toLowerCase().includes(q));
-  }, [flagSearch]);
+    return FLAG_SKINS.filter((f) =>
+      f.name.toLowerCase().includes(q) || translateFlag(f.name, flagLang).toLowerCase().includes(q)
+    );
+  }, [flagSearch, flagLang]);
 
   const filteredHeads = useMemo(() => {
     if (!headSearch.trim()) return headOptions;
@@ -223,7 +227,7 @@ export default function ShopScreen() {
               </View>
             )}
             <Text style={styles.flagLabel} numberOfLines={1} ellipsizeMode="tail">
-              {item.name}
+              {translateFlag(item.name, flagLang)}
             </Text>
           </Pressable>
         </Animated.View>

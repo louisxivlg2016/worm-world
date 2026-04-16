@@ -7,6 +7,13 @@ export interface EventCostume {
   bodyTexture: string
 }
 
+export interface EventDateRange {
+  startMonth: number
+  startDay: number
+  endMonth: number
+  endDay: number
+}
+
 export interface GameEvent {
   id: GameMode
   label: string
@@ -18,6 +25,7 @@ export interface GameEvent {
   startDay: number
   endMonth: number
   endDay: number
+  datesByYear?: Record<number, EventDateRange>
   bgGradient: [string, string]
   aiColors: [string, string, string, string]
   borderColor: string
@@ -158,6 +166,35 @@ export const GAME_EVENTS: GameEvent[] = [
     winMessage: 'Tu as gagné le costume St Patrick ! Il est maintenant disponible dans la boutique.',
   },
   {
+    id: 'ramadan',
+    label: 'Ramadan',
+    emoji: '🕌',
+    costumes: [
+      { id: 'ramadan', label: 'Croissant', preview: '/heads/eid.png', bodyTexture: '/heads/eid-body.png' },
+      { id: 'ramadan2', label: 'Fanous', preview: '/heads/eid2.png', bodyTexture: '/heads/eid2-body.png' },
+    ],
+    unlockKey: 'ramadanUnlocked',
+    bgImage: '/eid-bg.png',
+    startMonth: 1, startDay: 18,
+    endMonth: 2, endDay: 19,
+    datesByYear: {
+      2025: { startMonth: 1, startDay: 28, endMonth: 2, endDay: 29 },
+      2026: { startMonth: 1, startDay: 18, endMonth: 2, endDay: 19 },
+      2027: { startMonth: 1, startDay: 8, endMonth: 2, endDay: 9 },
+      2028: { startMonth: 0, startDay: 28, endMonth: 1, endDay: 26 },
+      2029: { startMonth: 0, startDay: 16, endMonth: 1, endDay: 14 },
+      2030: { startMonth: 0, startDay: 6, endMonth: 1, endDay: 4 },
+    },
+    bgGradient: ['#1a1a4a', '#0a0a2e'],
+    aiColors: ['#FFD700', '#8B4789', '#FFD700', '#2d1458'],
+    borderColor: 'rgba(255,215,0,0.5)',
+    glowColor: 'rgba(255,215,0,',
+    btnGradient: 'linear-gradient(135deg, #2d1458, #8B4789, #FFD700)',
+    btnShadow: '0 6px 25px rgba(139,71,137,0.5)',
+    winTitle: 'Ramadan Unlock!',
+    winMessage: 'Tu as gagné le costume Ramadan ! Il est maintenant disponible dans la boutique.',
+  },
+  {
     id: 'eid',
     label: 'Eid',
     emoji: '🌙',
@@ -167,8 +204,16 @@ export const GAME_EVENTS: GameEvent[] = [
     ],
     unlockKey: 'eidUnlocked',
     bgImage: '/eid-bg.png',
-    startMonth: 3, startDay: 10,
-    endMonth: 3, endDay: 12,
+    startMonth: 2, startDay: 20,
+    endMonth: 2, endDay: 22,
+    datesByYear: {
+      2025: { startMonth: 2, startDay: 30, endMonth: 2, endDay: 31 },
+      2026: { startMonth: 2, startDay: 20, endMonth: 2, endDay: 22 },
+      2027: { startMonth: 2, startDay: 10, endMonth: 2, endDay: 11 },
+      2028: { startMonth: 1, startDay: 27, endMonth: 1, endDay: 28 },
+      2029: { startMonth: 1, startDay: 15, endMonth: 1, endDay: 16 },
+      2030: { startMonth: 1, startDay: 5, endMonth: 1, endDay: 6 },
+    },
     bgGradient: ['#0a2e1a', '#052010'],
     aiColors: ['#006233', '#FFD700', '#006233', '#FFD700'],
     borderColor: 'rgba(255,215,0,0.5)',
@@ -189,8 +234,16 @@ export const GAME_EVENTS: GameEvent[] = [
     ],
     unlockKey: 'easterUnlocked',
     bgImage: '/easter-egg-bg.png',
-    startMonth: 3, startDay: 18,
-    endMonth: 3, endDay: 21,
+    startMonth: 3, startDay: 5,
+    endMonth: 3, endDay: 10,
+    datesByYear: {
+      2025: { startMonth: 3, startDay: 20, endMonth: 3, endDay: 20 },
+      2026: { startMonth: 3, startDay: 5, endMonth: 3, endDay: 10 },
+      2027: { startMonth: 2, startDay: 28, endMonth: 3, endDay: 2 },
+      2028: { startMonth: 3, startDay: 16, endMonth: 3, endDay: 21 },
+      2029: { startMonth: 3, startDay: 1, endMonth: 3, endDay: 6 },
+      2030: { startMonth: 3, startDay: 21, endMonth: 3, endDay: 26 },
+    },
     bgGradient: ['#2d5a1e', '#1a3a10'],
     aiColors: ['#98FB98', '#FFB6C1', '#87CEEB', '#DDA0DD'],
     borderColor: 'rgba(152,251,152,0.5)',
@@ -421,11 +474,20 @@ export function isEventActive(event: GameEvent): boolean {
   if (DEV_MODE) return true
 
   const today = new Date()
-  const WINDOW_DAYS = 14 // show 2 weeks before and after
+  // Events with per-year dates (moving holidays like Easter/Ramadan) use exact dates
+  // Other events use a 14-day window around fixed dates
+  const WINDOW_DAYS = event.datesByYear ? 0 : 14
+
+  const year = today.getFullYear()
+  const yearOverride = event.datesByYear?.[year]
+  const sMonth = yearOverride?.startMonth ?? event.startMonth
+  const sDay = yearOverride?.startDay ?? event.startDay
+  const eMonth = yearOverride?.endMonth ?? event.endMonth
+  const eDay = yearOverride?.endDay ?? event.endDay
 
   // Build event date for this year
-  const eventStart = new Date(today.getFullYear(), event.startMonth, event.startDay)
-  const eventEnd = new Date(today.getFullYear(), event.endMonth, event.endDay)
+  const eventStart = new Date(year, sMonth, sDay)
+  const eventEnd = new Date(year, eMonth, eDay)
 
   // Visible window: 14 days before start to 14 days after end
   const windowStart = new Date(eventStart)

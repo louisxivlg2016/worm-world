@@ -35,7 +35,13 @@ export function GameCanvas({
   const [boostEnergy, setBoostEnergy] = useState(100)
   const [leaderboard, setLeaderboard] = useState<{ name: string; score: number; isPlayer: boolean }[]>([])
   const [showHint, setShowHint] = useState(true)
+  const [joyKnob, setJoyKnob] = useState({ x: 0, y: 0 })
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+  const [controlStyle] = useState(() => {
+    try {
+      return (typeof localStorage !== 'undefined' ? localStorage : null)?.getItem('controlStyle') || 'mouse'
+    } catch { return 'mouse' }
+  })
   const [minimapSize] = useState(() => {
     const sizes: Record<string, number> = { tiny: 80, small: 120, medium: 160, large: 200, xlarge: 250 }
     try {
@@ -53,7 +59,7 @@ export function GameCanvas({
     onWin,
   }
 
-  const { startGame, stopGame } = useGameEngine(canvasRef, minimapRef, callbacks)
+  const { startGame, stopGame, stateRef } = useGameEngine(canvasRef, minimapRef, callbacks)
 
   useEffect(() => {
     startGame(playerName, playerSkin, roomSlug, roomId, gameMode, seed)
@@ -61,8 +67,20 @@ export function GameCanvas({
     // Background music
     const audio = new Audio('/music.mp3')
     audio.loop = true
-    audio.volume = 0.35
+    let savedVol = 0.35
+    try {
+      const saved = (typeof localStorage !== 'undefined' ? localStorage : null)?.getItem('musicVolume')
+      if (saved) savedVol = parseFloat(saved)
+    } catch {}
+    audio.volume = savedVol
     audio.play().catch(() => {})
+
+    // Preload collision sound
+    const chocSfx = new Audio('/choc.mp3')
+    chocSfx.volume = savedVol
+    chocSfx.preload = 'auto'
+    chocSfx.load()
+    ;(window as any).__chocSfx = chocSfx
 
     const hintTimer = setTimeout(() => setShowHint(false), 5000)
 
@@ -153,6 +171,106 @@ export function GameCanvas({
       {showHint && (
         <div style={styles.controlsHint}>{t('controlsHint')}</div>
       )}
+
+      {/* Directional buttons - only in buttons mode */}
+      {controlStyle === 'buttons' && <div style={styles.dpad}>
+        <div
+          style={styles.dpadBtn}
+          onMouseDown={() => { const s = stateRef.current; s.controlMode = 'keyboard'; s.keys.up = true }}
+          onMouseUp={() => { stateRef.current.keys.up = false }}
+          onMouseLeave={() => { stateRef.current.keys.up = false }}
+          onTouchStart={(e) => { e.preventDefault(); const s = stateRef.current; s.controlMode = 'keyboard'; s.keys.up = true }}
+          onTouchEnd={(e) => { e.preventDefault(); stateRef.current.keys.up = false }}
+        >▲</div>
+        <div style={{ display: 'flex', gap: 4 }}>
+          <div
+            style={styles.dpadBtn}
+            onMouseDown={() => { const s = stateRef.current; s.controlMode = 'keyboard'; s.keys.left = true }}
+            onMouseUp={() => { stateRef.current.keys.left = false }}
+            onMouseLeave={() => { stateRef.current.keys.left = false }}
+            onTouchStart={(e) => { e.preventDefault(); const s = stateRef.current; s.controlMode = 'keyboard'; s.keys.left = true }}
+            onTouchEnd={(e) => { e.preventDefault(); stateRef.current.keys.left = false }}
+          >◀</div>
+          <div
+            style={styles.dpadBtn}
+            onMouseDown={() => { const s = stateRef.current; s.controlMode = 'keyboard'; s.keys.right = true }}
+            onMouseUp={() => { stateRef.current.keys.right = false }}
+            onMouseLeave={() => { stateRef.current.keys.right = false }}
+            onTouchStart={(e) => { e.preventDefault(); const s = stateRef.current; s.controlMode = 'keyboard'; s.keys.right = true }}
+            onTouchEnd={(e) => { e.preventDefault(); stateRef.current.keys.right = false }}
+          >▶</div>
+        </div>
+        <div
+          style={styles.dpadBtn}
+          onMouseDown={() => { const s = stateRef.current; s.controlMode = 'keyboard'; s.keys.down = true }}
+          onMouseUp={() => { stateRef.current.keys.down = false }}
+          onMouseLeave={() => { stateRef.current.keys.down = false }}
+          onTouchStart={(e) => { e.preventDefault(); const s = stateRef.current; s.controlMode = 'keyboard'; s.keys.down = true }}
+          onTouchEnd={(e) => { e.preventDefault(); stateRef.current.keys.down = false }}
+        >▼</div>
+      </div>}
+
+      {/* Joystick */}
+      {controlStyle === 'joystick' && <div
+        style={styles.joystick}
+        onMouseDown={(e) => {
+          const s = stateRef.current; s.controlMode = 'touch';
+          const rect = e.currentTarget.getBoundingClientRect();
+          const cx = rect.left + 60, cy = rect.top + 60;
+          const jx = Math.max(-1, Math.min(1, (e.clientX - cx) / 50));
+          const jy = Math.max(-1, Math.min(1, (e.clientY - cy) / 50));
+          s.touchVector.x = jx * 100; s.touchVector.y = jy * 100;
+          setJoyKnob({ x: jx, y: jy });
+          const onMove = (ev: MouseEvent) => {
+            const mx = Math.max(-1, Math.min(1, (ev.clientX - cx) / 50));
+            const my = Math.max(-1, Math.min(1, (ev.clientY - cy) / 50));
+            s.touchVector.x = mx * 100; s.touchVector.y = my * 100;
+            setJoyKnob({ x: mx, y: my });
+          };
+          const onUp = () => { s.touchVector.x = 0; s.touchVector.y = 0; setJoyKnob({ x: 0, y: 0 }); window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); };
+          window.addEventListener('mousemove', onMove);
+          window.addEventListener('mouseup', onUp);
+        }}
+        onTouchStart={(e) => {
+          e.preventDefault(); const s = stateRef.current; s.controlMode = 'touch';
+          const rect = e.currentTarget.getBoundingClientRect();
+          const cx = rect.left + 60, cy = rect.top + 60;
+          const t = e.touches[0];
+          const jx = Math.max(-1, Math.min(1, (t.clientX - cx) / 50));
+          const jy = Math.max(-1, Math.min(1, (t.clientY - cy) / 50));
+          s.touchVector.x = jx * 100; s.touchVector.y = jy * 100;
+          setJoyKnob({ x: jx, y: jy });
+          const onMove = (ev: TouchEvent) => {
+            ev.preventDefault(); const ct = ev.touches[0];
+            const mx = Math.max(-1, Math.min(1, (ct.clientX - cx) / 50));
+            const my = Math.max(-1, Math.min(1, (ct.clientY - cy) / 50));
+            s.touchVector.x = mx * 100; s.touchVector.y = my * 100;
+            setJoyKnob({ x: mx, y: my });
+          };
+          const onEnd = () => { s.touchVector.x = 0; s.touchVector.y = 0; setJoyKnob({ x: 0, y: 0 }); window.removeEventListener('touchmove', onMove); window.removeEventListener('touchend', onEnd); };
+          window.addEventListener('touchmove', onMove, { passive: false });
+          window.addEventListener('touchend', onEnd);
+        }}
+      >
+        <div style={{ ...styles.joystickKnob, top: `calc(50% + ${joyKnob.y * 35}px)`, left: `calc(50% + ${joyKnob.x * 35}px)`, transition: joyKnob.x === 0 && joyKnob.y === 0 ? 'all 0.15s' : 'none' }} />
+      </div>}
+
+      {/* Swipe zone */}
+      {controlStyle === 'swipe' && <div
+        style={styles.swipeZone}
+        onTouchStart={(e) => {
+          e.preventDefault(); const s = stateRef.current; s.controlMode = 'touch';
+          const t = e.touches[0]; const start = { x: t.clientX, y: t.clientY };
+          const onMove = (ev: TouchEvent) => {
+            ev.preventDefault(); const ct = ev.touches[0];
+            s.touchVector.x = Math.max(-100, Math.min(100, (ct.clientX - start.x) * 2));
+            s.touchVector.y = Math.max(-100, Math.min(100, (ct.clientY - start.y) * 2));
+          };
+          const onEnd = () => { s.touchVector.x = 0; s.touchVector.y = 0; window.removeEventListener('touchmove', onMove); window.removeEventListener('touchend', onEnd); };
+          window.addEventListener('touchmove', onMove, { passive: false });
+          window.addEventListener('touchend', onEnd);
+        }}
+      >Swipe</div>}
     </>
   )
 }
@@ -263,6 +381,70 @@ const styles: Record<string, React.CSSProperties> = {
     letterSpacing: 1,
     pointerEvents: 'none',
   },
+  dpad: {
+    position: 'fixed',
+    bottom: 20, left: 20,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 4,
+    zIndex: 30,
+  },
+  dpadBtn: {
+    width: 50, height: 50,
+    borderRadius: 25,
+    background: 'rgba(255,255,255,0.2)',
+    border: '2px solid rgba(255,255,255,0.35)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: 22,
+    color: '#fff',
+    cursor: 'pointer',
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
+    touchAction: 'none',
+    backdropFilter: 'blur(4px)',
+  } as React.CSSProperties,
+  joystick: {
+    position: 'fixed',
+    bottom: 20, left: 20,
+    width: 120, height: 120,
+    borderRadius: 60,
+    background: 'rgba(255,255,255,0.12)',
+    border: '2px solid rgba(255,255,255,0.3)',
+    zIndex: 30,
+    touchAction: 'none',
+    backdropFilter: 'blur(4px)',
+  },
+  joystickKnob: {
+    position: 'absolute',
+    top: '50%', left: '50%',
+    transform: 'translate(-50%,-50%)',
+    width: 40, height: 40,
+    borderRadius: 20,
+    background: 'rgba(255,255,255,0.45)',
+    border: '2px solid rgba(255,255,255,0.6)',
+    pointerEvents: 'none',
+  },
+  swipeZone: {
+    position: 'fixed',
+    bottom: 20, left: 20,
+    width: 110, height: 110,
+    borderRadius: 20,
+    background: 'rgba(255,255,255,0.08)',
+    border: '2px dashed rgba(255,255,255,0.25)',
+    zIndex: 30,
+    touchAction: 'none',
+    backdropFilter: 'blur(4px)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 14,
+    fontWeight: '700',
+    userSelect: 'none',
+  } as React.CSSProperties,
   raceHud: {
     position: 'fixed',
     top: 60, left: 10,

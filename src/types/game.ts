@@ -149,7 +149,7 @@ export interface Camera {
 
 export type GameMode = 'battle' | 'ctf' | 'ffa' | 'coins' | 'race'
   | 'stpatrick' | 'noel' | 'newyear' | 'valentine' | 'easter' | 'halloween' | 'summer'
-  | 'carnival' | 'holi' | 'mayday' | 'bastille' | 'july4th' | 'muertos' | 'diwali' | 'reveillon' | 'cny' | 'thanksgiving' | 'eid'
+  | 'carnival' | 'holi' | 'mayday' | 'bastille' | 'july4th' | 'muertos' | 'diwali' | 'reveillon' | 'cny' | 'thanksgiving' | 'eid' | 'ramadan'
 export type GameScreen = 'menu' | 'lobby' | 'shop' | 'profile' | 'playing' | 'dead' | 'event-win'
 
 export interface GameState {

@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useState } from "react";
 
 interface MiniWormGameProps {
   foodImages: string[];
@@ -8,9 +8,10 @@ interface MiniWormGameProps {
   headType?: string;
   bgColors?: [string, string];
   celebrationEmoji?: string;
+  controlStyle?: string;
 }
 
-export default function MiniWormGame({ foodImages, width, height, skinColors, headType, bgColors, celebrationEmoji }: MiniWormGameProps) {
+export default function MiniWormGame({ foodImages, width, height, skinColors, headType, bgColors, celebrationEmoji, controlStyle }: MiniWormGameProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const stateRef = useRef<{
     worm: { x: number; y: number }[];
@@ -189,19 +190,18 @@ export default function MiniWormGame({ foodImages, width, height, skinColors, he
       for (let i = s.worm.length - 1; i >= 0; i--) {
         const p = s.worm[i];
         const r = SEG_R * (i === 0 ? 1.2 : Math.max(0.3, 1 - i * 0.005));
+        const color = COLORS[i % COLORS.length];
 
         // Shadow
         ctx.fillStyle = "rgba(0,0,0,0.15)";
         ctx.beginPath();
         ctx.arc(p.x, p.y + r * 0.3, r * 1.05, 0, Math.PI * 2);
         ctx.fill();
-
         // Body
-        ctx.fillStyle = COLORS[i % COLORS.length];
+        ctx.fillStyle = color;
         ctx.beginPath();
         ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
         ctx.fill();
-
         // Highlight
         ctx.fillStyle = "rgba(255,255,255,0.18)";
         ctx.beginPath();
@@ -361,12 +361,138 @@ export default function MiniWormGame({ foodImages, width, height, skinColors, he
 
   if (typeof window === "undefined") return null;
 
+  const btnStyle: React.CSSProperties = {
+    width: 44, height: 44, borderRadius: 22,
+    backgroundColor: "rgba(255,255,255,0.25)",
+    border: "2px solid rgba(255,255,255,0.4)",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    fontSize: 20, color: "#fff", cursor: "pointer",
+    userSelect: "none", WebkitUserSelect: "none",
+    touchAction: "none",
+  };
+
+  const dirRef = useRef<{ dx: number; dy: number }>({ dx: 0, dy: 0 });
+  const [knobPos, setKnobPos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      const s = stateRef.current;
+      const d = dirRef.current;
+      if (!s || (d.dx === 0 && d.dy === 0)) return;
+      const head = s.worm[0];
+      s.mouse.x = head.x + d.dx * 200;
+      s.mouse.y = head.y + d.dy * 200;
+    }, 16);
+    return () => clearInterval(id);
+  }, []);
+
+  const pressDir = (dx: number, dy: number) => {
+    dirRef.current = { dx, dy };
+    setKnobPos({ x: dx, y: dy });
+    const s = stateRef.current;
+    if (s) {
+      const head = s.worm[0];
+      s.mouse.x = head.x + dx * 200;
+      s.mouse.y = head.y + dy * 200;
+    }
+  };
+  const releaseDir = () => { dirRef.current = { dx: 0, dy: 0 }; setKnobPos({ x: 0, y: 0 }); };
+
   return (
-    <canvas
-      ref={canvasRef}
-      width={width}
-      height={height}
-      style={{ width, height, borderRadius: 4 }}
-    />
+    <div style={{ position: "relative", width, height }}>
+      <canvas
+        ref={canvasRef}
+        width={width}
+        height={height}
+        style={{ width, height, borderRadius: 4 }}
+      />
+      {/* D-pad buttons */}
+      {controlStyle === "buttons" && <div style={{ position: "absolute", bottom: 10, right: 10, display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+        <div style={btnStyle} onMouseDown={() => pressDir(0, -1)} onMouseUp={releaseDir} onMouseLeave={releaseDir}
+          onTouchStart={(e) => { e.preventDefault(); pressDir(0, -1); }} onTouchEnd={(e) => { e.preventDefault(); releaseDir(); }}>▲</div>
+        <div style={{ display: "flex", gap: 2 }}>
+          <div style={btnStyle} onMouseDown={() => pressDir(-1, 0)} onMouseUp={releaseDir} onMouseLeave={releaseDir}
+            onTouchStart={(e) => { e.preventDefault(); pressDir(-1, 0); }} onTouchEnd={(e) => { e.preventDefault(); releaseDir(); }}>◀</div>
+          <div style={btnStyle} onMouseDown={() => pressDir(1, 0)} onMouseUp={releaseDir} onMouseLeave={releaseDir}
+            onTouchStart={(e) => { e.preventDefault(); pressDir(1, 0); }} onTouchEnd={(e) => { e.preventDefault(); releaseDir(); }}>▶</div>
+        </div>
+        <div style={btnStyle} onMouseDown={() => pressDir(0, 1)} onMouseUp={releaseDir} onMouseLeave={releaseDir}
+          onTouchStart={(e) => { e.preventDefault(); pressDir(0, 1); }} onTouchEnd={(e) => { e.preventDefault(); releaseDir(); }}>▼</div>
+      </div>}
+
+      {/* Joystick */}
+      {controlStyle === "joystick" && <div
+        style={{
+          position: "absolute", bottom: 10, right: 10, width: 100, height: 100,
+          borderRadius: 50, backgroundColor: "rgba(255,255,255,0.15)",
+          border: "2px solid rgba(255,255,255,0.3)", touchAction: "none",
+        }}
+        onMouseDown={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const cx = rect.left + 50, cy = rect.top + 50;
+          pressDir((e.clientX - cx) / 50, (e.clientY - cy) / 50);
+          const onMove = (ev: MouseEvent) => {
+            pressDir(Math.max(-1, Math.min(1, (ev.clientX - cx) / 50)), Math.max(-1, Math.min(1, (ev.clientY - cy) / 50)));
+          };
+          const onUp = () => { releaseDir(); window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+          window.addEventListener("mousemove", onMove);
+          window.addEventListener("mouseup", onUp);
+        }}
+        onTouchStart={(e) => {
+          e.preventDefault();
+          const rect = e.currentTarget.getBoundingClientRect();
+          const cx = rect.left + 50, cy = rect.top + 50;
+          const t = e.touches[0];
+          pressDir((t.clientX - cx) / 50, (t.clientY - cy) / 50);
+          const onMove = (ev: TouchEvent) => {
+            ev.preventDefault(); const ct = ev.touches[0];
+            pressDir(Math.max(-1, Math.min(1, (ct.clientX - cx) / 50)), Math.max(-1, Math.min(1, (ct.clientY - cy) / 50)));
+          };
+          const onEnd = () => { releaseDir(); window.removeEventListener("touchmove", onMove); window.removeEventListener("touchend", onEnd); };
+          window.addEventListener("touchmove", onMove, { passive: false });
+          window.addEventListener("touchend", onEnd);
+        }}
+      >
+        <div style={{
+          position: "absolute",
+          top: `calc(50% + ${knobPos.y * 30}px)`,
+          left: `calc(50% + ${knobPos.x * 30}px)`,
+          transform: "translate(-50%,-50%)",
+          width: 30, height: 30, borderRadius: 15,
+          backgroundColor: "rgba(255,255,255,0.5)", border: "2px solid rgba(255,255,255,0.7)",
+          pointerEvents: "none", transition: knobPos.x === 0 && knobPos.y === 0 ? "all 0.15s" : "none",
+        }} />
+      </div>}
+
+      {/* Swipe zone */}
+      {controlStyle === "swipe" && <div
+        style={{
+          position: "absolute", bottom: 10, right: 10, width: 90, height: 90,
+          borderRadius: 16, backgroundColor: "rgba(255,255,255,0.1)",
+          border: "2px dashed rgba(255,255,255,0.3)", touchAction: "none",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontSize: 11, color: "rgba(255,255,255,0.5)", fontWeight: "700",
+          userSelect: "none", WebkitUserSelect: "none",
+        }}
+        onTouchStart={(e) => {
+          e.preventDefault();
+          const t = e.touches[0];
+          const start = { x: t.clientX, y: t.clientY };
+          const onMove = (ev: TouchEvent) => {
+            ev.preventDefault();
+            const ct = ev.touches[0];
+            const sdx = ct.clientX - start.x;
+            const sdy = ct.clientY - start.y;
+            if (Math.abs(sdx) > 5 || Math.abs(sdy) > 5) {
+              const len = Math.sqrt(sdx * sdx + sdy * sdy);
+              pressDir(sdx / len, sdy / len);
+            }
+          };
+          const onEnd = () => { releaseDir(); window.removeEventListener("touchmove", onMove); window.removeEventListener("touchend", onEnd); };
+          window.addEventListener("touchmove", onMove, { passive: false });
+          window.addEventListener("touchend", onEnd);
+        }}
+      >Swipe</div>}
+    </div>
   );
 }

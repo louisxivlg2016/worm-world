@@ -169,6 +169,9 @@ export const FLAG_IMAGES: Record<string, ImageSourcePropType> = {
   Tadjikistan: require("../../drapeau/tadjikistan.png"),
   Taiwan: require("../../drapeau/taiwan.png"),
   Turkmenistan: require("../../drapeau/turkmenistan.png"),
+  Ouzbekistan: require("../../drapeau/ouzbekistan.png"),
+  Malaisie: require("../../drapeau/malaisie.png"),
+  Yemen: require("../../drapeau/yemen.png"),
   // Oceania
   Australie: require("../../drapeau/australie.png"),
   "Nouvelle-Zelande": require("../../drapeau/nouvelle-zelande.png"),

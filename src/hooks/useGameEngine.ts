@@ -531,6 +531,27 @@ function updateWorm(worm: Worm, dt: number, foods: Food[], coins: Coin[], partic
         playerCoinsRef.value++
         getNativeBridge().haptic('light')
         getNativeBridge().playSound('coin')
+        // Play coin pickup sound (instant via Web Audio, fallback HTMLAudio)
+        if (typeof window !== 'undefined') {
+          try {
+            const ctx = (window as any).__audioCtx as AudioContext | undefined
+            const buffer = (window as any).__coinBuffer as AudioBuffer | undefined
+            if (ctx && buffer) {
+              if (ctx.state === 'suspended') ctx.resume()
+              const source = ctx.createBufferSource()
+              source.buffer = buffer
+              const gain = ctx.createGain()
+              let vol = 0.6
+              try { const v = localStorage.getItem('sfxVolume'); if (v) vol = parseFloat(v) } catch {}
+              gain.gain.value = vol
+              source.connect(gain).connect(ctx.destination)
+              source.start(0)
+            } else {
+              const sfx = (window as any).__coinSfx as HTMLAudioElement | undefined
+              if (sfx) { sfx.currentTime = 0; sfx.play().catch(() => {}) }
+            }
+          } catch {}
+        }
         // Spawn flying coin animation toward the coin panel (bottom-left)
         if (flyingCoins && canvasH) {
           flyingCoins.push({

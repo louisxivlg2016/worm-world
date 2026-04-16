@@ -59,8 +59,58 @@ export function AppInner() {
   useEffect(() => {
     const audio = new Audio(backgroundMusic)
     audio.loop = true
-    audio.volume = 0.35
+    let savedVol = 0.35
+    try {
+      const saved = (typeof localStorage !== 'undefined' ? localStorage : null)?.getItem('musicVolume')
+      if (saved) savedVol = parseFloat(saved)
+    } catch {}
+    audio.volume = savedVol
     audio.preload = 'auto'
+
+    // Preload collision sound — both Web Audio API and HTMLAudio as fallback
+    let sfxVol = 0.6
+    try {
+      const s = (typeof localStorage !== 'undefined' ? localStorage : null)?.getItem('sfxVolume')
+      if (s) sfxVol = parseFloat(s)
+    } catch {}
+    if (!(window as any).__chocSfx) {
+      const chocSfx = new Audio('/choc.mp3')
+      chocSfx.volume = sfxVol
+      chocSfx.preload = 'auto'
+      chocSfx.load()
+      ;(window as any).__chocSfx = chocSfx
+    }
+    if (!(window as any).__chocBuffer) {
+      const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext
+      if (AudioCtx) {
+        const ctx = (window as any).__audioCtx || new AudioCtx()
+        ;(window as any).__audioCtx = ctx
+        fetch('/choc.mp3')
+          .then((r) => r.arrayBuffer())
+          .then((buf) => ctx.decodeAudioData(buf))
+          .then((decoded) => { (window as any).__chocBuffer = decoded })
+          .catch(() => {})
+      }
+    }
+    if (!(window as any).__coinBuffer) {
+      const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext
+      if (AudioCtx) {
+        const ctx = (window as any).__audioCtx || new AudioCtx()
+        ;(window as any).__audioCtx = ctx
+        fetch('/coin.mp3')
+          .then((r) => r.arrayBuffer())
+          .then((buf) => ctx.decodeAudioData(buf))
+          .then((decoded) => { (window as any).__coinBuffer = decoded })
+          .catch(() => {})
+      }
+    }
+    if (!(window as any).__coinSfx) {
+      const coinSfx = new Audio('/coin.mp3')
+      coinSfx.volume = sfxVol
+      coinSfx.preload = 'auto'
+      coinSfx.load()
+      ;(window as any).__coinSfx = coinSfx
+    }
     backgroundAudioRef.current = audio
 
     return () => {
