@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useGameEngine, type GameEngineCallbacks } from '@/hooks/useGameEngine'
 import type { GameMode, WormSkin } from '@/types/game'
+import { getEventByMode } from '@/config/events'
 
 interface GameCanvasProps {
   playerName: string
@@ -134,11 +135,28 @@ export function GameCanvas({
       {/* Score */}
       <div style={styles.score}>Score: {score}</div>
 
-      {/* Coins */}
-      <div style={styles.coinPanel}>
-        <span style={{ fontSize: 24 }}>&#x1FA99;</span>
-        <span style={styles.coinText}>{coins}</span>
-      </div>
+      {/* Coins / Event currency */}
+      {(() => {
+        const event = gameMode ? getEventByMode(gameMode) : undefined
+        if (event) {
+          return (
+            <div style={styles.coinPanel}>
+              {event.currencyImage ? (
+                <img src={event.currencyImage} alt="" style={{ width: 28, height: 28 }} />
+              ) : (
+                <span style={{ fontSize: 24 }}>{event.emoji}</span>
+              )}
+              <span style={styles.coinText}>{coins}</span>
+            </div>
+          )
+        }
+        return (
+          <div style={styles.coinPanel}>
+            <span style={{ fontSize: 24 }}>&#x1FA99;</span>
+            <span style={styles.coinText}>{coins}</span>
+          </div>
+        )
+      })()}
 
       {/* Boost bar */}
       <div style={styles.boostContainer}>
