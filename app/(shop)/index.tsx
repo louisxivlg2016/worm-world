@@ -131,6 +131,7 @@ function getHeadOptions(): HeadOption[] {
       unlockKey: e.unlockKey as string | undefined,
       eventId: e.id as string | undefined,
       eventEmoji: e.emoji as string | undefined,
+      currencyImage: e.currencyImage as string | undefined,
     }));
   });
   return [...base, ...eventHeads];
@@ -315,7 +316,12 @@ export default function ShopScreen() {
         <View style={{ flexDirection: "row", gap: 8 }}>
           {GAME_EVENTS.filter(e => (eventGems[e.id] || 0) > 0).map(e => (
             <View key={e.id} style={styles.gemsBar}>
-              <Text style={styles.gemsText}>{e.emoji} {eventGems[e.id] || 0}</Text>
+              {e.currencyImage ? (
+                <Image source={{ uri: e.currencyImage }} style={{ width: 22, height: 22 }} resizeMode="contain" />
+              ) : (
+                <Text style={styles.gemsText}>{e.emoji}</Text>
+              )}
+              <Text style={styles.gemsText}>{eventGems[e.id] || 0}</Text>
             </View>
           ))}
         </View>
@@ -337,10 +343,18 @@ export default function ShopScreen() {
               h.locked && styles.headItemLocked,
             ]}
           >
-            <Text style={[styles.headLabel, h.locked && styles.headLabelLocked]}>
-              {h.locked ? (h.unlockKey ? `${h.eventEmoji || "💎"} 30 ` : "🔒 ") : ""}
-              {h.label}
-            </Text>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+              {h.locked && h.unlockKey && h.currencyImage && (
+                <Image source={{ uri: h.currencyImage }} style={{ width: 18, height: 18 }} resizeMode="contain" />
+              )}
+              <Text style={[styles.headLabel, h.locked && styles.headLabelLocked]}>
+                {h.locked
+                  ? (h.unlockKey
+                      ? (h.currencyImage ? `30 ${h.label}` : `${h.eventEmoji || "💎"} 30 ${h.label}`)
+                      : `🔒 ${h.label}`)
+                  : h.label}
+              </Text>
+            </View>
           </Pressable>
         ))}
       </ScrollView>
@@ -504,7 +518,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   gemsBar: {
-    flexDirection: "row", alignItems: "center", justifyContent: "space-between",
+    flexDirection: "row", alignItems: "center", gap: 6,
     backgroundColor: "rgba(147,197,253,0.12)", borderRadius: 14,
     paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
     marginBottom: spacing.sm,

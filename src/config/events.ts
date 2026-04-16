@@ -18,6 +18,7 @@ export interface GameEvent {
   id: GameMode
   label: string
   emoji: string
+  currencyImage?: string
   costumes: EventCostume[]
   unlockKey: string
   bgImage: string
@@ -85,6 +86,7 @@ export const GAME_EVENTS: GameEvent[] = [
     id: 'cny',
     label: 'Nouvel An Chinois',
     emoji: '🏮',
+    currencyImage: '/cny-coin.png',
     costumes: [
       { id: 'cny', label: 'Lanterne', preview: '/heads/cny.png', bodyTexture: '/heads/cny-body.png' },
       { id: 'cny2', label: 'Dragon', preview: '/heads/cny2.png', bodyTexture: '/heads/cny2-body.png' },
