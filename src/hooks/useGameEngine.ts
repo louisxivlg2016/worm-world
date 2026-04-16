@@ -1685,7 +1685,20 @@ if (IS_DOM) {
   _coinImg.onload = () => { coinImg = _coinImg }
 }
 
-function drawCoins(ctx: CanvasRenderingContext2D, coins: Coin[], camera: Camera, w: number, h: number) {
+// Cache for event-specific coin images
+const eventCoinCache = new Map<string, HTMLImageElement>()
+function getEventCoinImg(src: string): HTMLImageElement | null {
+  if (!IS_DOM) return null
+  const cached = eventCoinCache.get(src)
+  if (cached) return cached
+  const img = new Image()
+  img.src = src
+  eventCoinCache.set(src, img)
+  return img
+}
+
+function drawCoins(ctx: CanvasRenderingContext2D, coins: Coin[], camera: Camera, w: number, h: number, eventCoinSrc?: string) {
+  const activeCoinImg = eventCoinSrc ? getEventCoinImg(eventCoinSrc) : coinImg
   const time = Date.now() * 0.004
   for (const c of coins) {
     const p = worldToScreen(c.x, c.y, camera, w, h)
@@ -1707,8 +1720,8 @@ function drawCoins(ctx: CanvasRenderingContext2D, coins: Coin[], camera: Camera,
     }
 
     // Draw coin image
-    if (coinImg) {
-      ctx.drawImage(coinImg, p.x - size, p.y - size, size * 2, size * 2)
+    if (activeCoinImg && activeCoinImg.complete && activeCoinImg.naturalWidth > 0) {
+      ctx.drawImage(activeCoinImg, p.x - size, p.y - size, size * 2, size * 2)
     } else {
       ctx.beginPath()
       ctx.arc(p.x, p.y, size, 0, Math.PI * 2)
@@ -2839,7 +2852,7 @@ export function useGameEngine(
       drawBackground(ctx, s.camera, canvas.width, canvas.height, s.player, s.gameMode)
       drawFood(ctx, s.foods, s.camera, canvas.width, canvas.height)
       drawChests(ctx, s.chests, s.camera, canvas.width, canvas.height)
-      drawCoins(ctx, s.coins, s.camera, canvas.width, canvas.height)
+      drawCoins(ctx, s.coins, s.camera, canvas.width, canvas.height, s.gameMode ? getEventByMode(s.gameMode)?.currencyImage : undefined)
       drawPotions(ctx, s.potions, s.camera, canvas.width, canvas.height)
       drawParticles(ctx, s.particles, s.camera, canvas.width, canvas.height)
 
