@@ -1806,18 +1806,24 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   const colors = worm.skin.colors
   const segR = radius * camera.zoom
 
-  // Quick cull: use actual body bounding box (head + tail + midpoint) instead of head-only
-  // so long worms that wrap around don't pop in/out when the head goes off-screen
-  const headP = worldToScreen(segments[0].x, segments[0].y, camera, w, h)
-  const tailIdx = segments.length - 1
-  const tailP = worldToScreen(segments[tailIdx].x, segments[tailIdx].y, camera, w, h)
-  const midIdx = Math.floor(segments.length / 2)
-  const midP = worldToScreen(segments[midIdx].x, segments[midIdx].y, camera, w, h)
-  const minX = Math.min(headP.x, tailP.x, midP.x)
-  const maxX = Math.max(headP.x, tailP.x, midP.x)
-  const minY = Math.min(headP.y, tailP.y, midP.y)
-  const maxY = Math.max(headP.y, tailP.y, midP.y)
-  const margin = segR + 20
+  // Quick cull: sample many points along the body to get an accurate bounding box
+  // Long curvy worms need multiple samples — 3 points miss S-shapes where the middle is visible
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
+  const sampleStep = Math.max(1, Math.floor(segments.length / 12))
+  for (let i = 0; i < segments.length; i += sampleStep) {
+    const sp = worldToScreen(segments[i].x, segments[i].y, camera, w, h)
+    if (sp.x < minX) minX = sp.x
+    if (sp.x > maxX) maxX = sp.x
+    if (sp.y < minY) minY = sp.y
+    if (sp.y > maxY) maxY = sp.y
+  }
+  // Always include tail
+  const tailP = worldToScreen(segments[segments.length - 1].x, segments[segments.length - 1].y, camera, w, h)
+  if (tailP.x < minX) minX = tailP.x
+  if (tailP.x > maxX) maxX = tailP.x
+  if (tailP.y < minY) minY = tailP.y
+  if (tailP.y > maxY) maxY = tailP.y
+  const margin = segR + 40
   if (maxX < -margin || minX > w + margin || maxY < -margin || minY > h + margin) return
 
   const invincible = worm.invincible > 0
