@@ -348,29 +348,50 @@ const LANG_FLAG_IMAGES: Record<string, any> = Object.fromEntries(
     .filter(([, img]) => img),
 );
 
+// Preload all flag images on module load so they are cached in the browser
+if (typeof window !== "undefined") {
+  Object.values(LANG_FLAG_IMAGES).forEach((src: any) => {
+    const uri = typeof src === "string" ? src : src?.uri || src?.default;
+    if (uri && typeof uri === "string") {
+      const preImg = new window.Image();
+      preImg.src = uri;
+    }
+  });
+  Object.values(FLAG_IMAGES).forEach((src: any) => {
+    const uri = typeof src === "string" ? src : src?.uri || src?.default;
+    if (uri && typeof uri === "string") {
+      const preImg = new window.Image();
+      preImg.src = uri;
+    }
+  });
+}
+
 const LangFlag = ({ code }: { code: string }) => {
   const img = LANG_FLAG_IMAGES[code];
-  if (img) {
-    return (
-      <Image
-        source={img}
-        style={{ width: 24, height: 16, borderRadius: 3, borderWidth: 1, borderColor: "rgba(0,0,0,0.3)" }}
-        resizeMode="cover"
-      />
-    );
-  }
-  // Fallback: colored stripes for languages without country flag
-  const flag = LANG_FLAGS[code] || { cols: ["#555", "#888"], orientation: "h" as const };
+  // Use colored-stripe fallback as placeholder background
+  const flag = LANG_FLAGS[code] || { cols: ["#444", "#555"], orientation: "h" as const };
   const isH = flag.orientation === "h";
-  return (
+  const placeholder = (
     <View style={{
-      width: 24, height: 16, borderRadius: 3, overflow: "hidden",
+      position: "absolute", top: 0, left: 0, width: 24, height: 16, borderRadius: 3, overflow: "hidden",
       flexDirection: isH ? "column" : "row",
-      borderWidth: 1, borderColor: "rgba(0,0,0,0.3)",
     }}>
       {flag.cols.map((c, i) => (
         <View key={i} style={{ flex: 1, backgroundColor: c }} />
       ))}
+    </View>
+  );
+  if (img) {
+    return (
+      <View style={{ width: 24, height: 16, borderRadius: 3, overflow: "hidden", borderWidth: 1, borderColor: "rgba(0,0,0,0.3)" }}>
+        {placeholder}
+        <Image source={img} style={{ width: 24, height: 16 }} resizeMode="cover" />
+      </View>
+    );
+  }
+  return (
+    <View style={{ width: 24, height: 16, borderRadius: 3, overflow: "hidden", borderWidth: 1, borderColor: "rgba(0,0,0,0.3)" }}>
+      {placeholder}
     </View>
   );
 };

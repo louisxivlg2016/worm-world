@@ -75,12 +75,43 @@ export function GameCanvas({
     audio.volume = savedVol
     audio.play().catch(() => {})
 
-    // Preload collision sound
+    // Read SFX volume
+    let sfxVol = 0.6
+    try {
+      const s = (typeof localStorage !== 'undefined' ? localStorage : null)?.getItem('sfxVolume')
+      if (s) sfxVol = parseFloat(s)
+    } catch {}
+
+    // Preload collision sound (HTMLAudio fallback)
     const chocSfx = new Audio('/choc.mp3')
-    chocSfx.volume = savedVol
+    chocSfx.volume = sfxVol
     chocSfx.preload = 'auto'
     chocSfx.load()
     ;(window as any).__chocSfx = chocSfx
+
+    // Preload coin pickup sound (HTMLAudio fallback)
+    if (!(window as any).__coinSfx) {
+      const coinSfx = new Audio('/coin.mp3')
+      coinSfx.volume = sfxVol
+      coinSfx.preload = 'auto'
+      coinSfx.load()
+      ;(window as any).__coinSfx = coinSfx
+    }
+
+    // Preload Web Audio buffers for instant playback
+    const AudioCtx = (window as any).AudioContext || (window as any).webkitAudioContext
+    if (AudioCtx) {
+      const ctx = (window as any).__audioCtx || new AudioCtx()
+      ;(window as any).__audioCtx = ctx
+      if (!(window as any).__chocBuffer) {
+        fetch('/choc.mp3').then((r) => r.arrayBuffer()).then((b) => ctx.decodeAudioData(b))
+          .then((d: AudioBuffer) => { (window as any).__chocBuffer = d }).catch(() => {})
+      }
+      if (!(window as any).__coinBuffer) {
+        fetch('/coin.mp3').then((r) => r.arrayBuffer()).then((b) => ctx.decodeAudioData(b))
+          .then((d: AudioBuffer) => { (window as any).__coinBuffer = d }).catch(() => {})
+      }
+    }
 
     const hintTimer = setTimeout(() => setShowHint(false), 5000)
 

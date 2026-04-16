@@ -21,6 +21,17 @@ import { SKINS } from "@/types/game";
 import { getStorage } from "@/services/StorageService";
 import { GAME_EVENTS } from "@/config/events";
 
+// Preload all flag images on module load so they are cached in the browser
+if (typeof window !== "undefined") {
+  Object.values(FLAG_IMAGES).forEach((src: any) => {
+    const uri = typeof src === "string" ? src : src?.uri || src?.default;
+    if (uri && typeof uri === "string") {
+      const preImg = new window.Image();
+      preImg.src = uri;
+    }
+  });
+}
+
 type FlagSkin = {
   name: string;
   colors: [string, string, string, string];
