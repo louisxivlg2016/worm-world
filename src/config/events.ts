@@ -323,6 +323,7 @@ export const GAME_EVENTS: GameEvent[] = [
     id: 'bastille',
     label: '14 Juillet',
     emoji: '🇫🇷',
+    currencyImage: '/bastille-coin.png',
     costumes: [
       { id: 'bastille', label: 'Cocarde', preview: '/heads/bastille.png', bodyTexture: '/heads/bastille-body.png' },
       { id: 'bastille2', label: 'Béret', preview: '/heads/bastille2.png', bodyTexture: '/heads/bastille2-body.png' },
