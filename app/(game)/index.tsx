@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { useGameState } from "@/context/GameStateContext";
 import { SKINS } from "@/types/game";
-import { GAME_EVENTS } from "@/config/events";
+import { GAME_EVENTS, isEventActive } from "@/config/events";
 import { getStorage } from "@/services/StorageService";
 import { colors, spacing } from "@/expo/theme";
 
@@ -21,8 +21,8 @@ export default function HomeScreen() {
   const [selectedSkin, setSelectedSkin] = useState(0);
   const activeSkin = customSkin ?? SKINS[selectedSkin] ?? SKINS[0];
 
-  // Show ALL events (not filtered by date or unlock state)
-  const activeEvents = GAME_EVENTS;
+  // Only show events during their actual date window
+  const activeEvents = GAME_EVENTS.filter((e) => isEventActive(e));
 
   const saveName = (n: string) => {
     setName(n);

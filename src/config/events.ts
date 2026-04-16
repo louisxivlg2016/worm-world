@@ -474,9 +474,8 @@ export function isEventActive(event: GameEvent): boolean {
   if (DEV_MODE) return true
 
   const today = new Date()
-  // Events with per-year dates (moving holidays like Easter/Ramadan) use exact dates
-  // Other events use a 14-day window around fixed dates
-  const WINDOW_DAYS = event.datesByYear ? 0 : 14
+  // All events use exact dates — festivals only show on their actual days
+  const WINDOW_DAYS = 0
 
   const year = today.getFullYear()
   const yearOverride = event.datesByYear?.[year]
