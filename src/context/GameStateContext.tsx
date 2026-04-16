@@ -28,11 +28,10 @@ interface GameStateValue {
   addCoins: (amount: number) => void;
   spendCoins: (amount: number) => void;
 
-  // Gems (event currency)
-  totalGems: number;
-  addGems: (amount: number) => void;
-  spendGems: (amount: number) => void;
-  unlockEventCostume: (unlockKey: string, cost: number) => boolean;
+  // Per-event currencies (one currency per festival)
+  eventGems: Record<string, number>;
+  addEventGems: (eventId: string, amount: number) => void;
+  unlockEventCostumeForEvent: (eventId: string, unlockKey: string, cost: number) => boolean;
 
   // Room/multiplayer
   roomSlug: string | undefined;
@@ -79,13 +78,11 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
     }
     return parseInt(saved, 10) || 0;
   });
-  const [totalGems, setTotalGems] = useState(() => {
-    const saved = getStorage().getItem("totalGems");
-    if (!saved) {
-      getStorage().setItem("totalGems", "50");
-      return 50;
-    }
-    return parseInt(saved, 10) || 0;
+  const [eventGems, setEventGems] = useState<Record<string, number>>(() => {
+    try {
+      const saved = getStorage().getItem("eventGems");
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
   });
   const [roomSlug, setRoomSlug] = useState<string | undefined>();
   const [roomId, setRoomId] = useState<string | undefined>();
@@ -111,28 +108,21 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const addGems = useCallback((amount: number) => {
-    setTotalGems(prev => {
-      const next = prev + amount;
-      getStorage().setItem("totalGems", String(next));
+  const addEventGems = useCallback((eventId: string, amount: number) => {
+    setEventGems(prev => {
+      const next = { ...prev, [eventId]: (prev[eventId] || 0) + amount };
+      getStorage().setItem("eventGems", JSON.stringify(next));
       return next;
     });
   }, []);
 
-  const spendGems = useCallback((amount: number) => {
-    setTotalGems(prev => {
-      const next = Math.max(0, prev - amount);
-      getStorage().setItem("totalGems", String(next));
-      return next;
-    });
-  }, []);
-
-  const unlockEventCostume = useCallback((unlockKey: string, cost: number) => {
+  const unlockEventCostumeForEvent = useCallback((eventId: string, unlockKey: string, cost: number) => {
     let success = false;
-    setTotalGems(prev => {
-      if (prev < cost) return prev;
-      const next = prev - cost;
-      getStorage().setItem("totalGems", String(next));
+    setEventGems(prev => {
+      const bal = prev[eventId] || 0;
+      if (bal < cost) return prev;
+      const next = { ...prev, [eventId]: bal - cost };
+      getStorage().setItem("eventGems", JSON.stringify(next));
       getStorage().setItem(unlockKey, "true");
       success = true;
       return next;
@@ -161,14 +151,17 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
   const handleDeath = useCallback((score: number, length: number, coins: number, kills: number) => {
     setDeathInfo({ score, length, coins, kills });
     addCoins(coins);
-    // Award gems: 1 per kill + 1 per 100 score points
-    const gemReward = kills + Math.floor(score / 100);
-    if (gemReward > 0) {
-      setTotalGems(prev => {
-        const next = prev + gemReward;
-        getStorage().setItem("totalGems", String(next));
-        return next;
-      });
+    // Award per-event gems if playing an event mode
+    const isEvent = gameMode && !["ffa", "battle", "coins", "ctf", "race"].includes(gameMode);
+    if (isEvent) {
+      const gemReward = kills + Math.floor(score / 50);
+      if (gemReward > 0) {
+        setEventGems(prev => {
+          const next = { ...prev, [gameMode]: (prev[gameMode] || 0) + gemReward };
+          getStorage().setItem("eventGems", JSON.stringify(next));
+          return next;
+        });
+      }
     }
     const elapsed = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
     const stats = loadStats();
@@ -182,15 +175,18 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
   }, [addCoins]);
 
   const handleEventWin = useCallback((unlockKey: string) => {
-    // Reaching the event milestone now awards gems instead of auto-unlocking
-    setTotalGems(prev => {
-      const next = prev + 50;
-      getStorage().setItem("totalGems", String(next));
-      return next;
-    });
+    // Reaching the event milestone awards 50 gems of THIS event's currency
+    const eventId = gameMode;
+    if (eventId && !["ffa", "battle", "coins", "ctf", "race"].includes(eventId)) {
+      setEventGems(prev => {
+        const next = { ...prev, [eventId]: (prev[eventId] || 0) + 50 };
+        getStorage().setItem("eventGems", JSON.stringify(next));
+        return next;
+      });
+    }
     setWonEventUnlockKey(unlockKey);
     setIsPlaying(false);
-  }, []);
+  }, [gameMode]);
 
   const applySkin = useCallback((skin: WormSkin, cost: number) => {
     spendCoins(cost);
@@ -207,7 +203,7 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
       playerSkin, setPlayerSkin,
       customSkin, setCustomSkin,
       totalCoins, addCoins, spendCoins,
-      totalGems, addGems, spendGems, unlockEventCostume,
+      eventGems, addEventGems, unlockEventCostumeForEvent,
       roomSlug, roomId, gameMode, seed, setRoomInfo,
       deathInfo,
       startGame, handleDeath, handleEventWin, applySkin,

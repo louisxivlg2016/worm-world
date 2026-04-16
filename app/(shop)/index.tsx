@@ -129,6 +129,8 @@ function getHeadOptions(): HeadOption[] {
       label: `${c.label} ${e.emoji}`,
       locked,
       unlockKey: e.unlockKey as string | undefined,
+      eventId: e.id as string | undefined,
+      eventEmoji: e.emoji as string | undefined,
     }));
   });
   return [...base, ...eventHeads];
@@ -165,21 +167,25 @@ export default function ShopScreen() {
   const [bodyStyle, setBodyStyle] = useState<"circles" | "tube">("circles");
   const [selectedFlag, setSelectedFlag] = useState<string | null>(null);
 
-  const { totalCoins: coins, totalGems: gems, unlockEventCostume } = useGameState();
+  const { totalCoins: coins, eventGems, unlockEventCostumeForEvent } = useGameState();
   const [, setUnlockTick] = useState(0);
 
-  const headOptions = useMemo(() => getHeadOptions(), [gems]);
+  const headOptions = useMemo(() => getHeadOptions(), [eventGems]);
 
-  const handleUnlockEvent = useCallback((unlockKey: string) => {
+  const handleUnlockEvent = useCallback((eventId: string, unlockKey: string) => {
     const EVENT_COSTUME_COST = 30;
-    if (gems < EVENT_COSTUME_COST) {
-      if (typeof window !== "undefined") window.alert("Pas assez de gemmes 💎 !");
-      else Alert.alert("Pas assez de gemmes 💎 !");
+    const bal = eventGems[eventId] || 0;
+    const event = GAME_EVENTS.find((e) => e.id === eventId);
+    const icon = event?.emoji || "💎";
+    if (bal < EVENT_COSTUME_COST) {
+      const msg = `Pas assez de ${icon} ! (${bal}/${EVENT_COSTUME_COST})`;
+      if (typeof window !== "undefined") window.alert(msg);
+      else Alert.alert(msg);
       return;
     }
-    const ok = unlockEventCostume(unlockKey, EVENT_COSTUME_COST);
+    const ok = unlockEventCostumeForEvent(eventId, unlockKey, EVENT_COSTUME_COST);
     if (ok) setUnlockTick((x) => x + 1);
-  }, [gems, unlockEventCostume]);
+  }, [eventGems, unlockEventCostumeForEvent]);
 
   const filteredFlags = useMemo(() => {
     if (!flagSearch.trim()) return FLAG_SKINS;
@@ -304,18 +310,23 @@ export default function ShopScreen() {
         value={headSearch}
         onChangeText={setHeadSearch}
       />
-      {/* Gems balance (for event costume purchases) */}
-      <View style={styles.gemsBar}>
-        <Text style={styles.gemsText}>💎 {gems}</Text>
-        <Text style={styles.gemsHint}>Costume événement = 30 💎</Text>
-      </View>
+      {/* Per-event currency balances */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.sm }}>
+        <View style={{ flexDirection: "row", gap: 8 }}>
+          {GAME_EVENTS.filter(e => (eventGems[e.id] || 0) > 0).map(e => (
+            <View key={e.id} style={styles.gemsBar}>
+              <Text style={styles.gemsText}>{e.emoji} {eventGems[e.id] || 0}</Text>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.headRow}>
         {filteredHeads.map((h) => (
           <Pressable
             key={h.id}
             onPress={() => {
-              if (h.locked && h.unlockKey) {
-                handleUnlockEvent(h.unlockKey);
+              if (h.locked && h.unlockKey && h.eventId) {
+                handleUnlockEvent(h.eventId, h.unlockKey);
               } else if (!h.locked) {
                 setHeadType(h.id);
               }
@@ -327,7 +338,7 @@ export default function ShopScreen() {
             ]}
           >
             <Text style={[styles.headLabel, h.locked && styles.headLabelLocked]}>
-              {h.locked ? (h.unlockKey ? "💎 30 " : "🔒 ") : ""}
+              {h.locked ? (h.unlockKey ? `${h.eventEmoji || "💎"} 30 ` : "🔒 ") : ""}
               {h.label}
             </Text>
           </Pressable>
