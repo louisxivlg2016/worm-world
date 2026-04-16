@@ -1793,12 +1793,19 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   const colors = worm.skin.colors
   const segR = radius * camera.zoom
 
-  // Quick cull: skip worm entirely if head is way off-screen
-  // (body can extend, so use generous margin based on segment count)
+  // Quick cull: use actual body bounding box (head + tail + midpoint) instead of head-only
+  // so long worms that wrap around don't pop in/out when the head goes off-screen
   const headP = worldToScreen(segments[0].x, segments[0].y, camera, w, h)
-  const bodyMargin = Math.min(segments.length * 6 * camera.zoom, w + h)
-  if (headP.x < -bodyMargin || headP.x > w + bodyMargin ||
-      headP.y < -bodyMargin || headP.y > h + bodyMargin) return
+  const tailIdx = segments.length - 1
+  const tailP = worldToScreen(segments[tailIdx].x, segments[tailIdx].y, camera, w, h)
+  const midIdx = Math.floor(segments.length / 2)
+  const midP = worldToScreen(segments[midIdx].x, segments[midIdx].y, camera, w, h)
+  const minX = Math.min(headP.x, tailP.x, midP.x)
+  const maxX = Math.max(headP.x, tailP.x, midP.x)
+  const minY = Math.min(headP.y, tailP.y, midP.y)
+  const maxY = Math.max(headP.y, tailP.y, midP.y)
+  const margin = segR + 20
+  if (maxX < -margin || minX > w + margin || maxY < -margin || minY > h + margin) return
 
   const invincible = worm.invincible > 0
   const invAlpha = invincible ? 0.3 * Math.sin(Date.now() * 0.01) : 0
