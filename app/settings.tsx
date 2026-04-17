@@ -658,7 +658,11 @@ export default function SettingsPage() {
   };
 
   const goBack = () => {
-    router.replace("/" as any);
+    if (typeof window !== "undefined") {
+      window.history.back();
+    } else {
+      router.replace("/" as any);
+    }
   };
 
   const selectedPack = FOOD_PACKS.find((p) => p.id === foodStyle) || FOOD_PACKS[0];
