@@ -1835,7 +1835,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
 
   // Smooth tube body rendering (for flags or tube body style)
   const isTube = worm.skin.bodyStyle === 'tube'
-  const isFlag = bodyTexImg && (worm.skin.isFlag || worm.skin.bodyTexture) && !isTube
+  const isFlag = bodyTexImg && worm.skin.isFlag && !isTube
 
   // Flag skins: clip circles + stretch one texture over the whole body
   if (isFlag && bodyTexImg) {
