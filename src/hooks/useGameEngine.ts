@@ -2019,19 +2019,8 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
       ctx.beginPath()
       ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
       ctx.clip()
-      // Draw texture filling the circle — offset by segment index so adjacent segments show adjacent parts
-      const texW = bodyTexImg.naturalWidth
-      const texH = bodyTexImg.naturalHeight
-      const aspect = texW / texH
-      const drawH = segR * 2
-      const drawW = drawH * aspect
-      // Shift texture horizontally based on segment position so stripes stick to body
-      const offsetX = (i * segR * 0.8) % drawW
-      ctx.drawImage(bodyTexImg, p.x - segR - offsetX, p.y - segR, drawW, drawH)
-      // Fill any gap on the right with a second copy
-      if (offsetX > 0) {
-        ctx.drawImage(bodyTexImg, p.x - segR - offsetX + drawW, p.y - segR, drawW, drawH)
-      }
+      // Draw texture filling the entire circle
+      ctx.drawImage(bodyTexImg, p.x - segR, p.y - segR, segR * 2, segR * 2)
       ctx.restore()
     } else {
       // Shadow
