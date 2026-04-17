@@ -19,11 +19,7 @@ export default function DeadScreen() {
 
   const retry = () => {
     startGame(playerName, playerSkin, gameMode, roomSlug, roomId, seed);
-    if (isRace) {
-      router.replace({ pathname: "/(game)/play", params: { mode: "race" } });
-    } else {
-      router.replace("/(game)/play");
-    }
+    router.replace({ pathname: "/(game)/play", params: { mode: gameMode } });
   };
 
   const backToMenu = () => {
