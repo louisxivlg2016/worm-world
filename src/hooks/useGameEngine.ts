@@ -2015,12 +2015,26 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
     if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
 
     if (bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0) {
+      // Calculate body direction angle from adjacent segments
+      let angle = 0
+      if (i > 0) {
+        const prev = segments[i - 1]
+        const pp = worldToScreen(prev.x, prev.y, camera, w, h)
+        angle = Math.atan2(pp.y - p.y, pp.x - p.x)
+      } else if (segments.length > 1) {
+        const next = segments[1]
+        const np = worldToScreen(next.x, next.y, camera, w, h)
+        angle = Math.atan2(p.y - np.y, p.x - np.x)
+      }
+      // Draw larger circle (overlap to hide segment gaps) with texture rotated along body
+      const bigR = segR * 1.3
       ctx.save()
       ctx.beginPath()
-      ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
+      ctx.arc(p.x, p.y, bigR, 0, Math.PI * 2)
       ctx.clip()
-      // Draw texture filling the entire circle
-      ctx.drawImage(bodyTexImg, p.x - segR, p.y - segR, segR * 2, segR * 2)
+      ctx.translate(p.x, p.y)
+      ctx.rotate(angle)
+      ctx.drawImage(bodyTexImg, -bigR, -bigR, bigR * 2, bigR * 2)
       ctx.restore()
     } else {
       // Shadow
