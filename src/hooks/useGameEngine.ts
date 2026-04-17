@@ -1835,7 +1835,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
 
   // Smooth tube body rendering (for flags or tube body style)
   const isTube = worm.skin.bodyStyle === 'tube'
-  const isFlag = bodyTexImg && (worm.skin.isFlag || worm.skin.bodyTexture) && !isTube
+  const isFlag = bodyTexImg && worm.skin.isFlag && !isTube
 
   // Flag skins: clip circles + stretch one texture over the whole body
   if (isFlag && bodyTexImg) {
@@ -2014,16 +2014,24 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
     const p = worldToScreen(seg.x, seg.y, camera, w, h)
     if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
 
-    if (bodyTexImg) {
-      const textureOffsetX = BODY_TEXTURE_OFFSETS[bodyTexKey ?? ''] ?? 0
-      const textureScale = BODY_TEXTURE_SCALES[bodyTexKey ?? ''] ?? 1
+    if (bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0) {
       ctx.save()
       ctx.beginPath()
       ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
       ctx.clip()
-      ctx.fillStyle = colors[i % colors.length]
-      ctx.fillRect(p.x - segR, p.y - segR, segR * 2, segR * 2)
-      drawContainedTextureInCircle(ctx, bodyTexImg, p.x, p.y, segR, textureOffsetX, textureScale)
+      // Draw texture filling the circle — offset by segment index so adjacent segments show adjacent parts
+      const texW = bodyTexImg.naturalWidth
+      const texH = bodyTexImg.naturalHeight
+      const aspect = texW / texH
+      const drawH = segR * 2
+      const drawW = drawH * aspect
+      // Shift texture horizontally based on segment position so stripes stick to body
+      const offsetX = (i * segR * 0.8) % drawW
+      ctx.drawImage(bodyTexImg, p.x - segR - offsetX, p.y - segR, drawW, drawH)
+      // Fill any gap on the right with a second copy
+      if (offsetX > 0) {
+        ctx.drawImage(bodyTexImg, p.x - segR - offsetX + drawW, p.y - segR, drawW, drawH)
+      }
       ctx.restore()
     } else {
       // Shadow
