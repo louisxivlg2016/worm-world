@@ -71,12 +71,15 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
     } catch { return null; }
   });
   const [totalCoins, setTotalCoins] = useState(() => {
+    const isLocal = typeof window !== "undefined" && (window.location?.hostname === "localhost" || window.location?.hostname === "127.0.0.1");
+    if (isLocal) {
+      getStorage().setItem("totalCoins", "90000000");
+      return 90000000;
+    }
     const saved = getStorage().getItem("totalCoins");
     if (!saved) {
-      const isLocal = typeof window !== "undefined" && (window.location?.hostname === "localhost" || window.location?.hostname === "127.0.0.1");
-      const startCoins = isLocal ? 90000000 : 9000;
-      getStorage().setItem("totalCoins", String(startCoins));
-      return startCoins;
+      getStorage().setItem("totalCoins", "9000");
+      return 9000;
     }
     return parseInt(saved, 10) || 0;
   });

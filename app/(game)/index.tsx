@@ -9,7 +9,7 @@ import { getStorage } from "@/services/StorageService";
 import { colors, spacing } from "@/expo/theme";
 
 export default function HomeScreen() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 600;
@@ -21,8 +21,9 @@ export default function HomeScreen() {
   const [selectedSkin, setSelectedSkin] = useState(0);
   const activeSkin = customSkin ?? SKINS[selectedSkin] ?? SKINS[0];
 
-  // Only show events during their actual date window
-  const activeEvents = GAME_EVENTS.filter((e) => isEventActive(e));
+  const userLang = (i18n.language || "fr").split("-")[0];
+  // Show events: universal (no lang) + matching user's language
+  const activeEvents = GAME_EVENTS.filter((e) => isEventActive(e) && (!e.lang || e.lang === userLang));
 
   const saveName = (n: string) => {
     setName(n);
