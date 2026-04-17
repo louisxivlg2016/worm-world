@@ -23,7 +23,11 @@ export default function DeadScreen() {
   };
 
   const backToMenu = () => {
-    router.dismissAll();
+    if (typeof window !== "undefined") {
+      window.location.href = "/";
+    } else {
+      router.dismissAll();
+    }
   };
 
   return (
