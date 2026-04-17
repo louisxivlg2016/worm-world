@@ -98,6 +98,7 @@ const resources = {
     tabMove: 'Contrôle', headerMove: 'Contrôle',
     ctrl_mouse: 'Souris', ctrl_buttons: 'Boutons', ctrl_joystick: 'Joystick', ctrl_swipe: 'Glisser',
     tabVolume: 'Volume', headerVolume: 'Son', musicVolume: 'Musique', sfxVolume: 'Effets', testSound: 'Tester',
+    event_newyear: 'Nouvel An', event_valentine: 'St Valentin', event_cny: 'Nouvel An Chinois', event_carnival: 'Carnaval', event_holi: 'Holi', event_stpatrick: 'St Patrick', event_ramadan: 'Ramadan', event_eid: 'Eid', event_easter: 'Pâques', event_mayday: 'Fête du Travail', event_summer: 'Été', event_july4th: '4 Juillet', event_bastille: '14 Juillet', event_halloween: 'Halloween', event_muertos: 'Día de Muertos', event_diwali: 'Diwali', event_thanksgiving: 'Thanksgiving', event_noel: 'Noël', event_reveillon: 'Réveillon',
   }},
   en: { translation: {
     title: 'WORMS ZONE', subtitle: '. I O',
@@ -133,6 +134,7 @@ const resources = {
     tabMove: 'Controls', headerMove: 'Controls',
     ctrl_mouse: 'Mouse', ctrl_buttons: 'Buttons', ctrl_joystick: 'Joystick', ctrl_swipe: 'Swipe',
     tabVolume: 'Volume', headerVolume: 'Sound', musicVolume: 'Music', sfxVolume: 'Effects', testSound: 'Test',
+    event_newyear: 'New Year', event_valentine: 'Valentine\'s', event_cny: 'Chinese New Year', event_carnival: 'Carnival', event_holi: 'Holi', event_stpatrick: 'St Patrick', event_ramadan: 'Ramadan', event_eid: 'Eid', event_easter: 'Easter', event_mayday: 'May Day', event_summer: 'Summer', event_july4th: 'July 4th', event_bastille: 'Bastille Day', event_halloween: 'Halloween', event_muertos: 'Day of the Dead', event_diwali: 'Diwali', event_thanksgiving: 'Thanksgiving', event_noel: 'Christmas', event_reveillon: 'New Year\'s Eve',
   }},
   es: { translation: {
     title: 'WORMS ZONE', subtitle: '. I O',
@@ -168,6 +170,7 @@ const resources = {
     tabMove: 'Control', headerMove: 'Control',
     ctrl_mouse: 'Ratón', ctrl_buttons: 'Botones', ctrl_joystick: 'Joystick', ctrl_swipe: 'Deslizar',
     tabVolume: 'Volumen', headerVolume: 'Sonido', musicVolume: 'Música', sfxVolume: 'Efectos', testSound: 'Probar',
+    event_newyear: 'Año Nuevo', event_valentine: 'San Valentín', event_cny: 'Año Nuevo Chino', event_carnival: 'Carnaval', event_holi: 'Holi', event_stpatrick: 'San Patricio', event_ramadan: 'Ramadán', event_eid: 'Eid', event_easter: 'Pascua', event_mayday: 'Día del Trabajo', event_summer: 'Verano', event_july4th: '4 de Julio', event_bastille: 'Día de la Bastilla', event_halloween: 'Halloween', event_muertos: 'Día de Muertos', event_diwali: 'Diwali', event_thanksgiving: 'Acción de Gracias', event_noel: 'Navidad', event_reveillon: 'Nochevieja',
   }},
   it: { translation: {
     title: 'WORMS ZONE', subtitle: '. I O',
@@ -203,6 +206,7 @@ const resources = {
     tabMove: 'Controllo', headerMove: 'Controllo',
     ctrl_mouse: 'Mouse', ctrl_buttons: 'Pulsanti', ctrl_joystick: 'Joystick', ctrl_swipe: 'Scorrere',
     tabVolume: 'Volume', headerVolume: 'Suono', musicVolume: 'Musica', sfxVolume: 'Effetti', testSound: 'Prova',
+    event_newyear: 'Capodanno', event_valentine: 'San Valentino', event_cny: 'Capodanno Cinese', event_carnival: 'Carnevale', event_holi: 'Holi', event_stpatrick: 'San Patrizio', event_ramadan: 'Ramadan', event_eid: 'Eid', event_easter: 'Pasqua', event_mayday: 'Festa del Lavoro', event_summer: 'Estate', event_july4th: '4 Luglio', event_bastille: 'Presa della Bastiglia', event_halloween: 'Halloween', event_muertos: 'Giorno dei Morti', event_diwali: 'Diwali', event_thanksgiving: 'Ringraziamento', event_noel: 'Natale', event_reveillon: 'Capodanno',
   }},
   ru: { translation: {
     title: 'WORMS ZONE', subtitle: '. I O',
@@ -238,6 +242,7 @@ const resources = {
     tabMove: 'Управление', headerMove: 'Управление',
     ctrl_mouse: 'Мышь', ctrl_buttons: 'Кнопки', ctrl_joystick: 'Джойстик', ctrl_swipe: 'Свайп',
     tabVolume: 'Громкость', headerVolume: 'Звук', musicVolume: 'Музыка', sfxVolume: 'Эффекты', testSound: 'Тест',
+    event_newyear: 'Новый год', event_valentine: 'День Валентина', event_cny: 'Китайский Новый год', event_carnival: 'Карнавал', event_holi: 'Холи', event_stpatrick: 'День Патрика', event_ramadan: 'Рамадан', event_eid: 'Ид', event_easter: 'Пасха', event_mayday: 'День труда', event_summer: 'Лето', event_july4th: '4 Июля', event_bastille: 'День Бастилии', event_halloween: 'Хэллоуин', event_muertos: 'День мёртвых', event_diwali: 'Дивали', event_thanksgiving: 'День благодарения', event_noel: 'Рождество', event_reveillon: 'Новогодняя ночь',
   }},
   zh: { translation: {
     title: 'WORMS ZONE', subtitle: '. I O',
@@ -273,6 +278,7 @@ const resources = {
     tabMove: '控制', headerMove: '控制',
     ctrl_mouse: '鼠标', ctrl_buttons: '按钮', ctrl_joystick: '摇杆', ctrl_swipe: '滑动',
     tabVolume: '音量', headerVolume: '声音', musicVolume: '音乐', sfxVolume: '音效', testSound: '测试',
+    event_newyear: '新年', event_valentine: '情人节', event_cny: '春节', event_carnival: '嘉年华', event_holi: '洒红节', event_stpatrick: '圣帕特里克', event_ramadan: '斋月', event_eid: '开斋节', event_easter: '复活节', event_mayday: '劳动节', event_summer: '夏天', event_july4th: '独立日', event_bastille: '巴士底日', event_halloween: '万圣节', event_muertos: '亡灵节', event_diwali: '排灯节', event_thanksgiving: '感恩节', event_noel: '圣诞节', event_reveillon: '除夕',
   }},
   ar: { translation: {
     title: 'WORMS ZONE', subtitle: '. I O',
@@ -308,6 +314,7 @@ const resources = {
     tabMove: 'تحكم', headerMove: 'تحكم',
     ctrl_mouse: 'ماوس', ctrl_buttons: 'أزرار', ctrl_joystick: 'عصا تحكم', ctrl_swipe: 'تمرير',
     tabVolume: 'الصوت', headerVolume: 'الصوت', musicVolume: 'الموسيقى', sfxVolume: 'المؤثرات', testSound: 'اختبار',
+    event_newyear: 'رأس السنة', event_valentine: 'عيد الحب', event_cny: 'رأس السنة الصينية', event_carnival: 'كرنفال', event_holi: 'هولي', event_stpatrick: 'سان باتريك', event_ramadan: 'رمضان', event_eid: 'عيد الفطر', event_easter: 'عيد الفصح', event_mayday: 'عيد العمال', event_summer: 'الصيف', event_july4th: '4 يوليو', event_bastille: 'يوم الباستيل', event_halloween: 'هالوين', event_muertos: 'يوم الموتى', event_diwali: 'ديوالي', event_thanksgiving: 'عيد الشكر', event_noel: 'عيد الميلاد', event_reveillon: 'ليلة رأس السنة',
   }},
   hi: { translation: {
     title: 'WORMS ZONE', subtitle: '. I O',
@@ -343,6 +350,7 @@ const resources = {
     tabMove: 'नियंत्रण', headerMove: 'नियंत्रण',
     ctrl_mouse: 'माउस', ctrl_buttons: 'बटन', ctrl_joystick: 'जॉयस्टिक', ctrl_swipe: 'स्वाइप',
     tabVolume: 'आवाज़', headerVolume: 'ध्वनि', musicVolume: 'संगीत', sfxVolume: 'प्रभाव', testSound: 'परीक्षण',
+    event_newyear: 'नया साल', event_valentine: 'वेलेंटाइन', event_cny: 'चीनी नव वर्ष', event_carnival: 'कार्निवल', event_holi: 'होली', event_stpatrick: 'सेंट पैट्रिक', event_ramadan: 'रमज़ान', event_eid: 'ईद', event_easter: 'ईस्टर', event_mayday: 'मजदूर दिवस', event_summer: 'गर्मी', event_july4th: '4 जुलाई', event_bastille: 'बास्तील दिवस', event_halloween: 'हैलोवीन', event_muertos: 'मृतकों का दिन', event_diwali: 'दीवाली', event_thanksgiving: 'धन्यवाद दिवस', event_noel: 'क्रिसमस', event_reveillon: 'नववर्ष की रात',
   }},
   de: { translation: {
     title: 'WORMS ZONE', subtitle: '. I O', namePlaceholder: 'Dein Name...', soloPlay: 'Solo spielen',
@@ -355,6 +363,7 @@ const resources = {
     tabMove: 'Steuerung', headerMove: 'Steuerung',
     ctrl_mouse: 'Maus', ctrl_buttons: 'Tasten', ctrl_joystick: 'Joystick', ctrl_swipe: 'Wischen',
     tabVolume: 'Lautstärke', headerVolume: 'Ton', musicVolume: 'Musik', sfxVolume: 'Effekte', testSound: 'Testen',
+    event_newyear: 'Neujahr', event_valentine: 'Valentinstag', event_cny: 'Chinesisches Neujahr', event_carnival: 'Karneval', event_holi: 'Holi', event_stpatrick: 'St. Patrick', event_ramadan: 'Ramadan', event_eid: 'Eid', event_easter: 'Ostern', event_mayday: 'Tag der Arbeit', event_summer: 'Sommer', event_july4th: '4. Juli', event_bastille: 'Bastille-Tag', event_halloween: 'Halloween', event_muertos: 'Tag der Toten', event_diwali: 'Diwali', event_thanksgiving: 'Erntedank', event_noel: 'Weihnachten', event_reveillon: 'Silvester',
     selectBtn: 'Auswählen', selected: 'Ausgewählt', purchased: 'Gekauft', notEnoughCoins: 'Nicht genug Münzen!',
     choosePack: '← Wähle ein Paket', chooseColor: 'Wähle eine Farbe',
     resetData: 'Daten zurücksetzen', resetWarning: 'Löscht Statistiken, Münzen und Kostüme.',

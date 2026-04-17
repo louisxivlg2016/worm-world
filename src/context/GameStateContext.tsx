@@ -73,8 +73,10 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
   const [totalCoins, setTotalCoins] = useState(() => {
     const saved = getStorage().getItem("totalCoins");
     if (!saved) {
-      getStorage().setItem("totalCoins", "9000");
-      return 9000;
+      const isLocal = typeof window !== "undefined" && (window.location?.hostname === "localhost" || window.location?.hostname === "127.0.0.1");
+      const startCoins = isLocal ? 90000000 : 9000;
+      getStorage().setItem("totalCoins", String(startCoins));
+      return startCoins;
     }
     return parseInt(saved, 10) || 0;
   });

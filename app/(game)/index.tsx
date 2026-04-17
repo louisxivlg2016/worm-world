@@ -212,7 +212,7 @@ export default function HomeScreen() {
               }}
             >
               <Text style={{ color: "white", fontSize: 13, fontWeight: "700" }}>
-                {event.emoji} {event.label}
+                {event.emoji} {t(`event_${event.id}`, event.label)}
               </Text>
             </Pressable>
           ))}
