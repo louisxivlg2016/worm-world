@@ -2027,8 +2027,8 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
         angle = Math.atan2(p.y - np.y, p.x - np.x)
       }
       // Draw larger circle (overlap to hide segment gaps) with texture rotated along body
-      const bigR = segR * 1.6
-      const drawR = bigR * 1.5
+      const bigR = segR * 1.3
+      const drawR = bigR * 1.4
       ctx.save()
       ctx.beginPath()
       ctx.arc(p.x, p.y, bigR, 0, Math.PI * 2)
