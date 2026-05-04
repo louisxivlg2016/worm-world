@@ -22,6 +22,7 @@ const IS_DOM = typeof Image !== 'undefined'
 // HEAD IMAGE CACHE — load once
 // ============================================
 const headImageCache = new Map<string, HTMLImageElement>()
+const accessoryHeadCache = new Map<string, boolean>()
 
 function loadHeadImage(src: string): HTMLImageElement | null {
   if (!IS_DOM) return null
@@ -30,6 +31,37 @@ function loadHeadImage(src: string): HTMLImageElement | null {
   img.src = src
   img.onload = () => { headImageCache.set(src, img) }
   return null
+}
+
+function isAccessoryHeadImage(src: string, img: HTMLImageElement): boolean {
+  if (!IS_DOM) return false
+  if (accessoryHeadCache.has(src)) return accessoryHeadCache.get(src)!
+  if (!img.naturalWidth || !img.naturalHeight) return false
+
+  const canvas = document.createElement('canvas')
+  canvas.width = img.naturalWidth
+  canvas.height = img.naturalHeight
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })
+  if (!ctx) return false
+
+  ctx.drawImage(img, 0, 0)
+
+  // Sample the lower-center zone where a face should normally exist.
+  const sampleW = Math.max(1, Math.floor(img.naturalWidth * 0.34))
+  const sampleH = Math.max(1, Math.floor(img.naturalHeight * 0.28))
+  const sampleX = Math.floor((img.naturalWidth - sampleW) / 2)
+  const sampleY = Math.floor(img.naturalHeight * 0.48)
+  const { data } = ctx.getImageData(sampleX, sampleY, sampleW, sampleH)
+
+  let opaquePixels = 0
+  for (let i = 3; i < data.length; i += 4) {
+    if (data[i] > 32) opaquePixels++
+  }
+
+  const coverage = opaquePixels / (sampleW * sampleH)
+  const isAccessory = coverage < 0.22
+  accessoryHeadCache.set(src, isAccessory)
+  return isAccessory
 }
 
 // Build HEAD_IMAGES dynamically from events + base heads
@@ -90,6 +122,45 @@ const BODY_TEXTURE_OFFSETS: Record<string, number> = {
 
 const BODY_TEXTURE_SCALES: Record<string, number> = {
   '/assets/france.png': DEFAULT_FLAG_TEXTURE_SCALE,
+}
+
+function drawDefaultHeadFace(
+  ctx: CanvasRenderingContext2D,
+  hp: { x: number; y: number },
+  headR: number,
+  colors: string[],
+  eyeBlink: number,
+) {
+  ctx.beginPath()
+  ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
+  ctx.fillStyle = colors[0]
+  ctx.fill()
+
+  const eyeR = headR * 0.32
+  const pupilR = eyeR * 0.55
+  const eyeSpacing = headR * 0.35
+
+  for (let side = -1; side <= 1; side += 2) {
+    const ex = hp.x + side * eyeSpacing
+    const ey = hp.y - headR * 0.1
+
+    ctx.beginPath()
+    ctx.arc(ex, ey, eyeR, 0, Math.PI * 2)
+    ctx.fillStyle = eyeBlink > 0 ? colors[0] : '#ffffff'
+    ctx.fill()
+
+    if (eyeBlink <= 0) {
+      ctx.beginPath()
+      ctx.arc(ex, ey, pupilR, 0, Math.PI * 2)
+      ctx.fillStyle = '#111'
+      ctx.fill()
+
+      ctx.beginPath()
+      ctx.arc(ex - pupilR * 0.3, ey - pupilR * 0.3, pupilR * 0.35, 0, Math.PI * 2)
+      ctx.fillStyle = '#fff'
+      ctx.fill()
+    }
+  }
 }
 
 function drawContainedTextureInCircle(
@@ -2078,8 +2149,12 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
 
   if (headType !== 'default' && HEAD_IMAGES[headType]) {
     // Custom head image — draw as the worm's actual head, big and clear
-    const headImg = headImageCache.get(HEAD_IMAGES[headType])
+    const headSrc = HEAD_IMAGES[headType]
+    const headImg = headImageCache.get(headSrc)
     if (headImg) {
+      if (isAccessoryHeadImage(headSrc, headImg)) {
+        drawDefaultHeadFace(ctx, hp, headR, colors, worm.eyeBlink)
+      }
       // Always upright — no rotation
       const aspect = headImg.naturalHeight / headImg.naturalWidth
       const imgW = headR * 5
@@ -2089,34 +2164,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
     }
   } else {
     // Default eyes — always upright (fixed position, no rotation)
-    const eyeR = headR * 0.32
-    const pupilR = eyeR * 0.55
-    const eyeSpacing = headR * 0.35
-
-    for (let side = -1; side <= 1; side += 2) {
-      const ex = hp.x + side * eyeSpacing
-      const ey = hp.y - headR * 0.1
-
-      // Eye white
-      ctx.beginPath()
-      ctx.arc(ex, ey, eyeR, 0, Math.PI * 2)
-      ctx.fillStyle = worm.eyeBlink > 0 ? colors[0] : '#ffffff'
-      ctx.fill()
-
-      if (worm.eyeBlink <= 0) {
-        // Pupil
-        ctx.beginPath()
-        ctx.arc(ex, ey, pupilR, 0, Math.PI * 2)
-        ctx.fillStyle = '#111'
-        ctx.fill()
-
-        // Eye shine
-        ctx.beginPath()
-        ctx.arc(ex - pupilR * 0.3, ey - pupilR * 0.3, pupilR * 0.35, 0, Math.PI * 2)
-        ctx.fillStyle = '#fff'
-        ctx.fill()
-      }
-    }
+    drawDefaultHeadFace(ctx, hp, headR, colors, worm.eyeBlink)
   }
 
   // Boost trail
