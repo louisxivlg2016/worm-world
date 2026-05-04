@@ -687,7 +687,7 @@ i18n
     fallbackLng: 'en',
     interpolation: { escapeValue: false },
     detection: {
-      order: ['navigator', 'htmlTag', 'querystring', 'localStorage'],
+      order: ['localStorage', 'querystring', 'navigator', 'htmlTag'],
       caches: ['localStorage'],
     },
   })
