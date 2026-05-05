@@ -1458,41 +1458,6 @@ function drawBackground(ctx: CanvasRenderingContext2D, camera: Camera, w: number
   ctx.fillStyle = grd
   ctx.fillRect(0, 0, w, h)
 
-  // Event: draw themed images scattered in the world (capped for performance)
-  if (event) {
-    const bgImg = eventBgCache.get(event.id)
-    if (bgImg) {
-      const effectiveZoom = Math.max(camera.zoom, 0.4) // clamp to avoid too many draws
-      const spacing = 380
-      const startWX = Math.floor((camera.x - w / 2 / effectiveZoom) / spacing) * spacing
-      const startWY = Math.floor((camera.y - h / 2 / effectiveZoom) / spacing) * spacing
-      const endWX = camera.x + w / 2 / effectiveZoom
-      const endWY = camera.y + h / 2 / effectiveZoom
-      ctx.globalAlpha = 0.12
-      let count = 0
-      for (let wx = startWX; wx <= endWX; wx += spacing) {
-        for (let wy = startWY; wy <= endWY; wy += spacing) {
-          if (++count > 60) break // hard cap
-          const hash = ((wx * 73856093) ^ (wy * 19349663)) >>> 0
-          const ox = (hash % 200) - 100
-          const oy = ((hash * 31) % 200) - 100
-          const rot = ((hash * 17) % 360) * Math.PI / 180
-          const size = 35 + (hash % 30)
-          const p = worldToScreen(wx + ox, wy + oy, camera, w, h)
-          if (p.x < -size || p.x > w + size || p.y < -size || p.y > h + size) continue
-          const s = size * camera.zoom
-          ctx.save()
-          ctx.translate(p.x, p.y)
-          ctx.rotate(rot)
-          ctx.drawImage(bgImg, -s / 2, -s / 2, s, s)
-          ctx.restore()
-        }
-        if (count > 60) break
-      }
-      ctx.globalAlpha = 1
-    }
-  }
-
   // Carpet texture (reduced for performance)
   const seed = Math.floor(camera.x * 0.1) + Math.floor(camera.y * 0.1) * 1000
   for (let i = 0; i < 80; i++) {
@@ -2205,8 +2170,8 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
         const tail = pts[pts.length - 1]
         const prevTail = pts[Math.max(0, pts.length - 2)]
         const tailAngle = Math.atan2(tail.y - prevTail.y, tail.x - prevTail.x)
-        const tailDrawW = R * 2.5
-        const tailDrawH = R * 1.95
+        const tailDrawW = R * 3.15
+        const tailDrawH = R * 2.45
         ctx.save()
         ctx.beginPath()
         ctx.arc(tail.x, tail.y, R * 1.02, 0, Math.PI * 2)
