@@ -244,6 +244,7 @@ function drawFlagTextureOnBody(
 ) {
   if (points.length < 2 || !img.complete || img.naturalWidth <= 0 || img.naturalHeight <= 0) return
 
+  const R = segR + 1
   const head = points[0]
   const tail = points[points.length - 1]
   const angle = Math.atan2(head.y - tail.y, head.x - tail.x)
@@ -255,19 +256,60 @@ function drawFlagTextureOnBody(
     bodyLength += Math.sqrt(dx * dx + dy * dy)
   }
 
-  const centerX = (head.x + tail.x) * 0.5
-  const centerY = (head.y + tail.y) * 0.5
-  const drawW = Math.max(bodyLength + segR * 3.5, segR * 8)
-  const drawH = segR * 2.25
+  const normals: { nx: number; ny: number }[] = []
+  for (let i = 0; i < points.length; i++) {
+    let dx = 0, dy = 0
+    const range = 3
+    for (let j = Math.max(0, i - range); j < Math.min(points.length - 1, i + range); j++) {
+      dx += points[j + 1].x - points[j].x
+      dy += points[j + 1].y - points[j].y
+    }
+    const len = Math.sqrt(dx * dx + dy * dy) || 1
+    normals.push({ nx: -dy / len, ny: dx / len })
+  }
+
+  const upper: { x: number; y: number }[] = []
+  const lower: { x: number; y: number }[] = []
+  for (let i = 0; i < points.length; i++) {
+    const p = points[i]
+    const n = normals[i]
+    upper.push({ x: p.x + n.nx * R, y: p.y + n.ny * R })
+    lower.push({ x: p.x - n.nx * R, y: p.y - n.ny * R })
+  }
+
+  const drawSmoothCurve = (curvePoints: { x: number; y: number }[]) => {
+    if (curvePoints.length < 2) return
+    ctx.moveTo(curvePoints[0].x, curvePoints[0].y)
+    for (let i = 0; i < curvePoints.length - 1; i++) {
+      const cx = (curvePoints[i].x + curvePoints[i + 1].x) / 2
+      const cy = (curvePoints[i].y + curvePoints[i + 1].y) / 2
+      ctx.quadraticCurveTo(curvePoints[i].x, curvePoints[i].y, cx, cy)
+    }
+    const last = curvePoints[curvePoints.length - 1]
+    ctx.lineTo(last.x, last.y)
+  }
 
   ctx.save()
   ctx.beginPath()
-  for (const p of points) {
-    ctx.moveTo(p.x + segR, p.y)
-    ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
-  }
+  drawSmoothCurve(upper)
+  ctx.arc(
+    tail.x, tail.y, R,
+    Math.atan2(upper[upper.length - 1].y - tail.y, upper[upper.length - 1].x - tail.x),
+    Math.atan2(lower[lower.length - 1].y - tail.y, lower[lower.length - 1].x - tail.x),
+  )
+  drawSmoothCurve([...lower].reverse())
+  ctx.arc(
+    head.x, head.y, R,
+    Math.atan2(lower[0].y - head.y, lower[0].x - head.x),
+    Math.atan2(upper[0].y - head.y, upper[0].x - head.x),
+  )
+  ctx.closePath()
   ctx.clip()
 
+  const centerX = (head.x + tail.x) * 0.5
+  const centerY = (head.y + tail.y) * 0.5
+  const drawW = Math.max(bodyLength + R * 4, R * 10)
+  const drawH = R * 2.05
   ctx.translate(centerX, centerY)
   ctx.rotate(angle)
   ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH)
@@ -282,29 +324,13 @@ function drawFlagTextureOnBody(
   ctx.restore()
 
   ctx.save()
-  for (const p of points) {
-    const gloss = ctx.createRadialGradient(
-      p.x - segR * 0.35, p.y - segR * 0.4, 0,
-      p.x, p.y, segR * 1.1,
-    )
-    gloss.addColorStop(0, 'rgba(255,255,255,0.18)')
-    gloss.addColorStop(0.55, 'rgba(255,255,255,0.04)')
-    gloss.addColorStop(1, 'rgba(0,0,0,0.16)')
-    ctx.fillStyle = gloss
-    ctx.beginPath()
-    ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
-    ctx.fill()
-  }
-  ctx.restore()
-
-  ctx.save()
-  ctx.lineWidth = Math.max(1, segR * 0.09)
+  ctx.lineJoin = 'round'
+  ctx.lineCap = 'round'
+  ctx.lineWidth = Math.max(1, R * 0.18)
   ctx.strokeStyle = 'rgba(0,0,0,0.28)'
-  for (const p of points) {
-    ctx.beginPath()
-    ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
-    ctx.stroke()
-  }
+  ctx.beginPath()
+  drawSmoothCurve(points)
+  ctx.stroke()
   ctx.restore()
 }
 
@@ -2025,31 +2051,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   const isTube = worm.skin.bodyStyle === 'tube'
   const isFlag = worm.skin.isFlag === true
 
-  // Flag skins: clip circles + stretch one texture over the whole body
-  if (isFlag && bodyTexImg) {
-    const flagPts: { x: number; y: number }[] = []
-    for (let i = segments.length - 1; i >= 0; i--) {
-      const seg = segments[i]
-      const p = worldToScreen(seg.x, seg.y, camera, w, h)
-      if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
-      flagPts.push(p)
-    }
-    if (flagPts.length >= 2) drawFlagTextureOnBody(ctx, flagPts.reverse(), segR, bodyTexImg)
-    if (invincible) {
-      for (let i = segments.length - 1; i >= 0; i--) {
-        const seg = segments[i]
-        const p = worldToScreen(seg.x, seg.y, camera, w, h)
-        if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, segR + 3 * camera.zoom, 0, Math.PI * 2)
-        ctx.strokeStyle = `rgba(255,255,255,${invAlpha})`
-        ctx.lineWidth = 2 * camera.zoom
-        ctx.stroke()
-      }
-    }
-  }
-
-  if (isTube) {
+  if (isTube || isFlag) {
     // Build screen-space points (skip every other for perf on long worms)
     const step = segments.length > 200 ? 2 : 1
     const pts: { x: number; y: number }[] = []
@@ -2105,56 +2107,89 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
         ctx.lineTo(last.x, last.y)
       }
 
+      const traceTubePath = () => {
+        ctx.beginPath()
+        drawSmoothCurve(upper)
+        const tail = pts[pts.length - 1]
+        ctx.arc(tail.x, tail.y, R,
+          Math.atan2(upper[upper.length - 1].y - tail.y, upper[upper.length - 1].x - tail.x),
+          Math.atan2(lower[lower.length - 1].y - tail.y, lower[lower.length - 1].x - tail.x))
+        const lowerRev = [...lower].reverse()
+        drawSmoothCurve(lowerRev)
+        const headPt = pts[0]
+        ctx.arc(headPt.x, headPt.y, R,
+          Math.atan2(lower[0].y - headPt.y, lower[0].x - headPt.x),
+          Math.atan2(upper[0].y - headPt.y, upper[0].x - headPt.x))
+        ctx.closePath()
+      }
+
       // === 1) Dark outline (drawn first, thicker) ===
-      ctx.save()
-      ctx.lineJoin = 'round'
-      ctx.lineCap = 'round'
-      ctx.lineWidth = (R * 2 + 8) * camera.zoom / segR
-      ctx.strokeStyle = 'rgba(0,0,0,0.95)'
-      ctx.beginPath()
-      drawSmoothCurve(pts)
-      ctx.stroke()
-      ctx.restore()
+      if (!isFlag) {
+        ctx.save()
+        ctx.lineJoin = 'round'
+        ctx.lineCap = 'round'
+        ctx.lineWidth = (R * 2 + 8) * camera.zoom / segR
+        ctx.strokeStyle = 'rgba(0,0,0,0.95)'
+        ctx.beginPath()
+        drawSmoothCurve(pts)
+        ctx.stroke()
+        ctx.restore()
+      }
 
       // === 2) Clip to tube shape and fill ===
       ctx.save()
-      ctx.beginPath()
-      drawSmoothCurve(upper)
-      // Tail cap
-      const tail = pts[pts.length - 1]
-      ctx.arc(tail.x, tail.y, R,
-        Math.atan2(upper[upper.length - 1].y - tail.y, upper[upper.length - 1].x - tail.x),
-        Math.atan2(lower[lower.length - 1].y - tail.y, lower[lower.length - 1].x - tail.x))
-      // Lower edge reversed
-      const lowerRev = [...lower].reverse()
-      drawSmoothCurve(lowerRev)
-      // Head cap
-      const headPt = pts[0]
-      ctx.arc(headPt.x, headPt.y, R,
-        Math.atan2(lower[0].y - headPt.y, lower[0].x - headPt.x),
-        Math.atan2(upper[0].y - headPt.y, upper[0].x - headPt.x))
-      ctx.closePath()
+      traceTubePath()
       ctx.clip()
 
-      // Fill tube with flag color stripes running along the tube length
-      {
+      if (isFlag && bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0) {
+        const lengths = [0]
+        for (let i = 1; i < pts.length; i++) {
+          const dx = pts[i].x - pts[i - 1].x
+          const dy = pts[i].y - pts[i - 1].y
+          lengths.push(lengths[lengths.length - 1] + Math.sqrt(dx * dx + dy * dy))
+        }
+        const totalLength = lengths[lengths.length - 1] || 1
+        for (let i = 0; i < pts.length - 1; i++) {
+          const p = pts[i]
+          const next = pts[i + 1]
+          const dx = next.x - p.x
+          const dy = next.y - p.y
+          const sliceLen = Math.max(1, Math.sqrt(dx * dx + dy * dy) + R * 0.85)
+          const angle = Math.atan2(dy, dx)
+          const sx = (lengths[i] / totalLength) * bodyTexImg.naturalWidth
+          const sw = Math.max(1, ((sliceLen / totalLength) * bodyTexImg.naturalWidth) + 2)
+          ctx.save()
+          ctx.translate((p.x + next.x) * 0.5, (p.y + next.y) * 0.5)
+          ctx.rotate(angle)
+          ctx.drawImage(
+            bodyTexImg,
+            sx, 0, Math.min(sw, bodyTexImg.naturalWidth - sx), bodyTexImg.naturalHeight,
+            -sliceLen / 2, -R * 1.04, sliceLen, R * 2.08,
+          )
+          ctx.restore()
+        }
+
+        const shine = ctx.createLinearGradient(0, minY, 0, maxY)
+        shine.addColorStop(0, 'rgba(255,255,255,0.22)')
+        shine.addColorStop(0.28, 'rgba(255,255,255,0.08)')
+        shine.addColorStop(0.55, 'rgba(255,255,255,0)')
+        shine.addColorStop(1, 'rgba(0,0,0,0.18)')
+        ctx.fillStyle = shine
+        ctx.fillRect(minX, minY, maxX - minX, maxY - minY)
+      } else {
+        // Fill tube with color stripes running across the body
         const stripeCount = colors.length
-        const stripeR = R / stripeCount
         for (let s = 0; s < stripeCount; s++) {
           ctx.fillStyle = colors[s]
           ctx.beginPath()
-          // Offset from center: goes from -R to +R in equal bands
           const off1 = -R + (s / stripeCount) * R * 2
           const off2 = -R + ((s + 1) / stripeCount) * R * 2
-          // First point
           const p0 = pts[0], n0 = normals[0]
           ctx.moveTo(p0.x + n0.nx * off1, p0.y + n0.ny * off1)
-          // Upper edge of this stripe
           for (let i = 1; i < pts.length; i++) {
             const p = pts[i], n = normals[i]
             ctx.lineTo(p.x + n.nx * off1, p.y + n.ny * off1)
           }
-          // Lower edge of this stripe (reversed)
           for (let i = pts.length - 1; i >= 0; i--) {
             const p = pts[i], n = normals[i]
             ctx.lineTo(p.x + n.nx * off2, p.y + n.ny * off2)
@@ -2166,15 +2201,43 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
 
       ctx.restore()
 
+      if (isFlag) {
+        const tail = pts[pts.length - 1]
+        const prevTail = pts[Math.max(0, pts.length - 2)]
+        const tailAngle = Math.atan2(tail.y - prevTail.y, tail.x - prevTail.x)
+        const tailDrawW = R * 2.5
+        const tailDrawH = R * 1.95
+        ctx.save()
+        ctx.beginPath()
+        ctx.arc(tail.x, tail.y, R * 1.02, 0, Math.PI * 2)
+        ctx.clip()
+        ctx.translate(tail.x, tail.y)
+        ctx.rotate(tailAngle)
+        ctx.drawImage(bodyTexImg!, -tailDrawW / 2, -tailDrawH / 2, tailDrawW, tailDrawH)
+        ctx.restore()
+
+        ctx.save()
+        ctx.lineJoin = 'round'
+        ctx.lineCap = 'round'
+        ctx.lineWidth = Math.max(1, R * 0.22)
+        ctx.strokeStyle = 'rgba(0,0,0,0.24)'
+        traceTubePath()
+        ctx.stroke()
+        ctx.restore()
+      }
+
       // Invincible glow
       if (invincible) {
         ctx.save()
         ctx.lineJoin = 'round'
         ctx.lineCap = 'round'
-        ctx.lineWidth = (R * 2 + 8) * camera.zoom / segR
+        ctx.lineWidth = isFlag ? Math.max(2, R * 0.4) : (R * 2 + 8) * camera.zoom / segR
         ctx.strokeStyle = `rgba(255,255,255,${invAlpha})`
-        ctx.beginPath()
-        drawSmoothCurve(pts)
+        if (isFlag) traceTubePath()
+        else {
+          ctx.beginPath()
+          drawSmoothCurve(pts)
+        }
         ctx.stroke()
         ctx.restore()
       }
@@ -2182,7 +2245,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   }
 
   for (let i = segments.length - 1; i >= 0; i--) {
-    if (isTube) break // already drawn above
+    if (isTube || isFlag) break // already drawn above
     const seg = segments[i]
     const p = worldToScreen(seg.x, seg.y, camera, w, h)
     if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
@@ -2199,17 +2262,35 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
         const np = worldToScreen(next.x, next.y, camera, w, h)
         angle = Math.atan2(p.y - np.y, p.x - np.x)
       }
-      // Draw larger circle (overlap to hide segment gaps) with texture rotated along body
-      const bigR = segR * 1.3
-      const drawR = bigR * 1.4
+      // Flag skins use larger overlapping textured capsules so the seams disappear
+      // without forcing the whole flag into a single straight strip.
+      const bigR = isFlag ? segR * 1.62 : segR * 1.3
+      const drawW = isFlag ? bigR * 2.7 : bigR * 2.8
+      const drawH = isFlag ? bigR * 1.9 : bigR * 2.8
       ctx.save()
       ctx.beginPath()
       ctx.arc(p.x, p.y, bigR, 0, Math.PI * 2)
       ctx.clip()
       ctx.translate(p.x, p.y)
       ctx.rotate(angle)
-      ctx.drawImage(bodyTexImg, -drawR, -drawR, drawR * 2, drawR * 2)
+      ctx.drawImage(bodyTexImg, -drawW / 2, -drawH / 2, drawW, drawH)
       ctx.restore()
+
+      if (isFlag) {
+        ctx.save()
+        const gloss = ctx.createRadialGradient(
+          p.x - bigR * 0.35, p.y - bigR * 0.45, 0,
+          p.x, p.y, bigR * 1.15,
+        )
+        gloss.addColorStop(0, 'rgba(255,255,255,0.12)')
+        gloss.addColorStop(0.55, 'rgba(255,255,255,0.03)')
+        gloss.addColorStop(1, 'rgba(0,0,0,0.10)')
+        ctx.fillStyle = gloss
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, bigR, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.restore()
+      }
     } else {
       // Shadow
       ctx.beginPath()
