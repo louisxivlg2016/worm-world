@@ -19,7 +19,7 @@ export default function HomeScreen() {
     try { return getStorage().getItem("playerName") ?? ""; } catch { return ""; }
   });
   const [selectedSkin, setSelectedSkin] = useState(0);
-  const activeSkin = customSkin ?? SKINS[selectedSkin] ?? SKINS[0];
+  const activeSkin = customSkin ?? playerSkin ?? SKINS[selectedSkin] ?? SKINS[0];
 
   const userLang = (i18n.language || "fr").split("-")[0];
   // Show events: universal (no lang) + matching user's language

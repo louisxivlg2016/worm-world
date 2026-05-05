@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useRef, useState, type ReactNod
 import { SKINS, type WormSkin, type GameMode } from "@/types/game";
 import { getStorage } from "@/services/StorageService";
 import { loadStats, saveStats } from "@/components/ProfileScreen";
+import { normalizeFlagSkin } from "@/utils/flagSkin";
 
 interface DeathInfo {
   score: number;
@@ -61,13 +62,13 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
   const [playerSkin, setPlayerSkin] = useState<WormSkin>(() => {
     try {
       const saved = getStorage().getItem("playerSkin");
-      return saved ? JSON.parse(saved) : SKINS[0];
+      return saved ? normalizeFlagSkin(JSON.parse(saved)) : SKINS[0];
     } catch { return SKINS[0]; }
   });
   const [customSkin, setCustomSkin] = useState<WormSkin | null>(() => {
     try {
       const saved = getStorage().getItem("customSkin");
-      return saved ? JSON.parse(saved) : null;
+      return saved ? normalizeFlagSkin(JSON.parse(saved)) : null;
     } catch { return null; }
   });
   const [totalCoins, setTotalCoins] = useState(() => {
@@ -194,11 +195,12 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
   }, [gameMode]);
 
   const applySkin = useCallback((skin: WormSkin, cost: number) => {
+    const normalizedSkin = normalizeFlagSkin(skin);
     spendCoins(cost);
-    setCustomSkin(skin);
-    setPlayerSkin(skin);
-    getStorage().setItem("customSkin", JSON.stringify(skin));
-    getStorage().setItem("playerSkin", JSON.stringify(skin));
+    setCustomSkin(normalizedSkin);
+    setPlayerSkin(normalizedSkin);
+    getStorage().setItem("customSkin", JSON.stringify(normalizedSkin));
+    getStorage().setItem("playerSkin", JSON.stringify(normalizedSkin));
   }, [spendCoins]);
 
   return (

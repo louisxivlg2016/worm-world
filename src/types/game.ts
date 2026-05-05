@@ -32,6 +32,7 @@ export interface WormSkin {
   eye?: string
   name?: string
   headType?: HeadType
+  flagName?: string
   bodyTexture?: string // URL to a body texture image
   isFlag?: boolean // true for flag skins (continuous body texture)
   bodyStyle?: BodyStyle

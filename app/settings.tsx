@@ -460,6 +460,24 @@ const FOOD_PACKS = [
     price: 2300,
   },
   {
+    id: "chinoise",
+    name: "Chinoise",
+    icon: "🥟",
+    items: [
+      "/food/youtiao.png", "/food/baozi.png", "/food/tangyuan.png", "/food/fermented-tofu.png",
+      "/food/gong-bao-jiding.png", "/food/yangzhou-fried-rice.png", "/food/cashew-chicken.png", "/food/peking-duck.png",
+      "/food/xiaolongbao.png", "/food/stir-fried-eggplant-with-garlic.png", "/food/jianbing.png", "/food/zongzi.png",
+      "/food/ma-po-tofu.png", "/food/dim-sum-chicken-feet.png", "/food/cantonese-roast-chicken.png", "/food/dongpo-rou.png",
+      "/food/egg-tart.png", "/food/wonton-soup.png", "/food/hot-and-sour-soup.png", "/food/sesame-balls.png",
+      "/food/sweet-tofu-with-goji-berries.png", "/food/mango-pudding.png", "/food/lanzhou-beef-noodle-soup.png", "/food/yu-xiang-rou-si.png",
+      "/food/egg-tart-alt.png", "/food/pineapple-bun.png", "/food/chinese-mochi.png", "/food/mooncake.png",
+      "/food/red-bean-cake.png", "/food/nian-gao.png", "/food/chinese-fruit-salad.png", "/food/fortune-cookies.png",
+      "/food/chinese-sausage-platter.png", "/food/century-egg-tofu.png", "/food/preserved-egg-box.png", "/food/oyster-platter.png",
+      "/food/hot-pot.png", "/food/lo-mein.png", "/food/dumpling-greens-soup.png", "/food/sweet-and-sour-dish.png",
+    ],
+    price: 2300,
+  },
+  {
     id: "circles",
     name: "Cercles",
     icon: "●",
@@ -614,7 +632,7 @@ export default function SettingsPage() {
   const handleFoodStyle = (packId: string) => {
     setFoodStyle(packId);
     // Map pack id to engine food style
-    const styleMap: Record<string, string> = { classic: "images", fruits: "images", francaise: "images", italienne: "images", americaine: "images", circles: "circles", emojis: "emojis" };
+    const styleMap: Record<string, string> = { classic: "images", fruits: "images", francaise: "images", italienne: "images", americaine: "images", chinoise: "images", circles: "circles", emojis: "emojis" };
     try {
       getStorage().setItem("foodStyle", styleMap[packId] || "images");
       getStorage().setItem("foodPack", packId);
@@ -1357,6 +1375,9 @@ export default function SettingsPage() {
               </Pressable>
               <Pressable onPress={() => setPreviewPack(previewPack === "americaine" ? null : "americaine")}>
                 <Image source={{ uri: "/food/americaine-donut.png" }} style={{ width: 80, height: 80 }} resizeMode="contain" />
+              </Pressable>
+              <Pressable onPress={() => setPreviewPack(previewPack === "chinoise" ? null : "chinoise")}>
+                <Image source={{ uri: "/food/baozi.png" }} style={{ width: 80, height: 80 }} resizeMode="contain" />
               </Pressable>
             </View>
 

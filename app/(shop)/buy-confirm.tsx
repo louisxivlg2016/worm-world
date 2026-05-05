@@ -9,6 +9,7 @@ export default function BuyConfirmSheet() {
   const params = useLocalSearchParams<{
     price: string;
     flag: string;
+    bodyTexture: string;
     headType: string;
     bodyStyle: string;
     colors: string;
@@ -24,10 +25,11 @@ export default function BuyConfirmSheet() {
       colors: skinColors,
       eye: "#fff",
       name: "Custom",
+      flagName: params.flag || undefined,
       headType: params.headType as any,
       bodyStyle: (params.bodyStyle as any) ?? "circles",
       isFlag: !!(params.flag),
-      bodyTexture: params.flag ? undefined : undefined,
+      bodyTexture: params.bodyTexture || undefined,
     }, price);
     router.back();
   };

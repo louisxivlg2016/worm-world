@@ -4,6 +4,7 @@ import "@/i18n";
 import "@/styles.css";
 import { GameCanvas } from "@/components/GameCanvas";
 import type { WormSkin, GameMode } from "@/types/game";
+import { normalizeFlagSkin } from "@/utils/flagSkin";
 
 interface GamePlayProps {
   playerName: string;
@@ -23,7 +24,7 @@ export default function GamePlay({
   onDeath, onWin, onBack,
 }: GamePlayProps) {
   let skin: WormSkin;
-  try { skin = JSON.parse(playerSkin); } catch { skin = { colors: ["#ff3366", "#ff6b35", "#ffd700", "#7cff00"], eye: "#fff" }; }
+  try { skin = normalizeFlagSkin(JSON.parse(playerSkin)); } catch { skin = { colors: ["#ff3366", "#ff6b35", "#ffd700", "#7cff00"], eye: "#fff" }; }
 
   return (
     <GameCanvas

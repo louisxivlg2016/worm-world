@@ -163,6 +163,51 @@ function drawDefaultHeadFace(
   }
 }
 
+function drawTexturedHeadFace(
+  ctx: CanvasRenderingContext2D,
+  hp: { x: number; y: number },
+  headR: number,
+  img: HTMLImageElement,
+  angle: number,
+  eyeBlink: number,
+) {
+  ctx.save()
+  ctx.beginPath()
+  ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
+  ctx.clip()
+  ctx.translate(hp.x, hp.y)
+  ctx.rotate(angle)
+  const drawR = headR * 1.9
+  ctx.drawImage(img, -drawR * 1.25, -drawR, drawR * 2.5, drawR * 2)
+  ctx.restore()
+
+  const eyeR = headR * 0.32
+  const pupilR = eyeR * 0.55
+  const eyeSpacing = headR * 0.35
+
+  for (let side = -1; side <= 1; side += 2) {
+    const ex = hp.x + side * eyeSpacing
+    const ey = hp.y - headR * 0.1
+
+    ctx.beginPath()
+    ctx.arc(ex, ey, eyeR, 0, Math.PI * 2)
+    ctx.fillStyle = eyeBlink > 0 ? 'rgba(255,255,255,0.12)' : '#ffffff'
+    ctx.fill()
+
+    if (eyeBlink <= 0) {
+      ctx.beginPath()
+      ctx.arc(ex, ey, pupilR, 0, Math.PI * 2)
+      ctx.fillStyle = '#111'
+      ctx.fill()
+
+      ctx.beginPath()
+      ctx.arc(ex - pupilR * 0.3, ey - pupilR * 0.3, pupilR * 0.35, 0, Math.PI * 2)
+      ctx.fillStyle = '#fff'
+      ctx.fill()
+    }
+  }
+}
+
 function drawContainedTextureInCircle(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
@@ -1906,7 +1951,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
 
   // Smooth tube body rendering
   const isTube = worm.skin.bodyStyle === 'tube'
-  const isFlag = false
+  const isFlag = worm.skin.isFlag === true
 
   // Flag skins: clip circles + stretch one texture over the whole body
   if (isFlag && bodyTexImg) {
@@ -2152,19 +2197,26 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
     const headSrc = HEAD_IMAGES[headType]
     const headImg = headImageCache.get(headSrc)
     if (headImg) {
+      let imageTopOffset = 0.75
       if (isAccessoryHeadImage(headSrc, headImg)) {
         drawDefaultHeadFace(ctx, hp, headR, colors, worm.eyeBlink)
+        // Accessory-only heads should sit on the worm face instead of floating above it.
+        imageTopOffset = 0.48
       }
       // Always upright — no rotation
       const aspect = headImg.naturalHeight / headImg.naturalWidth
       const imgW = headR * 5
       const imgH = imgW * aspect
-      // Push up so the face sits above the body, crown visible
-      ctx.drawImage(headImg, hp.x - imgW / 2, hp.y - imgH * 0.75, imgW, imgH)
+      // Full heads sit higher; accessory hats sit lower so they attach to the worm head.
+      ctx.drawImage(headImg, hp.x - imgW / 2, hp.y - imgH * imageTopOffset, imgW, imgH)
     }
   } else {
-    // Default eyes — always upright (fixed position, no rotation)
-    drawDefaultHeadFace(ctx, hp, headR, colors, worm.eyeBlink)
+    if (worm.skin.isFlag && bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0) {
+      drawTexturedHeadFace(ctx, hp, headR, bodyTexImg, angle, worm.eyeBlink)
+    } else {
+      // Default eyes — always upright (fixed position, no rotation)
+      drawDefaultHeadFace(ctx, hp, headR, colors, worm.eyeBlink)
+    }
   }
 
   // Boost trail

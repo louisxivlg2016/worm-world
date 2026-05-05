@@ -35,6 +35,7 @@ if (typeof window !== "undefined") {
 
 type FlagSkin = {
   name: string;
+  bodyTexture?: string;
   colors: [string, string, string, string];
 };
 
@@ -214,6 +215,14 @@ export default function ShopScreen() {
     return 0;
   }, [selectedFlag, headType, bodyStyle]);
 
+  const getFlagTextureUri = useCallback((flagName: string | null) => {
+    if (!flagName) return "";
+    const source = FLAG_IMAGES[flagName];
+    if (!source) return "";
+    const resolved = Image.resolveAssetSource(source);
+    return resolved?.uri ?? "";
+  }, []);
+
   const handleApply = () => {
     const price = computePrice();
     if (price > 0 && price > coins) return;
@@ -222,6 +231,7 @@ export default function ShopScreen() {
       params: {
         price: String(price),
         flag: selectedFlag ?? "",
+        bodyTexture: getFlagTextureUri(selectedFlag),
         headType,
         bodyStyle,
         colors: JSON.stringify(selectedColors),

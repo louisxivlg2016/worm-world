@@ -469,6 +469,36 @@ function drawContainedTextureInCircle(
   ctx.drawImage(img, dx, dy, drawW, drawH)
 }
 
+function FlagTexturePreview({ src, colors }: { src: string; colors: string[] }) {
+  const headBase = colors[0] ?? '#1e57d6'
+  const headShade = colors[2] ?? colors[1] ?? '#0c2e83'
+  return (
+    <div style={shopStyles.flagTextureWrap}>
+      <div
+        style={{
+          ...shopStyles.flagTextureBody,
+          backgroundImage: `url(${src})`,
+        }}
+      />
+      <div
+        style={{
+          ...shopStyles.flagTextureDetail,
+          backgroundImage: `url(${src})`,
+        }}
+      />
+      <div
+        style={{
+          ...shopStyles.flagTextureHead,
+          background: `radial-gradient(circle at 35% 30%, ${headBase}, ${headShade} 72%)`,
+        }}
+      >
+        <div style={shopStyles.flagTextureEye} />
+        <div style={shopStyles.flagTextureEye} />
+      </div>
+    </div>
+  )
+}
+
 const FLAG_PRICE = 200
 const DRAGON_PRICE = 2000
 const TUBE_PRICE = 500
@@ -873,7 +903,7 @@ export function ShopScreen({ currentSkin, playerCoins, onApply, onBack }: ShopSc
                 onClick={() => applyFlag(f.colors, f.bodyTexture)}
                 title={displayName}
               >
-                <img src={f.preview} alt={displayName} style={shopStyles.flagPreview} />
+                <FlagTexturePreview src={f.preview} colors={f.colors} />
                 <span style={shopStyles.flagName}>{displayName}</span>
               </div>
             )
@@ -1031,10 +1061,11 @@ const shopStyles: Record<string, React.CSSProperties> = {
     gap: 10,
     padding: '10px 12px',
     borderRadius: 12,
-    background: 'rgba(255,255,255,0.06)',
-    border: '1px solid rgba(255,255,255,0.1)',
+    background: 'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',
+    border: '1px solid rgba(255,255,255,0.12)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 18px rgba(0,0,0,0.18)',
     cursor: 'pointer',
-    transition: 'background 0.2s',
+    transition: 'background 0.2s, transform 0.2s',
   },
   flagName: {
     color: 'rgba(255,255,255,0.7)',
@@ -1050,6 +1081,59 @@ const shopStyles: Record<string, React.CSSProperties> = {
     borderRadius: '50%',
     border: '1px solid rgba(255,255,255,0.15)',
     flexShrink: 0,
+  },
+  flagTextureWrap: {
+    position: 'relative',
+    width: 112,
+    height: 42,
+    flexShrink: 0,
+    filter: 'drop-shadow(0 6px 10px rgba(0,0,0,0.28))',
+  },
+  flagTextureBody: {
+    position: 'absolute',
+    left: 2,
+    top: 9,
+    width: 86,
+    height: 24,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    borderRadius: '999px 16px 16px 999px',
+    border: '1px solid rgba(0,0,0,0.28)',
+    boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.16), inset 0 -5px 6px rgba(0,0,0,0.28)',
+    clipPath: 'path("M20 1 Q56 0 82 3 Q86 8 86 12 Q86 20 78 23 Q58 24 21 24 Q8 24 0 18 Q3 9 20 1 Z")',
+  },
+  flagTextureHead: {
+    position: 'absolute',
+    right: 4,
+    top: 7,
+    width: 28,
+    height: 28,
+    borderRadius: '50%',
+    border: '1px solid rgba(255,255,255,0.14)',
+    boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.12), inset 0 -4px 6px rgba(0,0,0,0.3)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 3,
+  },
+  flagTextureDetail: {
+    position: 'absolute',
+    left: 46,
+    top: 11,
+    width: 16,
+    height: 16,
+    borderRadius: '50%',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    border: '2px solid rgba(255,235,160,0.95)',
+    boxShadow: '0 1px 4px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.22)',
+  },
+  flagTextureEye: {
+    width: 7,
+    height: 9,
+    borderRadius: '50%',
+    background: '#fff',
+    boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.12)',
   },
   flagBodyPreview: {
     width: '100%',
