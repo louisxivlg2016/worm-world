@@ -1,4 +1,3 @@
-import { Image } from "react-native";
 import { FLAG_IMAGES } from "@/assets/flags";
 import type { WormSkin } from "@/types/game";
 
@@ -78,12 +77,17 @@ function colorsMatch(a: string[], b: string[]) {
   return a.length === b.length && a.every((color, index) => normalizeHex(color) === normalizeHex(b[index] ?? ""));
 }
 
+function getAssetUri(source: any) {
+  if (!source) return "";
+  if (typeof source === "string") return source;
+  if (typeof source?.uri === "string") return source.uri;
+  if (typeof source?.default === "string") return source.default;
+  return "";
+}
+
 export function getFlagTextureUri(flagName?: string | null) {
   if (!flagName) return "";
-  const source = FLAG_IMAGES[flagName];
-  if (!source) return "";
-  const resolved = Image.resolveAssetSource(source);
-  return resolved?.uri ?? "";
+  return getAssetUri(FLAG_IMAGES[flagName]);
 }
 
 export function getFlagNameFromColors(colors?: string[] | null) {

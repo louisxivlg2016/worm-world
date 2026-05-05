@@ -151,6 +151,14 @@ const COLOR_PALETTE = [
   "#3498db", "#2ecc71", "#f39c12", "#9b59b6", "#1abc9c", "#e91e63",
 ];
 
+function getAssetUri(source: any): string {
+  if (!source) return "";
+  if (typeof source === "string") return source;
+  if (typeof source?.uri === "string") return source.uri;
+  if (typeof source?.default === "string") return source.default;
+  return "";
+}
+
 export default function ShopScreen() {
   const { t, i18n } = useTranslation();
   const flagLang = (i18n.language || "fr").split("-")[0];
@@ -217,10 +225,7 @@ export default function ShopScreen() {
 
   const getFlagTextureUri = useCallback((flagName: string | null) => {
     if (!flagName) return "";
-    const source = FLAG_IMAGES[flagName];
-    if (!source) return "";
-    const resolved = Image.resolveAssetSource(source);
-    return resolved?.uri ?? "";
+    return getAssetUri(FLAG_IMAGES[flagName]);
   }, []);
 
   const handleApply = () => {
