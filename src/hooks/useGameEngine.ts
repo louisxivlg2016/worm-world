@@ -2215,15 +2215,6 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
         ctx.rotate(tailAngle)
         ctx.drawImage(bodyTexImg!, -tailDrawW / 2, -tailDrawH / 2, tailDrawW, tailDrawH)
         ctx.restore()
-
-        ctx.save()
-        ctx.lineJoin = 'round'
-        ctx.lineCap = 'round'
-        ctx.lineWidth = Math.max(1, R * 0.22)
-        ctx.strokeStyle = 'rgba(0,0,0,0.24)'
-        traceTubePath()
-        ctx.stroke()
-        ctx.restore()
       }
 
       // Invincible glow
