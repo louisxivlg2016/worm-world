@@ -236,6 +236,78 @@ function drawContainedTextureInCircle(
   ctx.drawImage(img, dx, dy, drawW, drawH)
 }
 
+function drawFlagTextureOnBody(
+  ctx: CanvasRenderingContext2D,
+  points: { x: number; y: number }[],
+  segR: number,
+  img: HTMLImageElement,
+) {
+  if (points.length < 2 || !img.complete || img.naturalWidth <= 0 || img.naturalHeight <= 0) return
+
+  const head = points[0]
+  const tail = points[points.length - 1]
+  const angle = Math.atan2(head.y - tail.y, head.x - tail.x)
+
+  let bodyLength = 0
+  for (let i = 1; i < points.length; i++) {
+    const dx = points[i].x - points[i - 1].x
+    const dy = points[i].y - points[i - 1].y
+    bodyLength += Math.sqrt(dx * dx + dy * dy)
+  }
+
+  const centerX = (head.x + tail.x) * 0.5
+  const centerY = (head.y + tail.y) * 0.5
+  const drawW = Math.max(bodyLength + segR * 3.5, segR * 8)
+  const drawH = segR * 2.25
+
+  ctx.save()
+  ctx.beginPath()
+  for (const p of points) {
+    ctx.moveTo(p.x + segR, p.y)
+    ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
+  }
+  ctx.clip()
+
+  ctx.translate(centerX, centerY)
+  ctx.rotate(angle)
+  ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH)
+
+  const shine = ctx.createLinearGradient(0, -drawH / 2, 0, drawH / 2)
+  shine.addColorStop(0, 'rgba(255,255,255,0.28)')
+  shine.addColorStop(0.32, 'rgba(255,255,255,0.08)')
+  shine.addColorStop(0.6, 'rgba(0,0,0,0)')
+  shine.addColorStop(1, 'rgba(0,0,0,0.22)')
+  ctx.fillStyle = shine
+  ctx.fillRect(-drawW / 2, -drawH / 2, drawW, drawH)
+  ctx.restore()
+
+  ctx.save()
+  for (const p of points) {
+    const gloss = ctx.createRadialGradient(
+      p.x - segR * 0.35, p.y - segR * 0.4, 0,
+      p.x, p.y, segR * 1.1,
+    )
+    gloss.addColorStop(0, 'rgba(255,255,255,0.18)')
+    gloss.addColorStop(0.55, 'rgba(255,255,255,0.04)')
+    gloss.addColorStop(1, 'rgba(0,0,0,0.16)')
+    ctx.fillStyle = gloss
+    ctx.beginPath()
+    ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
+    ctx.fill()
+  }
+  ctx.restore()
+
+  ctx.save()
+  ctx.lineWidth = Math.max(1, segR * 0.09)
+  ctx.strokeStyle = 'rgba(0,0,0,0.28)'
+  for (const p of points) {
+    ctx.beginPath()
+    ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
+    ctx.stroke()
+  }
+  ctx.restore()
+}
+
 // Preload all (only in browser)
 if (typeof Image !== 'undefined') {
   Object.values(HEAD_IMAGES).forEach(src => loadHeadImage(src))
@@ -1955,29 +2027,14 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
 
   // Flag skins: clip circles + stretch one texture over the whole body
   if (isFlag && bodyTexImg) {
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
-    ctx.save()
-    ctx.beginPath()
+    const flagPts: { x: number; y: number }[] = []
     for (let i = segments.length - 1; i >= 0; i--) {
       const seg = segments[i]
       const p = worldToScreen(seg.x, seg.y, camera, w, h)
       if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
-      ctx.moveTo(p.x + segR, p.y)
-      ctx.arc(p.x, p.y, segR, 0, Math.PI * 2)
-      if (p.x - segR < minX) minX = p.x - segR
-      if (p.y - segR < minY) minY = p.y - segR
-      if (p.x + segR > maxX) maxX = p.x + segR
-      if (p.y + segR > maxY) maxY = p.y + segR
+      flagPts.push(p)
     }
-    ctx.clip()
-    if (minX < Infinity) {
-      const bw = maxX - minX, bh = maxY - minY
-      const aspect = bodyTexImg.naturalWidth / bodyTexImg.naturalHeight
-      let drawW = bw, drawH = bw / aspect
-      if (drawH < bh) { drawH = bh; drawW = bh * aspect }
-      ctx.drawImage(bodyTexImg, minX + (bw - drawW) / 2, minY + (bh - drawH) / 2, drawW, drawH)
-    }
-    ctx.restore()
+    if (flagPts.length >= 2) drawFlagTextureOnBody(ctx, flagPts.reverse(), segR, bodyTexImg)
     if (invincible) {
       for (let i = segments.length - 1; i >= 0; i--) {
         const seg = segments[i]
