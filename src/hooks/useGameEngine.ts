@@ -1959,6 +1959,9 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
 
     if (pts.length >= 3) {
       const R = segR + 1 // slightly larger for smooth look
+      let flagLengths: number[] | null = null
+      let flagRepeatScreenWidth = 0
+      let flagRepeatTextureWidth = 0
 
       // Compute smoothed normals
       const normals: { nx: number; ny: number }[] = []
@@ -2047,6 +2050,9 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
         const textureAspect = bodyTexImg.naturalWidth / bodyTexImg.naturalHeight
         const repeatScreenWidth = Math.max(R * 2.08 * textureAspect, R * 3.6)
         const repeatTextureWidth = bodyTexImg.naturalWidth
+        flagLengths = lengths
+        flagRepeatScreenWidth = repeatScreenWidth
+        flagRepeatTextureWidth = repeatTextureWidth
         for (let i = 0; i < pts.length - 1; i++) {
           const p = pts[i]
           const next = pts[i + 1]
@@ -2095,7 +2101,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
 
       ctx.restore()
 
-      if (isFlag) {
+      if (isFlag && bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0 && flagLengths && flagRepeatScreenWidth > 0) {
         const tail = pts[pts.length - 1]
         const prevTail = pts[Math.max(0, pts.length - 2)]
         const tailAngle = Math.atan2(tail.y - prevTail.y, tail.x - prevTail.x)
@@ -2103,8 +2109,8 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
         const tailDrawH = R * 2.45
         const tailTextureAspect = bodyTexImg!.naturalWidth / bodyTexImg!.naturalHeight
         const tailRepeatScreenWidth = Math.max(R * 2.08 * tailTextureAspect, R * 3.6)
-        const tailSrcStart = (lengths[lengths.length - 1] / tailRepeatScreenWidth) * bodyTexImg!.naturalWidth
-        const tailSrcSpan = (tailDrawW / tailRepeatScreenWidth) * bodyTexImg!.naturalWidth
+        const tailSrcStart = (flagLengths[flagLengths.length - 1] / tailRepeatScreenWidth) * flagRepeatTextureWidth
+        const tailSrcSpan = (tailDrawW / tailRepeatScreenWidth) * flagRepeatTextureWidth
         ctx.save()
         ctx.beginPath()
         ctx.arc(tail.x, tail.y, R * 1.02, 0, Math.PI * 2)
