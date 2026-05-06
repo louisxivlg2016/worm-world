@@ -1,10 +1,10 @@
 export const colors = {
-  background: "#08141f",
-  surface: "#13263c",
+  background: "#18324a",
+  surface: "#274763",
   primary: "#ff7a59",
   accent: "#2ec4b6",
   text: "#ffffff",
-  textSecondary: "rgba(226,232,240,0.72)",
+  textSecondary: "rgba(241,245,249,0.78)",
   danger: "#ff5d73",
   gold: "#f6c453",
 } as const;
