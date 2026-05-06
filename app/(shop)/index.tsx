@@ -7,6 +7,7 @@ import {
   ScrollView,
   FlatList,
   Image,
+  ImageBackground,
   Pressable,
   StyleSheet,
   useWindowDimensions,
@@ -119,6 +120,102 @@ type MouthOption = {
   label: string;
   preview: string;
 };
+
+function ShopWormPreview({
+  colors: palette,
+  eyeStyle,
+  mouthStyle,
+  flagSource,
+}: {
+  colors: string[];
+  eyeStyle: EyeOption["id"];
+  mouthStyle: MouthOption["id"];
+  flagSource?: any;
+}) {
+  const segments = Array.from({ length: 8 });
+
+  const renderEye = (side: "left" | "right") => {
+    const closed = eyeStyle === "happy" || (eyeStyle === "wink" && side === "right");
+    if (closed) {
+      return <View style={[styles.previewEyeClosed, eyeStyle === "happy" && styles.previewEyeHappy]} />;
+    }
+    return (
+      <View style={styles.previewEye}>
+        <View style={styles.previewPupil} />
+      </View>
+    );
+  };
+
+  const mouthNode = mouthStyle === "none"
+    ? null
+    : mouthStyle === "surprised"
+      ? <View style={styles.previewMouthSurprised} />
+      : (
+        <View
+          style={[
+            styles.previewMouth,
+            mouthStyle === "grin" && styles.previewMouthGrin,
+            mouthStyle === "angry" && styles.previewMouthAngry,
+          ]}
+        />
+      );
+
+  return (
+    <View style={styles.previewCard}>
+      <Text style={styles.previewTitle}>Aperçu du ver</Text>
+      <View style={styles.previewStage}>
+        {segments.map((_, index) => {
+          const isHead = index === segments.length - 1;
+          const left = index * 34;
+          const top = Math.abs(index - 3.5) * 4 + (index > 4 ? 4 : 0);
+          const stripeColor = palette[(segments.length - 1 - index) % palette.length] || palette[0];
+          const commonStyle = [
+            styles.previewSegment,
+            { left, top },
+            isHead && styles.previewHead,
+          ];
+
+          const face = isHead ? (
+            <View style={styles.previewFaceWrap}>
+              <View style={styles.previewEyesRow}>
+                {renderEye("left")}
+                {renderEye("right")}
+              </View>
+              {mouthNode}
+            </View>
+          ) : null;
+
+          if (flagSource) {
+            return (
+              <ImageBackground
+                key={index}
+                source={flagSource}
+                resizeMode="cover"
+                imageStyle={styles.previewSegmentImage}
+                style={commonStyle}
+              >
+                {face}
+              </ImageBackground>
+            );
+          }
+
+          return (
+            <View
+              key={index}
+              style={[
+                ...commonStyle,
+                { backgroundColor: stripeColor },
+              ]}
+            >
+              <View style={styles.previewHighlight} />
+              {face}
+            </View>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
 
 function getHeadOptions(): HeadOption[] {
   const base: HeadOption[] = [
@@ -318,13 +415,24 @@ export default function ShopScreen() {
     ? { maxWidth: contentMaxWidth, alignSelf: 'center' as const, width: '100%' as any, paddingHorizontal: spacing.md }
     : {};
 
+  const selectedFlagSource = selectedFlag ? FLAG_IMAGES[selectedFlag] : undefined;
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <View style={styles.bgOrbA} />
+      <View style={styles.bgOrbB} />
       <View style={desktopContainerStyle}>
       {/* Coin Balance */}
       <View style={styles.coinBar}>
         <Text style={styles.coinText}>{"\u{1FA99}"} {coins}</Text>
       </View>
+
+      <ShopWormPreview
+        colors={selectedColors}
+        eyeStyle={eyeStyle}
+        mouthStyle={mouthStyle}
+        flagSource={selectedFlagSource}
+      />
 
       {/* Preset Skins */}
       <Text style={styles.sectionTitle}>{t("shopPresets")}</Text>
@@ -533,16 +641,141 @@ const styles = StyleSheet.create({
   content: {
     padding: spacing.md,
   },
+  bgOrbA: {
+    position: "absolute",
+    top: -60,
+    left: -40,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    backgroundColor: "rgba(46,196,182,0.10)",
+  },
+  bgOrbB: {
+    position: "absolute",
+    top: 120,
+    right: -60,
+    width: 240,
+    height: 240,
+    borderRadius: 120,
+    backgroundColor: "rgba(246,196,83,0.10)",
+  },
   coinBar: {
     alignSelf: "center",
-    backgroundColor: "rgba(255,215,0,0.15)",
+    backgroundColor: "rgba(246,196,83,0.15)",
     borderWidth: 1,
-    borderColor: "rgba(255,215,0,0.3)",
+    borderColor: "rgba(246,196,83,0.3)",
     borderRadius: 30,
     borderCurve: "continuous",
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
     marginBottom: spacing.md,
+  },
+  previewCard: {
+    backgroundColor: "rgba(255,255,255,0.05)",
+    borderRadius: 22,
+    borderCurve: "continuous",
+    padding: spacing.md,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
+    marginBottom: spacing.md,
+    boxShadow: "0 10px 24px rgba(0,0,0,0.18)",
+  },
+  previewTitle: {
+    color: colors.gold,
+    fontSize: 16,
+    fontWeight: "800",
+    marginBottom: spacing.sm,
+  },
+  previewStage: {
+    height: 92,
+    justifyContent: "center",
+  },
+  previewSegment: {
+    position: "absolute",
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    borderCurve: "continuous",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.16)",
+    boxShadow: "0 8px 16px rgba(0,0,0,0.18)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  previewSegmentImage: {
+    borderRadius: 29,
+  },
+  previewHead: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+  },
+  previewHighlight: {
+    position: "absolute",
+    top: 8,
+    left: 10,
+    width: 18,
+    height: 12,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.2)",
+  },
+  previewFaceWrap: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  previewEyesRow: {
+    flexDirection: "row",
+    gap: 6,
+    alignItems: "center",
+  },
+  previewEye: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  previewPupil: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#111",
+  },
+  previewEyeClosed: {
+    width: 12,
+    height: 3,
+    borderRadius: 4,
+    backgroundColor: "#111",
+  },
+  previewEyeHappy: {
+    transform: [{ rotate: "8deg" }],
+  },
+  previewMouth: {
+    width: 18,
+    height: 8,
+    borderBottomWidth: 2,
+    borderColor: "#111",
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    marginTop: 5,
+  },
+  previewMouthGrin: {
+    width: 20,
+    height: 10,
+    borderBottomWidth: 3,
+  },
+  previewMouthAngry: {
+    transform: [{ rotate: "180deg" }],
+  },
+  previewMouthSurprised: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: "#111",
+    marginTop: 5,
   },
   coinText: {
     color: colors.gold,
@@ -558,9 +791,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   searchInput: {
-    backgroundColor: "rgba(255,255,255,0.08)",
+    backgroundColor: "rgba(255,255,255,0.06)",
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.15)",
+    borderColor: "rgba(255,255,255,0.12)",
     borderRadius: 12,
     borderCurve: "continuous",
     paddingHorizontal: spacing.md,
@@ -577,7 +810,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginRight: spacing.md,
     padding: spacing.sm,
-    backgroundColor: colors.surface,
+    backgroundColor: "rgba(19,38,60,0.92)",
     borderRadius: 12,
     borderCurve: "continuous",
     boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
@@ -617,7 +850,7 @@ const styles = StyleSheet.create({
   headItem: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    backgroundColor: colors.surface,
+    backgroundColor: "rgba(19,38,60,0.92)",
     borderRadius: 20,
     borderCurve: "continuous",
     borderWidth: 1,
@@ -651,7 +884,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    backgroundColor: colors.surface,
+    backgroundColor: "rgba(19,38,60,0.92)",
     borderRadius: 16,
     borderCurve: "continuous",
     borderWidth: 1,
@@ -738,7 +971,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderCurve: "continuous",
     overflow: "hidden",
-    backgroundColor: "rgba(255,255,255,0.06)",
+    backgroundColor: "rgba(19,38,60,0.92)",
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
@@ -773,7 +1006,7 @@ const styles = StyleSheet.create({
     borderCurve: "continuous",
     alignItems: "center",
     backgroundColor: colors.primary,
-    boxShadow: "0 4px 15px rgba(124,58,237,0.4)",
+    boxShadow: "0 6px 18px rgba(255,122,89,0.28)",
   },
   applyBtnDisabled: {
     opacity: 0.5,

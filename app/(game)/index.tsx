@@ -44,6 +44,24 @@ export default function HomeScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <View style={{
+        position: "absolute",
+        top: -120,
+        left: -40,
+        width: 260,
+        height: 260,
+        borderRadius: 130,
+        backgroundColor: "rgba(46,196,182,0.12)",
+      }} />
+      <View style={{
+        position: "absolute",
+        top: 80,
+        right: -70,
+        width: 240,
+        height: 240,
+        borderRadius: 120,
+        backgroundColor: "rgba(246,196,83,0.10)",
+      }} />
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
@@ -68,7 +86,7 @@ export default function HomeScreen() {
       </Pressable>
 
       {/* Title */}
-      <Text style={{ color: colors.gold, fontSize: 36, fontWeight: "900", letterSpacing: 4, marginTop: spacing.xl }}>
+      <Text style={{ color: colors.gold, fontSize: 36, fontWeight: "900", letterSpacing: 4, marginTop: spacing.xl, textShadowColor: "rgba(0,0,0,0.35)", textShadowRadius: 12 }}>
         {t("title")}
       </Text>
       <Text style={{ color: colors.textSecondary, fontSize: 16, marginTop: -8 }}>
@@ -77,8 +95,8 @@ export default function HomeScreen() {
 
       {/* Coins */}
       <View style={{
-        backgroundColor: "rgba(255,215,0,0.12)", borderRadius: 30, paddingHorizontal: 20, paddingVertical: 8,
-        borderWidth: 1, borderColor: "rgba(255,215,0,0.3)",
+        backgroundColor: "rgba(246,196,83,0.12)", borderRadius: 30, paddingHorizontal: 20, paddingVertical: 8,
+        borderWidth: 1, borderColor: "rgba(246,196,83,0.3)",
       }}>
         <Text style={{ color: colors.gold, fontWeight: "700", fontSize: 18, fontVariant: ["tabular-nums"] }}>
           🪙 {totalCoins.toLocaleString()}
@@ -94,8 +112,8 @@ export default function HomeScreen() {
         maxLength={15}
         style={{
           width: "100%", padding: 14, borderRadius: 30, borderCurve: "continuous",
-          backgroundColor: "rgba(255,255,255,0.08)", color: colors.text,
-          borderWidth: 2, borderColor: "rgba(255,255,255,0.15)", fontSize: 16, textAlign: "center",
+          backgroundColor: "rgba(255,255,255,0.06)", color: colors.text,
+          borderWidth: 1, borderColor: "rgba(255,255,255,0.12)", fontSize: 16, textAlign: "center",
         }}
       />
 
@@ -111,7 +129,7 @@ export default function HomeScreen() {
                 borderWidth: 3, borderCurve: "continuous",
                 borderColor: !customSkin && i === selectedSkin ? colors.gold : "rgba(255,255,255,0.15)",
                 backgroundColor: skin.colors[0],
-                boxShadow: !customSkin && i === selectedSkin ? "0 0 12px rgba(255,215,0,0.5)" : "none",
+                boxShadow: !customSkin && i === selectedSkin ? "0 0 12px rgba(246,196,83,0.45)" : "0 4px 10px rgba(0,0,0,0.18)",
               }}
             />
           ))}
@@ -130,7 +148,7 @@ export default function HomeScreen() {
         onPress={() => play("coins")}
         style={{
           width: "100%", paddingVertical: 14, borderRadius: 50, borderCurve: "continuous",
-          backgroundColor: "rgba(255,215,0,0.15)", borderWidth: 2, borderColor: "rgba(255,215,0,0.4)",
+          backgroundColor: "rgba(246,196,83,0.14)", borderWidth: 1, borderColor: "rgba(246,196,83,0.4)",
           alignItems: "center",
         }}
       >
@@ -164,7 +182,7 @@ export default function HomeScreen() {
           const days = Math.floor(remaining / DAY);
           const hours = Math.floor((remaining % DAY) / (60 * 60 * 1000));
           return (
-            <View style={{ width: "100%", paddingVertical: 14, borderRadius: 50, borderCurve: "continuous", backgroundColor: "rgba(255,255,255,0.05)", alignItems: "center" }}>
+            <View style={{ width: "100%", paddingVertical: 14, borderRadius: 50, borderCurve: "continuous", backgroundColor: "rgba(255,255,255,0.04)", alignItems: "center", borderWidth: 1, borderColor: "rgba(255,255,255,0.06)" }}>
               <Text style={{ color: "rgba(255,255,255,0.3)", fontSize: 14 }}>
                 🏁 {t("grandPrix")} — {days}j {hours}h
               </Text>
@@ -188,8 +206,8 @@ export default function HomeScreen() {
             }}
             style={{
               width: "100%", paddingVertical: 14, borderRadius: 50, borderCurve: "continuous",
-              backgroundColor: "#228B22", alignItems: "center",
-              boxShadow: "0 6px 25px rgba(34,139,34,0.4)",
+              backgroundColor: "#1f8f7b", alignItems: "center",
+              boxShadow: "0 6px 25px rgba(46,196,182,0.35)",
             }}
           >
             <Text style={{ color: "white", fontSize: 16, fontWeight: "800", letterSpacing: 2 }}>
