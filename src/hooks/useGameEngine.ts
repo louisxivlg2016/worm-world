@@ -236,102 +236,33 @@ function drawContainedTextureInCircle(
   ctx.drawImage(img, dx, dy, drawW, drawH)
 }
 
-function drawFlagTextureOnBody(
+function drawRepeatedTextureSlice(
   ctx: CanvasRenderingContext2D,
-  points: { x: number; y: number }[],
-  segR: number,
   img: HTMLImageElement,
+  srcStart: number,
+  srcSpan: number,
+  dx: number,
+  dy: number,
+  dw: number,
+  dh: number,
 ) {
-  if (points.length < 2 || !img.complete || img.naturalWidth <= 0 || img.naturalHeight <= 0) return
+  const width = img.naturalWidth
+  if (width <= 0 || srcSpan <= 0 || dw <= 0 || dh <= 0) return
 
-  const R = segR + 1
-  const head = points[0]
-  const tail = points[points.length - 1]
-  const angle = Math.atan2(head.y - tail.y, head.x - tail.x)
+  let remainingSrc = srcSpan
+  let currentSrc = ((srcStart % width) + width) % width
+  let drawnX = dx
+  let remainingDw = dw
 
-  let bodyLength = 0
-  for (let i = 1; i < points.length; i++) {
-    const dx = points[i].x - points[i - 1].x
-    const dy = points[i].y - points[i - 1].y
-    bodyLength += Math.sqrt(dx * dx + dy * dy)
+  while (remainingSrc > 0.001 && remainingDw > 0.001) {
+    const chunkSrc = Math.min(remainingSrc, width - currentSrc)
+    const chunkDw = dw * (chunkSrc / srcSpan)
+    ctx.drawImage(img, currentSrc, 0, chunkSrc, img.naturalHeight, drawnX, dy, chunkDw, dh)
+    remainingSrc -= chunkSrc
+    remainingDw -= chunkDw
+    drawnX += chunkDw
+    currentSrc = 0
   }
-
-  const normals: { nx: number; ny: number }[] = []
-  for (let i = 0; i < points.length; i++) {
-    let dx = 0, dy = 0
-    const range = 3
-    for (let j = Math.max(0, i - range); j < Math.min(points.length - 1, i + range); j++) {
-      dx += points[j + 1].x - points[j].x
-      dy += points[j + 1].y - points[j].y
-    }
-    const len = Math.sqrt(dx * dx + dy * dy) || 1
-    normals.push({ nx: -dy / len, ny: dx / len })
-  }
-
-  const upper: { x: number; y: number }[] = []
-  const lower: { x: number; y: number }[] = []
-  for (let i = 0; i < points.length; i++) {
-    const p = points[i]
-    const n = normals[i]
-    upper.push({ x: p.x + n.nx * R, y: p.y + n.ny * R })
-    lower.push({ x: p.x - n.nx * R, y: p.y - n.ny * R })
-  }
-
-  const drawSmoothCurve = (curvePoints: { x: number; y: number }[]) => {
-    if (curvePoints.length < 2) return
-    ctx.moveTo(curvePoints[0].x, curvePoints[0].y)
-    for (let i = 0; i < curvePoints.length - 1; i++) {
-      const cx = (curvePoints[i].x + curvePoints[i + 1].x) / 2
-      const cy = (curvePoints[i].y + curvePoints[i + 1].y) / 2
-      ctx.quadraticCurveTo(curvePoints[i].x, curvePoints[i].y, cx, cy)
-    }
-    const last = curvePoints[curvePoints.length - 1]
-    ctx.lineTo(last.x, last.y)
-  }
-
-  ctx.save()
-  ctx.beginPath()
-  drawSmoothCurve(upper)
-  ctx.arc(
-    tail.x, tail.y, R,
-    Math.atan2(upper[upper.length - 1].y - tail.y, upper[upper.length - 1].x - tail.x),
-    Math.atan2(lower[lower.length - 1].y - tail.y, lower[lower.length - 1].x - tail.x),
-  )
-  drawSmoothCurve([...lower].reverse())
-  ctx.arc(
-    head.x, head.y, R,
-    Math.atan2(lower[0].y - head.y, lower[0].x - head.x),
-    Math.atan2(upper[0].y - head.y, upper[0].x - head.x),
-  )
-  ctx.closePath()
-  ctx.clip()
-
-  const centerX = (head.x + tail.x) * 0.5
-  const centerY = (head.y + tail.y) * 0.5
-  const drawW = Math.max(bodyLength + R * 4, R * 10)
-  const drawH = R * 2.05
-  ctx.translate(centerX, centerY)
-  ctx.rotate(angle)
-  ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH)
-
-  const shine = ctx.createLinearGradient(0, -drawH / 2, 0, drawH / 2)
-  shine.addColorStop(0, 'rgba(255,255,255,0.28)')
-  shine.addColorStop(0.32, 'rgba(255,255,255,0.08)')
-  shine.addColorStop(0.6, 'rgba(0,0,0,0)')
-  shine.addColorStop(1, 'rgba(0,0,0,0.22)')
-  ctx.fillStyle = shine
-  ctx.fillRect(-drawW / 2, -drawH / 2, drawW, drawH)
-  ctx.restore()
-
-  ctx.save()
-  ctx.lineJoin = 'round'
-  ctx.lineCap = 'round'
-  ctx.lineWidth = Math.max(1, R * 0.18)
-  ctx.strokeStyle = 'rgba(0,0,0,0.28)'
-  ctx.beginPath()
-  drawSmoothCurve(points)
-  ctx.stroke()
-  ctx.restore()
 }
 
 // Preload all (only in browser)
@@ -2113,7 +2044,9 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
           const dy = pts[i].y - pts[i - 1].y
           lengths.push(lengths[lengths.length - 1] + Math.sqrt(dx * dx + dy * dy))
         }
-        const totalLength = lengths[lengths.length - 1] || 1
+        const textureAspect = bodyTexImg.naturalWidth / bodyTexImg.naturalHeight
+        const repeatScreenWidth = Math.max(R * 2.08 * textureAspect, R * 3.6)
+        const repeatTextureWidth = bodyTexImg.naturalWidth
         for (let i = 0; i < pts.length - 1; i++) {
           const p = pts[i]
           const next = pts[i + 1]
@@ -2121,16 +2054,12 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
           const dy = next.y - p.y
           const sliceLen = Math.max(1, Math.sqrt(dx * dx + dy * dy) + R * 0.85)
           const angle = Math.atan2(dy, dx)
-          const sx = (lengths[i] / totalLength) * bodyTexImg.naturalWidth
-          const sw = Math.max(1, ((sliceLen / totalLength) * bodyTexImg.naturalWidth) + 2)
+          const sx = (lengths[i] / repeatScreenWidth) * repeatTextureWidth
+          const sw = Math.max(1, (sliceLen / repeatScreenWidth) * repeatTextureWidth)
           ctx.save()
           ctx.translate((p.x + next.x) * 0.5, (p.y + next.y) * 0.5)
           ctx.rotate(angle)
-          ctx.drawImage(
-            bodyTexImg,
-            sx, 0, Math.min(sw, bodyTexImg.naturalWidth - sx), bodyTexImg.naturalHeight,
-            -sliceLen / 2, -R * 1.04, sliceLen, R * 2.08,
-          )
+          drawRepeatedTextureSlice(ctx, bodyTexImg, sx, sw, -sliceLen / 2, -R * 1.04, sliceLen, R * 2.08)
           ctx.restore()
         }
 
@@ -2172,13 +2101,17 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
         const tailAngle = Math.atan2(tail.y - prevTail.y, tail.x - prevTail.x)
         const tailDrawW = R * 3.15
         const tailDrawH = R * 2.45
+        const tailTextureAspect = bodyTexImg!.naturalWidth / bodyTexImg!.naturalHeight
+        const tailRepeatScreenWidth = Math.max(R * 2.08 * tailTextureAspect, R * 3.6)
+        const tailSrcStart = (lengths[lengths.length - 1] / tailRepeatScreenWidth) * bodyTexImg!.naturalWidth
+        const tailSrcSpan = (tailDrawW / tailRepeatScreenWidth) * bodyTexImg!.naturalWidth
         ctx.save()
         ctx.beginPath()
         ctx.arc(tail.x, tail.y, R * 1.02, 0, Math.PI * 2)
         ctx.clip()
         ctx.translate(tail.x, tail.y)
         ctx.rotate(tailAngle)
-        ctx.drawImage(bodyTexImg!, -tailDrawW / 2, -tailDrawH / 2, tailDrawW, tailDrawH)
+        drawRepeatedTextureSlice(ctx, bodyTexImg!, tailSrcStart, tailSrcSpan, -tailDrawW / 2, -tailDrawH / 2, tailDrawW, tailDrawH)
         ctx.restore()
       }
 
