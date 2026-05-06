@@ -11,6 +11,8 @@ export default function BuyConfirmSheet() {
     flag: string;
     bodyTexture: string;
     headType: string;
+    eyeStyle: string;
+    mouthStyle: string;
     bodyStyle: string;
     colors: string;
   }>();
@@ -27,6 +29,8 @@ export default function BuyConfirmSheet() {
       name: "Custom",
       flagName: params.flag || undefined,
       headType: params.headType as any,
+      eyeStyle: (params.eyeStyle as any) || "classic",
+      mouthStyle: (params.mouthStyle as any) || "smile",
       bodyStyle: (params.bodyStyle as any) ?? "circles",
       isFlag: !!(params.flag),
       bodyTexture: params.bodyTexture || undefined,

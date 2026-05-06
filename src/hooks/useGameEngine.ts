@@ -9,7 +9,7 @@ import {
   FOOD_EMOJIS, SPECIAL_FOOD_EMOJIS, FOOD_IMAGES, SPECIAL_FOOD_IMAGES,
   type Worm, type Food, type Coin, type Particle, type Camera, type Potion, type Chest, type FlyingCoin,
   type Segment, type WormSkin, type AIStrategy, type GameMode, type HeadType, type PotionType,
-  POTION_DURATION, POTION_COUNT, CHEST_COUNT,
+  POTION_DURATION, POTION_COUNT, CHEST_COUNT, type EyeStyle, type MouthStyle,
 } from '@/types/game'
 // Multiplayer now handled by SpacetimeService
 
@@ -130,37 +130,107 @@ function drawDefaultHeadFace(
   headR: number,
   colors: string[],
   eyeBlink: number,
+  eyeStyle: EyeStyle = 'classic',
+  mouthStyle: MouthStyle = 'smile',
 ) {
   ctx.beginPath()
   ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
   ctx.fillStyle = colors[0]
   ctx.fill()
 
+  drawFaceDetails(ctx, hp, headR, colors[0], eyeBlink, eyeStyle, mouthStyle)
+}
+
+function drawFaceDetails(
+  ctx: CanvasRenderingContext2D,
+  hp: { x: number; y: number },
+  headR: number,
+  blinkFill: string,
+  eyeBlink: number,
+  eyeStyle: EyeStyle,
+  mouthStyle: MouthStyle,
+) {
   const eyeR = headR * 0.32
   const pupilR = eyeR * 0.55
   const eyeSpacing = headR * 0.35
+  const eyeY = hp.y - headR * 0.1
+
+  const drawClosedEye = (ex: number, arch = 0.45) => {
+    ctx.beginPath()
+    ctx.lineWidth = Math.max(2, headR * 0.11)
+    ctx.lineCap = 'round'
+    ctx.strokeStyle = '#111'
+    ctx.moveTo(ex - eyeR * 0.7, eyeY)
+    ctx.quadraticCurveTo(ex, eyeY - eyeR * arch, ex + eyeR * 0.7, eyeY)
+    ctx.stroke()
+  }
 
   for (let side = -1; side <= 1; side += 2) {
     const ex = hp.x + side * eyeSpacing
-    const ey = hp.y - headR * 0.1
+    const winkEye = eyeStyle === 'wink' && side === 1
+    const happyEye = eyeStyle === 'happy'
+    const angryEye = eyeStyle === 'angry'
+
+    if (winkEye || happyEye) {
+      drawClosedEye(ex, happyEye ? 0.6 : 0.18)
+      continue
+    }
+
+    const eyeOffsetY = angryEye ? eyeR * 0.06 : 0
 
     ctx.beginPath()
-    ctx.arc(ex, ey, eyeR, 0, Math.PI * 2)
-    ctx.fillStyle = eyeBlink > 0 ? colors[0] : '#ffffff'
+    ctx.arc(ex, eyeY + eyeOffsetY, eyeR, 0, Math.PI * 2)
+    ctx.fillStyle = eyeBlink > 0 ? blinkFill : '#ffffff'
     ctx.fill()
 
     if (eyeBlink <= 0) {
       ctx.beginPath()
-      ctx.arc(ex, ey, pupilR, 0, Math.PI * 2)
+      ctx.arc(ex, eyeY + eyeOffsetY, pupilR, 0, Math.PI * 2)
       ctx.fillStyle = '#111'
       ctx.fill()
 
       ctx.beginPath()
-      ctx.arc(ex - pupilR * 0.3, ey - pupilR * 0.3, pupilR * 0.35, 0, Math.PI * 2)
+      ctx.arc(ex - pupilR * 0.3, eyeY + eyeOffsetY - pupilR * 0.3, pupilR * 0.35, 0, Math.PI * 2)
       ctx.fillStyle = '#fff'
       ctx.fill()
+
+      if (angryEye) {
+        ctx.beginPath()
+        ctx.lineWidth = Math.max(2, headR * 0.09)
+        ctx.lineCap = 'round'
+        ctx.strokeStyle = '#111'
+        ctx.moveTo(ex - eyeR * 0.8, eyeY - eyeR * 0.95)
+        ctx.lineTo(ex + side * eyeR * 0.55, eyeY - eyeR * 1.2)
+        ctx.stroke()
+      }
     }
   }
+
+  if (mouthStyle === 'none') return
+
+  const mouthY = hp.y + headR * 0.42
+  ctx.beginPath()
+  ctx.lineWidth = Math.max(2, headR * 0.1)
+  ctx.lineCap = 'round'
+  ctx.strokeStyle = '#111'
+
+  if (mouthStyle === 'surprised') {
+    ctx.arc(hp.x, mouthY - headR * 0.02, headR * 0.15, 0, Math.PI * 2)
+    ctx.stroke()
+    return
+  }
+
+  if (mouthStyle === 'angry') {
+    ctx.moveTo(hp.x - headR * 0.28, mouthY + headR * 0.08)
+    ctx.quadraticCurveTo(hp.x, mouthY - headR * 0.18, hp.x + headR * 0.28, mouthY + headR * 0.08)
+    ctx.stroke()
+    return
+  }
+
+  const smileDepth = mouthStyle === 'grin' ? headR * 0.22 : headR * 0.14
+  ctx.moveTo(hp.x - headR * 0.3, mouthY - headR * 0.02)
+  ctx.quadraticCurveTo(hp.x, mouthY + smileDepth, hp.x + headR * 0.3, mouthY - headR * 0.02)
+  ctx.stroke()
 }
 
 function drawTexturedHeadFace(
@@ -170,6 +240,8 @@ function drawTexturedHeadFace(
   img: HTMLImageElement,
   angle: number,
   eyeBlink: number,
+  eyeStyle: EyeStyle = 'classic',
+  mouthStyle: MouthStyle = 'smile',
 ) {
   ctx.save()
   ctx.beginPath()
@@ -181,31 +253,7 @@ function drawTexturedHeadFace(
   ctx.drawImage(img, -drawR * 1.25, -drawR, drawR * 2.5, drawR * 2)
   ctx.restore()
 
-  const eyeR = headR * 0.32
-  const pupilR = eyeR * 0.55
-  const eyeSpacing = headR * 0.35
-
-  for (let side = -1; side <= 1; side += 2) {
-    const ex = hp.x + side * eyeSpacing
-    const ey = hp.y - headR * 0.1
-
-    ctx.beginPath()
-    ctx.arc(ex, ey, eyeR, 0, Math.PI * 2)
-    ctx.fillStyle = eyeBlink > 0 ? 'rgba(255,255,255,0.12)' : '#ffffff'
-    ctx.fill()
-
-    if (eyeBlink <= 0) {
-      ctx.beginPath()
-      ctx.arc(ex, ey, pupilR, 0, Math.PI * 2)
-      ctx.fillStyle = '#111'
-      ctx.fill()
-
-      ctx.beginPath()
-      ctx.arc(ex - pupilR * 0.3, ey - pupilR * 0.3, pupilR * 0.35, 0, Math.PI * 2)
-      ctx.fillStyle = '#fff'
-      ctx.fill()
-    }
-  }
+  drawFaceDetails(ctx, hp, headR, 'rgba(255,255,255,0.12)', eyeBlink, eyeStyle, mouthStyle)
 }
 
 function drawContainedTextureInCircle(
@@ -2224,6 +2272,8 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   const headR = radius * camera.zoom
   const angle = worm.angle
   const headType = worm.skin.headType ?? 'default'
+  const eyeStyle = worm.skin.eyeStyle ?? 'classic'
+  const mouthStyle = worm.skin.mouthStyle ?? 'smile'
 
   if (headType !== 'default' && HEAD_IMAGES[headType]) {
     // Custom head image — draw as the worm's actual head, big and clear
@@ -2232,7 +2282,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
     if (headImg) {
       let imageTopOffset = 0.75
       if (isAccessoryHeadImage(headSrc, headImg)) {
-        drawDefaultHeadFace(ctx, hp, headR, colors, worm.eyeBlink)
+        drawDefaultHeadFace(ctx, hp, headR, colors, worm.eyeBlink, eyeStyle, mouthStyle)
         // Accessory-only heads should sit on the worm face instead of floating above it.
         imageTopOffset = 0.48
       }
@@ -2245,10 +2295,10 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
     }
   } else {
     if (worm.skin.isFlag && bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0) {
-      drawTexturedHeadFace(ctx, hp, headR, bodyTexImg, angle, worm.eyeBlink)
+      drawTexturedHeadFace(ctx, hp, headR, bodyTexImg, angle, worm.eyeBlink, eyeStyle, mouthStyle)
     } else {
       // Default eyes — always upright (fixed position, no rotation)
-      drawDefaultHeadFace(ctx, hp, headR, colors, worm.eyeBlink)
+      drawDefaultHeadFace(ctx, hp, headR, colors, worm.eyeBlink, eyeStyle, mouthStyle)
     }
   }
 

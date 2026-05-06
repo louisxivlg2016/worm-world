@@ -26,12 +26,16 @@ export type HeadType = 'default' | 'queen' | 'king' | 'dragon'
   | 'carnival' | 'holi' | 'mayday' | 'bastille' | 'july4th' | 'muertos' | 'diwali' | 'reveillon' | 'cny' | 'thanksgiving' | 'eid'
 
 export type BodyStyle = 'circles' | 'tube'
+export type EyeStyle = 'classic' | 'angry' | 'happy' | 'wink'
+export type MouthStyle = 'none' | 'smile' | 'grin' | 'angry' | 'surprised'
 
 export interface WormSkin {
   colors: string[]
   eye?: string
   name?: string
   headType?: HeadType
+  eyeStyle?: EyeStyle
+  mouthStyle?: MouthStyle
   flagName?: string
   bodyTexture?: string // URL to a body texture image
   isFlag?: boolean // true for flag skins (continuous body texture)

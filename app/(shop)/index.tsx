@@ -108,6 +108,18 @@ type HeadOption = {
   locked: boolean;
 };
 
+type EyeOption = {
+  id: "classic" | "angry" | "happy" | "wink";
+  label: string;
+  preview: string;
+};
+
+type MouthOption = {
+  id: "none" | "smile" | "grin" | "angry" | "surprised";
+  label: string;
+  preview: string;
+};
+
 function getHeadOptions(): HeadOption[] {
   const base: HeadOption[] = [
     { id: "default", label: "Classique", locked: false },
@@ -142,6 +154,21 @@ const FLAG_PRICE = 200;
 const DRAGON_PRICE = 2000;
 const TUBE_PRICE = 500;
 
+const EYE_OPTIONS: EyeOption[] = [
+  { id: "classic", label: "Classiques", preview: "◉ ◉" },
+  { id: "angry", label: "Méchants", preview: "⌒ ⌒" },
+  { id: "happy", label: "Joyeux", preview: "◡ ◡" },
+  { id: "wink", label: "Clin d'œil", preview: "◉ ー" },
+];
+
+const MOUTH_OPTIONS: MouthOption[] = [
+  { id: "none", label: "Aucune", preview: "·" },
+  { id: "smile", label: "Sourire", preview: "◡" },
+  { id: "grin", label: "Grand sourire", preview: "ᴗ" },
+  { id: "angry", label: "Méchante", preview: "⌣" },
+  { id: "surprised", label: "Surprise", preview: "O" },
+];
+
 const COLOR_PALETTE = [
   "#ff3366", "#ff6b9d", "#cc0044", "#00ccff", "#0088ff", "#0055cc",
   "#7cff00", "#44cc00", "#228800", "#ff6b35", "#ffaa00", "#cc4400",
@@ -174,6 +201,8 @@ export default function ShopScreen() {
   ]);
   const [activeSlot, setActiveSlot] = useState(0);
   const [headType, setHeadType] = useState("default");
+  const [eyeStyle, setEyeStyle] = useState<EyeOption["id"]>("classic");
+  const [mouthStyle, setMouthStyle] = useState<MouthOption["id"]>("smile");
   const [bodyStyle, setBodyStyle] = useState<"circles" | "tube">("circles");
   const [selectedFlag, setSelectedFlag] = useState<string | null>(null);
 
@@ -238,6 +267,8 @@ export default function ShopScreen() {
         flag: selectedFlag ?? "",
         bodyTexture: getFlagTextureUri(selectedFlag),
         headType,
+        eyeStyle,
+        mouthStyle,
         bodyStyle,
         colors: JSON.stringify(selectedColors),
       },
@@ -389,6 +420,44 @@ export default function ShopScreen() {
           </Pressable>
         ))}
       </View>
+
+      <Text style={styles.sectionTitle}>Yeux</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionRow}>
+        {EYE_OPTIONS.map((option) => (
+          <Pressable
+            key={option.id}
+            onPress={() => setEyeStyle(option.id)}
+            style={[
+              styles.faceOption,
+              eyeStyle === option.id && styles.faceOptionSelected,
+            ]}
+          >
+            <Text style={styles.facePreview}>{option.preview}</Text>
+            <Text style={[styles.faceLabel, eyeStyle === option.id && styles.faceLabelSelected]}>
+              {option.label}
+            </Text>
+          </Pressable>
+        ))}
+      </ScrollView>
+
+      <Text style={styles.sectionTitle}>Bouche</Text>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionRow}>
+        {MOUTH_OPTIONS.map((option) => (
+          <Pressable
+            key={option.id}
+            onPress={() => setMouthStyle(option.id)}
+            style={[
+              styles.faceOption,
+              mouthStyle === option.id && styles.faceOptionSelected,
+            ]}
+          >
+            <Text style={styles.facePreview}>{option.preview}</Text>
+            <Text style={[styles.faceLabel, mouthStyle === option.id && styles.faceLabelSelected]}>
+              {option.label}
+            </Text>
+          </Pressable>
+        ))}
+      </ScrollView>
 
       {/* Color Picker */}
       <Text style={styles.sectionTitle}>{t("shopColors")}</Text>
@@ -571,6 +640,42 @@ const styles = StyleSheet.create({
   },
   headLabelLocked: {
     color: colors.textSecondary,
+  },
+  optionRow: {
+    flexDirection: "row",
+    marginBottom: spacing.sm,
+  },
+  faceOption: {
+    minWidth: 96,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    borderCurve: "continuous",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.15)",
+    marginRight: spacing.sm,
+  },
+  faceOptionSelected: {
+    borderColor: colors.gold,
+    backgroundColor: "rgba(255,215,0,0.15)",
+  },
+  facePreview: {
+    color: colors.text,
+    fontSize: 22,
+    fontWeight: "700",
+    marginBottom: 4,
+  },
+  faceLabel: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  faceLabelSelected: {
+    color: colors.gold,
   },
   toggleRow: {
     flexDirection: "row",
