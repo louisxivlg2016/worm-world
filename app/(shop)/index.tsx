@@ -143,6 +143,7 @@ function ShopWormPreview({
   headPreview?: string;
 }) {
   const segments = Array.from({ length: 8 });
+  const hasHeadCostume = !!headPreview
 
   const renderEye = (side: "left" | "right") => {
     const closed = eyeStyle === "happy" || (eyeStyle === "wink" && side === "right");
@@ -183,6 +184,7 @@ function ShopWormPreview({
             styles.previewSegment,
             { left, top },
             isHead && styles.previewHead,
+            isHead && hasHeadCostume && styles.previewHeadShell,
           ];
 
           const face = isHead ? (
@@ -194,17 +196,21 @@ function ShopWormPreview({
                   resizeMode="contain"
                 />
               ) : null}
-              <View style={styles.previewEyesRow}>
-                {renderEye("left")}
-                {renderEye("right")}
-              </View>
-              {mouthNode}
+              {!hasHeadCostume && (
+                <>
+                  <View style={styles.previewEyesRow}>
+                    {renderEye("left")}
+                    {renderEye("right")}
+                  </View>
+                  {mouthNode}
+                </>
+              )}
             </View>
           ) : null;
 
           const segmentSource = flagSource || bodyTextureSource;
 
-          if (segmentSource) {
+          if (segmentSource && !(isHead && hasHeadCostume)) {
             return (
               <ImageBackground
                 key={index}
@@ -760,6 +766,11 @@ const styles = StyleSheet.create({
     height: 62,
     borderRadius: 31,
   },
+  previewHeadShell: {
+    backgroundColor: "transparent",
+    borderColor: "transparent",
+    boxShadow: "none",
+  },
   previewHighlight: {
     position: "absolute",
     top: 8,
@@ -775,9 +786,9 @@ const styles = StyleSheet.create({
   },
   previewHeadCostume: {
     position: "absolute",
-    width: 42,
-    height: 42,
-    top: -6,
+    width: 56,
+    height: 56,
+    top: 2,
   },
   previewEyesRow: {
     flexDirection: "row",
