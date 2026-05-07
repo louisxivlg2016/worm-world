@@ -107,6 +107,11 @@ type HeadOption = {
   id: string;
   label: string;
   locked: boolean;
+  preview?: string;
+  unlockKey?: string;
+  eventId?: string;
+  eventEmoji?: string;
+  currencyImage?: string;
 };
 
 type EyeOption = {
@@ -126,11 +131,13 @@ function ShopWormPreview({
   eyeStyle,
   mouthStyle,
   flagSource,
+  headPreview,
 }: {
   colors: string[];
   eyeStyle: EyeOption["id"];
   mouthStyle: MouthOption["id"];
   flagSource?: any;
+  headPreview?: string;
 }) {
   const segments = Array.from({ length: 8 });
 
@@ -177,6 +184,13 @@ function ShopWormPreview({
 
           const face = isHead ? (
             <View style={styles.previewFaceWrap}>
+              {headPreview ? (
+                <Image
+                  source={{ uri: headPreview }}
+                  style={styles.previewHeadCostume}
+                  resizeMode="contain"
+                />
+              ) : null}
               <View style={styles.previewEyesRow}>
                 {renderEye("left")}
                 {renderEye("right")}
@@ -220,17 +234,17 @@ function ShopWormPreview({
 function getHeadOptions(): HeadOption[] {
   const base: HeadOption[] = [
     { id: "default", label: "Classique", locked: false },
-    { id: "queen", label: "Reine", locked: false },
-    { id: "king", label: "Roi", locked: false },
-    { id: "dragon", label: "Dragon", locked: false },
-    { id: "cat", label: "Chat 🐱", locked: false },
-    { id: "dog", label: "Chien 🐶", locked: false },
-    { id: "panda", label: "Panda 🐼", locked: false },
-    { id: "fox", label: "Renard 🦊", locked: false },
-    { id: "penguin", label: "Pingouin 🐧", locked: false },
-    { id: "robot", label: "Robot 🤖", locked: false },
-    { id: "alien", label: "Alien 👽", locked: false },
-    { id: "ninja", label: "Ninja 🥷", locked: false },
+    { id: "queen", label: "Reine", locked: false, preview: "/heads/queen.png" },
+    { id: "king", label: "Roi", locked: false, preview: "/heads/king.png" },
+    { id: "dragon", label: "Dragon", locked: false, preview: "/heads/dragon.png" },
+    { id: "cat", label: "Chat 🐱", locked: false, preview: "/heads/cat.png" },
+    { id: "dog", label: "Chien 🐶", locked: false, preview: "/heads/dog.png" },
+    { id: "panda", label: "Panda 🐼", locked: false, preview: "/heads/panda.png" },
+    { id: "fox", label: "Renard 🦊", locked: false, preview: "/heads/fox.png" },
+    { id: "penguin", label: "Pingouin 🐧", locked: false, preview: "/heads/penguin.png" },
+    { id: "robot", label: "Robot 🤖", locked: false, preview: "/heads/robot.png" },
+    { id: "alien", label: "Alien 👽", locked: false, preview: "/heads/alien.png" },
+    { id: "ninja", label: "Ninja 🥷", locked: false, preview: "/heads/ninja.png" },
   ];
   const eventHeads = GAME_EVENTS.flatMap((e) => {
     const locked = getStorage().getItem(e.unlockKey) !== "true";
@@ -238,6 +252,7 @@ function getHeadOptions(): HeadOption[] {
       id: c.id,
       label: `${c.label} ${e.emoji}`,
       locked,
+      preview: c.preview,
       unlockKey: e.unlockKey as string | undefined,
       eventId: e.id as string | undefined,
       eventEmoji: e.emoji as string | undefined,
@@ -331,11 +346,7 @@ export default function ShopScreen() {
     );
   }, [flagSearch, flagLang]);
 
-  const filteredHeads = useMemo(() => {
-    if (!headSearch.trim()) return headOptions;
-    const q = headSearch.toLowerCase();
-    return headOptions.filter((h) => h.label.toLowerCase().includes(q));
-  }, [headSearch, headOptions]);
+  const filteredHeads = useMemo(() => headOptions, [headOptions]);
 
   const availableHeadIds = useMemo(
     () => filteredHeads.filter((h) => !h.locked).map((h) => h.id),
@@ -434,6 +445,7 @@ export default function ShopScreen() {
     : {};
 
   const selectedFlagSource = selectedFlag ? FLAG_IMAGES[selectedFlag] : undefined;
+  const selectedHeadPreview = selectedHeadMeta?.preview;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -445,12 +457,32 @@ export default function ShopScreen() {
         <Text style={styles.coinText}>{"\u{1FA99}"} {coins}</Text>
       </View>
 
-      <ShopWormPreview
-        colors={selectedColors}
-        eyeStyle={eyeStyle}
-        mouthStyle={mouthStyle}
-        flagSource={selectedFlagSource}
-      />
+      <View style={styles.previewNavRow}>
+        <Pressable
+          onPress={() => cycleHead(-1)}
+          style={[styles.costumeArrowBtn, availableHeadIds.length === 0 && styles.costumeArrowBtnDisabled]}
+          disabled={availableHeadIds.length === 0}
+        >
+          <Text style={styles.costumeArrowText}>‹</Text>
+        </Pressable>
+        <View style={styles.previewNavCenter}>
+          <ShopWormPreview
+            colors={selectedColors}
+            eyeStyle={eyeStyle}
+            mouthStyle={mouthStyle}
+            flagSource={selectedFlagSource}
+            headPreview={selectedHeadPreview}
+          />
+          <Text style={styles.previewCostumeName}>{selectedHeadMeta?.label ?? "Classique"}</Text>
+        </View>
+        <Pressable
+          onPress={() => cycleHead(1)}
+          style={[styles.costumeArrowBtn, availableHeadIds.length === 0 && styles.costumeArrowBtnDisabled]}
+          disabled={availableHeadIds.length === 0}
+        >
+          <Text style={styles.costumeArrowText}>›</Text>
+        </Pressable>
+      </View>
 
       {/* Preset Skins */}
       <Text style={styles.sectionTitle}>{t("shopPresets")}</Text>
@@ -476,35 +508,6 @@ export default function ShopScreen() {
 
       {/* Head / Costume Selector */}
       <Text style={styles.sectionTitle}>{t("shopHead")}</Text>
-      <TextInput
-        style={styles.searchInput}
-        placeholder={t("searchCostume")}
-        placeholderTextColor={colors.textSecondary}
-        value={headSearch}
-        onChangeText={setHeadSearch}
-      />
-      <View style={styles.costumeNavRow}>
-        <Pressable
-          onPress={() => cycleHead(-1)}
-          style={[styles.costumeArrowBtn, availableHeadIds.length === 0 && styles.costumeArrowBtnDisabled]}
-          disabled={availableHeadIds.length === 0}
-        >
-          <Text style={styles.costumeArrowText}>‹</Text>
-        </Pressable>
-        <View style={styles.costumeCurrentCard}>
-          <Text style={styles.costumeCurrentLabel}>Costume choisi</Text>
-          <Text style={styles.costumeCurrentValue} numberOfLines={1}>
-            {selectedHeadMeta?.label ?? "Classique"}
-          </Text>
-        </View>
-        <Pressable
-          onPress={() => cycleHead(1)}
-          style={[styles.costumeArrowBtn, availableHeadIds.length === 0 && styles.costumeArrowBtnDisabled]}
-          disabled={availableHeadIds.length === 0}
-        >
-          <Text style={styles.costumeArrowText}>›</Text>
-        </Pressable>
-      </View>
       {/* Per-event currency balances */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.sm }}>
         <View style={{ flexDirection: "row", gap: 8 }}>
@@ -520,38 +523,20 @@ export default function ShopScreen() {
           ))}
         </View>
       </ScrollView>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.headRow}>
-        {filteredHeads.map((h) => (
-          <Pressable
-            key={h.id}
-            onPress={() => {
-              if (h.locked && h.unlockKey && h.eventId) {
-                handleUnlockEvent(h.eventId, h.unlockKey);
-              } else if (!h.locked) {
-                setHeadType(h.id);
-              }
-            }}
-            style={[
-              styles.headItem,
-              headType === h.id && styles.headItemSelected,
-              h.locked && styles.headItemLocked,
-            ]}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-              {h.locked && h.unlockKey && h.currencyImage && (
-                <Image source={{ uri: h.currencyImage }} style={{ width: 18, height: 18 }} resizeMode="contain" />
-              )}
-              <Text style={[styles.headLabel, h.locked && styles.headLabelLocked]}>
-                {h.locked
-                  ? (h.unlockKey
-                      ? (h.currencyImage ? `30 ${h.label}` : `${h.eventEmoji || "💎"} 30 ${h.label}`)
-                      : `🔒 ${h.label}`)
-                  : h.label}
-              </Text>
-            </View>
-          </Pressable>
-        ))}
-      </ScrollView>
+      {!!selectedHeadMeta?.locked && (
+        <Pressable
+          onPress={() => {
+            if (selectedHeadMeta.unlockKey && selectedHeadMeta.eventId) {
+              handleUnlockEvent(selectedHeadMeta.eventId, selectedHeadMeta.unlockKey);
+            }
+          }}
+          style={styles.lockedCostumeCard}
+        >
+          <Text style={styles.lockedCostumeText}>
+            {selectedHeadMeta.currencyImage ? `30 ${selectedHeadMeta.label}` : `${selectedHeadMeta.eventEmoji || "💎"} 30 ${selectedHeadMeta.label}`}
+          </Text>
+        </Pressable>
+      )}
 
       {/* Body Style Toggle */}
       <Text style={styles.sectionTitle}>{t("shopBodyStyle")}</Text>
@@ -730,6 +715,22 @@ const styles = StyleSheet.create({
     height: 92,
     justifyContent: "center",
   },
+  previewNavRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  previewNavCenter: {
+    flex: 1,
+  },
+  previewCostumeName: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: "800",
+    textAlign: "center",
+    marginTop: spacing.sm,
+  },
   previewSegment: {
     position: "absolute",
     width: 58,
@@ -763,6 +764,12 @@ const styles = StyleSheet.create({
   previewFaceWrap: {
     alignItems: "center",
     justifyContent: "center",
+  },
+  previewHeadCostume: {
+    position: "absolute",
+    width: 68,
+    height: 68,
+    top: -14,
   },
   previewEyesRow: {
     flexDirection: "row",
@@ -870,10 +877,6 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontSize: 11,
   },
-  headRow: {
-    flexDirection: "row",
-    marginBottom: spacing.sm,
-  },
   gemsBar: {
     flexDirection: "row", alignItems: "center", gap: 6,
     backgroundColor: "rgba(147,197,253,0.12)", borderRadius: 14,
@@ -886,39 +889,6 @@ const styles = StyleSheet.create({
   },
   gemsHint: {
     color: colors.textSecondary, fontSize: 12,
-  },
-  headItem: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    backgroundColor: "rgba(39,71,99,0.94)",
-    borderRadius: 20,
-    borderCurve: "continuous",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.15)",
-    marginRight: spacing.sm,
-  },
-  headItemSelected: {
-    borderColor: colors.gold,
-    backgroundColor: "rgba(255,215,0,0.15)",
-  },
-  headItemLocked: {
-    opacity: 0.8,
-    borderColor: "rgba(147,197,253,0.5)",
-    backgroundColor: "rgba(147,197,253,0.1)",
-  },
-  headLabel: {
-    color: colors.text,
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  headLabelLocked: {
-    color: colors.textSecondary,
-  },
-  costumeNavRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    marginBottom: spacing.sm,
   },
   costumeArrowBtn: {
     width: 48,
@@ -939,28 +909,20 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     lineHeight: 30,
   },
-  costumeCurrentCard: {
-    flex: 1,
-    minHeight: 48,
+  lockedCostumeCard: {
     borderRadius: 16,
     borderCurve: "continuous",
     backgroundColor: "rgba(255,255,255,0.10)",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.14)",
-    justifyContent: "center",
     paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.sm,
   },
-  costumeCurrentLabel: {
-    color: colors.textSecondary,
-    fontSize: 11,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    marginBottom: 2,
-  },
-  costumeCurrentValue: {
+  lockedCostumeText: {
     color: colors.text,
-    fontSize: 14,
-    fontWeight: "800",
+    fontSize: 13,
+    fontWeight: "700",
   },
   optionRow: {
     flexDirection: "row",
