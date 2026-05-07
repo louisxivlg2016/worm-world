@@ -1,12 +1,12 @@
 export const colors = {
-  background: "#2f4858",
-  surface: "#42677a",
-  primary: "#ff8c42",
-  accent: "#8bd3dd",
+  background: "#244b3c",
+  surface: "#356a56",
+  primary: "#7acb88",
+  accent: "#b7e4c7",
   text: "#ffffff",
-  textSecondary: "rgba(245,250,252,0.78)",
-  danger: "#ff6b6b",
-  gold: "#ffd166",
+  textSecondary: "rgba(241,255,245,0.78)",
+  danger: "#ff7b7b",
+  gold: "#f4d35e",
 } as const;
 
 export const spacing = {
