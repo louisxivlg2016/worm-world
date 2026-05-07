@@ -32,7 +32,7 @@ export default function RootLayout() {
     spacetimeService.connect().then(() => {
       console.log("[App/Web] SpacetimeDB connected");
     }).catch((err) => {
-      console.error("[App/Web] SpacetimeDB connection failed:", err);
+      console.warn("[App/Web] SpacetimeDB connection skipped:", err);
     });
   }, []);
 
@@ -92,4 +92,3 @@ function WebLayout() {
     </>
   );
 }
-

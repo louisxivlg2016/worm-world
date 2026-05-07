@@ -71,7 +71,7 @@ export default function RootLayout() {
     spacetimeService.connect().then(() => {
       console.log("[App] SpacetimeDB connected");
     }).catch((err) => {
-      console.error("[App] SpacetimeDB connection failed:", err);
+      console.warn("[App] SpacetimeDB connection skipped:", err);
     });
   }, []);
 

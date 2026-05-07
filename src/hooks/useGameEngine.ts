@@ -2721,7 +2721,7 @@ export function useGameEngine(
             console.log('[MP] Connected, subscribing to game data...')
             const rid = spacetimeService.getCurrentRoomId()
             if (rid) spacetimeService.subscribeToGameData(rid)
-          }).catch((e: any) => console.error('[MP] Connect failed:', e))
+          }).catch((e: any) => console.warn('[MP] Connect skipped:', e))
         } else {
           const rid = spacetimeService.getCurrentRoomId()
           console.log('[MP] Already connected, currentRoomId:', rid)

@@ -36,14 +36,18 @@ class SpacetimeService {
   private callbacks: GameCallbacks = {}
   private updateLoopInterval: ReturnType<typeof setInterval> | null = null
   private connected = false
+  private connectPromise: Promise<Identity> | null = null
   private pendingCreateResolve: ((result: { slug: string; seed: number; gameMode: string; maxPlayers: number } | null) => void) | null = null
 
   connect(): Promise<Identity> {
     if (this.conn && this.connected && this.identity) {
       return Promise.resolve(this.identity)
     }
+    if (this.connectPromise) {
+      return this.connectPromise
+    }
 
-    return new Promise((resolve, reject) => {
+    this.connectPromise = new Promise((resolve, reject) => {
       let savedToken: string | null = null
       try { savedToken = localStorage.getItem('spacetimedb_token') } catch {}
 
@@ -56,9 +60,11 @@ class SpacetimeService {
           .withToken(savedToken || undefined)
           .onConnect((conn: DbConnection, identity: Identity, token: string) => {
             console.log('[SpacetimeDB] Connected, identity:', identity.toHexString())
+            this.conn = conn
             this.identity = identity
             this.token = token
             this.connected = true
+            this.connectPromise = null
             try { localStorage.setItem('spacetimedb_token', token) } catch {}
 
             conn.subscriptionBuilder()
@@ -79,14 +85,20 @@ class SpacetimeService {
             this.connected = false
           })
           .onConnectError((_ctx: any, err: Error) => {
-            console.error('[SpacetimeDB] Connection error:', err)
+            this.connected = false
+            this.conn = null
+            this.connectPromise = null
+            console.warn('[SpacetimeDB] Connection unavailable:', err)
             reject(err)
           })
           .build()
       } catch (e) {
+        this.connectPromise = null
         reject(e)
       }
     })
+
+    return this.connectPromise
   }
 
   private setupTableCallbacks(conn: DbConnection) {
