@@ -108,6 +108,7 @@ type HeadOption = {
   label: string;
   locked: boolean;
   preview?: string;
+  bodyTexture?: string;
   unlockKey?: string;
   eventId?: string;
   eventEmoji?: string;
@@ -131,12 +132,14 @@ function ShopWormPreview({
   eyeStyle,
   mouthStyle,
   flagSource,
+  bodyTextureSource,
   headPreview,
 }: {
   colors: string[];
   eyeStyle: EyeOption["id"];
   mouthStyle: MouthOption["id"];
   flagSource?: any;
+  bodyTextureSource?: any;
   headPreview?: string;
 }) {
   const segments = Array.from({ length: 8 });
@@ -199,11 +202,13 @@ function ShopWormPreview({
             </View>
           ) : null;
 
-          if (flagSource) {
+          const segmentSource = flagSource || bodyTextureSource;
+
+          if (segmentSource) {
             return (
               <ImageBackground
                 key={index}
-                source={flagSource}
+                source={segmentSource}
                 resizeMode="cover"
                 imageStyle={styles.previewSegmentImage}
                 style={commonStyle}
@@ -236,15 +241,15 @@ function getHeadOptions(): HeadOption[] {
     { id: "default", label: "Classique", locked: false },
     { id: "queen", label: "Reine", locked: false, preview: "/heads/queen.png" },
     { id: "king", label: "Roi", locked: false, preview: "/heads/king.png" },
-    { id: "dragon", label: "Dragon", locked: false, preview: "/heads/dragon.png" },
-    { id: "cat", label: "Chat 🐱", locked: false, preview: "/heads/cat.png" },
-    { id: "dog", label: "Chien 🐶", locked: false, preview: "/heads/dog.png" },
-    { id: "panda", label: "Panda 🐼", locked: false, preview: "/heads/panda.png" },
-    { id: "fox", label: "Renard 🦊", locked: false, preview: "/heads/fox.png" },
-    { id: "penguin", label: "Pingouin 🐧", locked: false, preview: "/heads/penguin.png" },
-    { id: "robot", label: "Robot 🤖", locked: false, preview: "/heads/robot.png" },
-    { id: "alien", label: "Alien 👽", locked: false, preview: "/heads/alien.png" },
-    { id: "ninja", label: "Ninja 🥷", locked: false, preview: "/heads/ninja.png" },
+    { id: "dragon", label: "Dragon", locked: false, preview: "/heads/dragon.png", bodyTexture: "/heads/dragon-body.png" },
+    { id: "cat", label: "Chat 🐱", locked: false, preview: "/heads/cat.png", bodyTexture: "/heads/cat-body.png" },
+    { id: "dog", label: "Chien 🐶", locked: false, preview: "/heads/dog.png", bodyTexture: "/heads/dog-body.png" },
+    { id: "panda", label: "Panda 🐼", locked: false, preview: "/heads/panda.png", bodyTexture: "/heads/panda-body.png" },
+    { id: "fox", label: "Renard 🦊", locked: false, preview: "/heads/fox.png", bodyTexture: "/heads/fox-body.png" },
+    { id: "penguin", label: "Pingouin 🐧", locked: false, preview: "/heads/penguin.png", bodyTexture: "/heads/penguin-body.png" },
+    { id: "robot", label: "Robot 🤖", locked: false, preview: "/heads/robot.png", bodyTexture: "/heads/robot-body.png" },
+    { id: "alien", label: "Alien 👽", locked: false, preview: "/heads/alien.png", bodyTexture: "/heads/alien-body.png" },
+    { id: "ninja", label: "Ninja 🥷", locked: false, preview: "/heads/ninja.png", bodyTexture: "/heads/ninja-body.png" },
   ];
   const eventHeads = GAME_EVENTS.flatMap((e) => {
     const locked = getStorage().getItem(e.unlockKey) !== "true";
@@ -253,6 +258,7 @@ function getHeadOptions(): HeadOption[] {
       label: `${c.label} ${e.emoji}`,
       locked,
       preview: c.preview,
+      bodyTexture: c.bodyTexture,
       unlockKey: e.unlockKey as string | undefined,
       eventId: e.id as string | undefined,
       eventEmoji: e.emoji as string | undefined,
@@ -446,6 +452,7 @@ export default function ShopScreen() {
 
   const selectedFlagSource = selectedFlag ? FLAG_IMAGES[selectedFlag] : undefined;
   const selectedHeadPreview = selectedHeadMeta?.preview;
+  const selectedHeadBodySource = selectedHeadMeta?.bodyTexture ? { uri: selectedHeadMeta.bodyTexture } : undefined;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -471,6 +478,7 @@ export default function ShopScreen() {
             eyeStyle={eyeStyle}
             mouthStyle={mouthStyle}
             flagSource={selectedFlagSource}
+            bodyTextureSource={selectedHeadBodySource}
             headPreview={selectedHeadPreview}
           />
           <Text style={styles.previewCostumeName}>{selectedHeadMeta?.label ?? "Classique"}</Text>
@@ -767,9 +775,9 @@ const styles = StyleSheet.create({
   },
   previewHeadCostume: {
     position: "absolute",
-    width: 68,
-    height: 68,
-    top: -14,
+    width: 42,
+    height: 42,
+    top: -6,
   },
   previewEyesRow: {
     flexDirection: "row",
