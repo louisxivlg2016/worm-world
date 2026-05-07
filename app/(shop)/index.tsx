@@ -337,6 +337,24 @@ export default function ShopScreen() {
     return headOptions.filter((h) => h.label.toLowerCase().includes(q));
   }, [headSearch, headOptions]);
 
+  const availableHeadIds = useMemo(
+    () => filteredHeads.filter((h) => !h.locked).map((h) => h.id),
+    [filteredHeads],
+  );
+
+  const selectedHeadMeta = useMemo(
+    () => headOptions.find((h) => h.id === headType) ?? null,
+    [headOptions, headType],
+  );
+
+  const cycleHead = useCallback((direction: -1 | 1) => {
+    if (availableHeadIds.length === 0) return;
+    const currentIndex = availableHeadIds.indexOf(headType);
+    const safeIndex = currentIndex >= 0 ? currentIndex : 0;
+    const nextIndex = (safeIndex + direction + availableHeadIds.length) % availableHeadIds.length;
+    setHeadType(availableHeadIds[nextIndex]);
+  }, [availableHeadIds, headType]);
+
   const numColumns = isDesktop ? 3 : 2;
   const itemGap = spacing.sm;
   const effectiveWidth = isDesktop ? contentMaxWidth : width;
@@ -465,6 +483,28 @@ export default function ShopScreen() {
         value={headSearch}
         onChangeText={setHeadSearch}
       />
+      <View style={styles.costumeNavRow}>
+        <Pressable
+          onPress={() => cycleHead(-1)}
+          style={[styles.costumeArrowBtn, availableHeadIds.length === 0 && styles.costumeArrowBtnDisabled]}
+          disabled={availableHeadIds.length === 0}
+        >
+          <Text style={styles.costumeArrowText}>‹</Text>
+        </Pressable>
+        <View style={styles.costumeCurrentCard}>
+          <Text style={styles.costumeCurrentLabel}>Costume choisi</Text>
+          <Text style={styles.costumeCurrentValue} numberOfLines={1}>
+            {selectedHeadMeta?.label ?? "Classique"}
+          </Text>
+        </View>
+        <Pressable
+          onPress={() => cycleHead(1)}
+          style={[styles.costumeArrowBtn, availableHeadIds.length === 0 && styles.costumeArrowBtnDisabled]}
+          disabled={availableHeadIds.length === 0}
+        >
+          <Text style={styles.costumeArrowText}>›</Text>
+        </Pressable>
+      </View>
       {/* Per-event currency balances */}
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.sm }}>
         <View style={{ flexDirection: "row", gap: 8 }}>
@@ -873,6 +913,54 @@ const styles = StyleSheet.create({
   },
   headLabelLocked: {
     color: colors.textSecondary,
+  },
+  costumeNavRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  costumeArrowBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderCurve: "continuous",
+    backgroundColor: colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 6px 16px rgba(0,0,0,0.18)",
+  },
+  costumeArrowBtnDisabled: {
+    opacity: 0.45,
+  },
+  costumeArrowText: {
+    color: colors.text,
+    fontSize: 28,
+    fontWeight: "800",
+    lineHeight: 30,
+  },
+  costumeCurrentCard: {
+    flex: 1,
+    minHeight: 48,
+    borderRadius: 16,
+    borderCurve: "continuous",
+    backgroundColor: "rgba(255,255,255,0.10)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.14)",
+    justifyContent: "center",
+    paddingHorizontal: spacing.md,
+  },
+  costumeCurrentLabel: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    marginBottom: 2,
+  },
+  costumeCurrentValue: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: "800",
   },
   optionRow: {
     flexDirection: "row",
