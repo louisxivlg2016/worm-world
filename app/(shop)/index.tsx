@@ -142,8 +142,17 @@ function ShopWormPreview({
   bodyTextureSource?: any;
   headPreview?: string;
 }) {
-  const segments = Array.from({ length: 8 });
-  const hasHeadCostume = !!headPreview
+  const segmentLayout = [
+    { left: 10, top: 50, size: 40 },
+    { left: 34, top: 42, size: 44 },
+    { left: 64, top: 33, size: 48 },
+    { left: 98, top: 25, size: 52 },
+    { left: 136, top: 18, size: 54 },
+    { left: 174, top: 14, size: 56 },
+    { left: 214, top: 12, size: 58 },
+    { left: 254, top: 10, size: 62, head: true },
+  ];
+  const hasHeadCostume = !!headPreview;
 
   const renderEye = (side: "left" | "right") => {
     const closed = eyeStyle === "happy" || (eyeStyle === "wink" && side === "right");
@@ -175,15 +184,18 @@ function ShopWormPreview({
     <View style={styles.previewCard}>
       <Text style={styles.previewTitle}>Aperçu du ver</Text>
       <View style={styles.previewStage}>
-        {segments.map((_, index) => {
-          const isHead = index === segments.length - 1;
-          const left = index * 34;
-          const top = Math.abs(index - 3.5) * 4 + (index > 4 ? 4 : 0);
-          const stripeColor = palette[(segments.length - 1 - index) % palette.length] || palette[0];
+        {segmentLayout.map((segment, index) => {
+          const isHead = !!segment.head;
+          const stripeColor = palette[(segmentLayout.length - 1 - index) % palette.length] || palette[0];
           const commonStyle = [
             styles.previewSegment,
-            { left, top },
-            isHead && styles.previewHead,
+            {
+              left: segment.left,
+              top: segment.top,
+              width: segment.size,
+              height: segment.size,
+              borderRadius: segment.size / 2,
+            },
             isHead && hasHeadCostume && styles.previewHeadShell,
           ];
 
@@ -215,8 +227,11 @@ function ShopWormPreview({
               <ImageBackground
                 key={index}
                 source={segmentSource}
-                resizeMode="cover"
-                imageStyle={styles.previewSegmentImage}
+                resizeMode={flagSource ? "cover" : "stretch"}
+                imageStyle={[
+                  styles.previewSegmentImage,
+                  bodyTextureSource && !flagSource && styles.previewBodyTextureImage,
+                ]}
                 style={commonStyle}
               >
                 {face}
@@ -726,8 +741,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   previewStage: {
-    height: 92,
+    height: 104,
     justifyContent: "center",
+    width: "100%",
   },
   previewNavRow: {
     flexDirection: "row",
@@ -761,10 +777,8 @@ const styles = StyleSheet.create({
   previewSegmentImage: {
     borderRadius: 29,
   },
-  previewHead: {
-    width: 62,
-    height: 62,
-    borderRadius: 31,
+  previewBodyTextureImage: {
+    transform: [{ scale: 1.1 }],
   },
   previewHeadShell: {
     backgroundColor: "transparent",
@@ -786,9 +800,10 @@ const styles = StyleSheet.create({
   },
   previewHeadCostume: {
     position: "absolute",
-    width: 56,
-    height: 56,
-    top: 2,
+    width: 70,
+    height: 70,
+    top: -2,
+    left: -4,
   },
   previewEyesRow: {
     flexDirection: "row",
