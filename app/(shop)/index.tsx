@@ -103,6 +103,43 @@ const FLAG_SKINS: FlagSkin[] = [
   { name: "Emirats Arabes Unis", colors: ["#00843D", "#FFFFFF", "#000000", "#CE1126"] },
 ];
 
+type FlagRegion = "all" | "europe" | "ameriques" | "asie" | "afrique" | "oceanie" | "moyenorient";
+
+const FLAG_REGION_LABELS: Record<FlagRegion, string> = {
+  all: "Tous",
+  europe: "Europe",
+  ameriques: "Amériques",
+  asie: "Asie",
+  afrique: "Afrique",
+  oceanie: "Océanie",
+  moyenorient: "Moyen-Orient",
+};
+
+const FLAG_REGION_ORDER: FlagRegion[] = [
+  "all", "europe", "ameriques", "asie", "afrique", "moyenorient", "oceanie",
+];
+
+const FLAG_REGION_MAP: Record<string, Exclude<FlagRegion, "all">> = {
+  France: "europe", Allemagne: "europe", Italie: "europe", Espagne: "europe",
+  Portugal: "europe", "Royaume-Uni": "europe", Belgique: "europe", "Pays-Bas": "europe",
+  Suisse: "europe", Suede: "europe", Pologne: "europe", Ukraine: "europe",
+  Grece: "europe", Roumanie: "europe", Irlande: "europe", Croatie: "europe",
+  Norvege: "europe", Danemark: "europe", Finlande: "europe", Russie: "europe",
+  USA: "ameriques", Canada: "ameriques", Mexique: "ameriques", Bresil: "ameriques",
+  Argentine: "ameriques", Colombie: "ameriques", Chili: "ameriques", Perou: "ameriques",
+  Jamaique: "ameriques", Haiti: "ameriques", Cuba: "ameriques",
+  Japon: "asie", Chine: "asie", "Coree du Sud": "asie", Inde: "asie",
+  Pakistan: "asie", Indonesie: "asie", Philippines: "asie", Vietnam: "asie",
+  Thailande: "asie",
+  Maroc: "afrique", Algerie: "afrique", Tunisie: "afrique", Egypte: "afrique",
+  Senegal: "afrique", Nigeria: "afrique", "Afrique du Sud": "afrique",
+  Cameroun: "afrique", Ghana: "afrique", Congo: "afrique", Ethiopie: "afrique",
+  Kenya: "afrique",
+  Australie: "oceanie", "Nouvelle-Zelande": "oceanie",
+  Turquie: "moyenorient", Iran: "moyenorient", "Arabie Saoudite": "moyenorient",
+  Israel: "moyenorient", Palestine: "moyenorient", "Emirats Arabes Unis": "moyenorient",
+};
+
 type HeadOption = {
   id: string;
   label: string;
@@ -319,6 +356,7 @@ export default function ShopScreen() {
   const [mouthStyle, setMouthStyle] = useState<MouthOption["id"]>(() => (playerSkin?.mouthStyle as MouthOption["id"]) ?? "smile");
   const [bodyStyle, setBodyStyle] = useState<"circles" | "tube">(() => playerSkin?.bodyStyle ?? "circles");
   const [selectedFlag, setSelectedFlag] = useState<string | null>(() => (playerSkin?.isFlag && playerSkin?.flagName) ? playerSkin.flagName : null);
+  const [flagRegion, setFlagRegion] = useState<FlagRegion>("all");
 
   const [, setUnlockTick] = useState(0);
 
@@ -340,12 +378,13 @@ export default function ShopScreen() {
   }, [eventGems, unlockEventCostumeForEvent]);
 
   const filteredFlags = useMemo(() => {
-    if (!flagSearch.trim()) return FLAG_SKINS;
-    const q = flagSearch.toLowerCase();
-    return FLAG_SKINS.filter((f) =>
-      f.name.toLowerCase().includes(q) || translateFlag(f.name, flagLang).toLowerCase().includes(q)
-    );
-  }, [flagSearch, flagLang]);
+    const q = flagSearch.trim().toLowerCase();
+    return FLAG_SKINS.filter((f) => {
+      if (flagRegion !== "all" && FLAG_REGION_MAP[f.name] !== flagRegion) return false;
+      if (!q) return true;
+      return f.name.toLowerCase().includes(q) || translateFlag(f.name, flagLang).toLowerCase().includes(q);
+    });
+  }, [flagSearch, flagLang, flagRegion]);
 
   const filteredHeads = useMemo(() => headOptions, [headOptions]);
 
@@ -370,7 +409,9 @@ export default function ShopScreen() {
   const numColumns = isDesktop ? 3 : 2;
   const itemGap = spacing.sm;
   const effectiveWidth = isDesktop ? contentMaxWidth : width;
-  const flagItemWidth = (effectiveWidth - spacing.md * 2 - itemGap * (numColumns - 1)) / numColumns;
+  const FLAG_TAB_WIDTH = 100;
+  const flagGridWidth = effectiveWidth - spacing.md * 2 - FLAG_TAB_WIDTH - spacing.sm;
+  const flagItemWidth = (flagGridWidth - itemGap * (numColumns - 1)) / numColumns;
 
   const computePrice = useCallback(() => {
     if (selectedFlag) return FLAG_PRICE;
@@ -638,16 +679,36 @@ export default function ShopScreen() {
         value={flagSearch}
         onChangeText={setFlagSearch}
       />
-      <FlatList
-        key={numColumns}
-        data={filteredFlags}
-        renderItem={renderFlagItem}
-        keyExtractor={(item) => item.name}
-        numColumns={numColumns}
-        scrollEnabled={false}
-        columnWrapperStyle={{ gap: itemGap }}
-        contentContainerStyle={{ gap: itemGap }}
-      />
+      <View style={styles.flagSectionRow}>
+        <View style={styles.flagTabs}>
+          {FLAG_REGION_ORDER.map((region) => {
+            const isActive = flagRegion === region;
+            return (
+              <Pressable
+                key={region}
+                onPress={() => setFlagRegion(region)}
+                style={[styles.flagTab, isActive && styles.flagTabActive]}
+              >
+                <Text style={[styles.flagTabText, isActive && styles.flagTabTextActive]}>
+                  {FLAG_REGION_LABELS[region]}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+        <View style={styles.flagGrid}>
+          <FlatList
+            key={numColumns}
+            data={filteredFlags}
+            renderItem={renderFlagItem}
+            keyExtractor={(item) => item.name}
+            numColumns={numColumns}
+            scrollEnabled={false}
+            columnWrapperStyle={{ gap: itemGap }}
+            contentContainerStyle={{ gap: itemGap }}
+          />
+        </View>
+      </View>
 
       {/* Apply Button */}
       <Pressable
@@ -1106,6 +1167,40 @@ const styles = StyleSheet.create({
     borderCurve: "continuous",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.2)",
+  },
+  flagSectionRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: spacing.sm,
+  },
+  flagTabs: {
+    width: 100,
+    flexDirection: "column",
+    gap: 6,
+  },
+  flagTab: {
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    borderCurve: "continuous",
+    backgroundColor: "rgba(255,255,255,0.06)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.10)",
+  },
+  flagTabActive: {
+    backgroundColor: "rgba(246,196,83,0.18)",
+    borderColor: colors.gold,
+  },
+  flagTabText: {
+    color: colors.textSecondary,
+    fontSize: 13,
+    fontWeight: "700",
+  },
+  flagTabTextActive: {
+    color: colors.gold,
+  },
+  flagGrid: {
+    flex: 1,
   },
   flagItem: {
     borderRadius: 12,
