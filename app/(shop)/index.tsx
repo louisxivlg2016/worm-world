@@ -186,23 +186,6 @@ function ShopWormPreview({
   const hasHeadCostume = !!headPreview;
   const segmentSource = flagSource || bodyTextureSource;
   const baseColor = palette[0] || "#9a9a9a";
-  const flagUri = flagSource ? getAssetUri(flagSource) : "";
-  const flagTubeStyle: any = flagUri
-    ? {
-        backgroundImage: `url(${flagUri})`,
-        backgroundSize: "auto 100%",
-        backgroundRepeat: "repeat-x",
-        backgroundPosition: "left center",
-      }
-    : null;
-  const flagHeadStyle: any = flagUri
-    ? {
-        backgroundImage: `url(${flagUri})`,
-        backgroundSize: "auto 100%",
-        backgroundRepeat: "repeat-x",
-        backgroundPosition: "center center",
-      }
-    : null;
 
   const renderEye = (side: "left" | "right") => {
     const closed = eyeStyle === "happy" || (eyeStyle === "wink" && side === "right");
@@ -239,10 +222,16 @@ function ShopWormPreview({
           style={[
             styles.previewTube,
             { backgroundColor: segmentSource ? "transparent" : baseColor },
-            flagTubeStyle,
           ]}
         >
-          {bodyTextureSource && !flagUri ? (
+          {flagSource ? (
+            <ImageBackground
+              source={flagSource}
+              resizeMode="cover"
+              imageStyle={styles.previewTubeImage}
+              style={styles.previewTubeFill}
+            />
+          ) : bodyTextureSource ? (
             <ImageBackground
               source={bodyTextureSource}
               resizeMode="repeat"
@@ -267,12 +256,11 @@ function ShopWormPreview({
               style={[
                 styles.previewHeadBubble,
                 { backgroundColor: segmentSource ? "transparent" : baseColor },
-                flagHeadStyle,
               ]}
             >
-              {bodyTextureSource && !flagUri ? (
+              {segmentSource ? (
                 <ImageBackground
-                  source={bodyTextureSource}
+                  source={segmentSource}
                   resizeMode="cover"
                   imageStyle={styles.previewHeadBubbleImage}
                   style={styles.previewHeadBubbleFill}
@@ -358,6 +346,10 @@ function getAssetUri(source: any): string {
   if (typeof source === "string") return source;
   if (typeof source?.uri === "string") return source.uri;
   if (typeof source?.default === "string") return source.default;
+  try {
+    const resolved = Image.resolveAssetSource(source);
+    if (resolved?.uri) return resolved.uri;
+  } catch {}
   return "";
 }
 
