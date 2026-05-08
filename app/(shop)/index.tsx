@@ -145,25 +145,24 @@ function ShopWormPreview({
   headPreview?: string;
 }) {
   const tubeBodyLayout = [
-    { left: 16, top: 52, width: 54, height: 28, rotate: "-14deg" },
-    { left: 48, top: 43, width: 60, height: 30, rotate: "-12deg" },
-    { left: 84, top: 34, width: 66, height: 32, rotate: "-9deg" },
-    { left: 124, top: 25, width: 70, height: 34, rotate: "-7deg" },
-    { left: 168, top: 19, width: 74, height: 36, rotate: "-5deg" },
-    { left: 214, top: 15, width: 76, height: 38, rotate: "-3deg" },
-    { left: 258, top: 13, width: 54, height: 40, rotate: "-1deg" },
+    { left: 18, top: 58, width: 64, height: 28, rotate: "1deg" },
+    { left: 58, top: 56, width: 68, height: 30, rotate: "1deg" },
+    { left: 102, top: 54, width: 70, height: 32, rotate: "0deg" },
+    { left: 148, top: 53, width: 72, height: 34, rotate: "0deg" },
+    { left: 196, top: 52, width: 72, height: 36, rotate: "-1deg" },
+    { left: 242, top: 51, width: 62, height: 38, rotate: "-1deg" },
   ];
   const circleBodyLayout = [
-    { left: 18, top: 48, width: 34, height: 34, rotate: "-12deg" },
-    { left: 42, top: 40, width: 38, height: 38, rotate: "-11deg" },
-    { left: 70, top: 32, width: 42, height: 42, rotate: "-9deg" },
-    { left: 102, top: 24, width: 46, height: 46, rotate: "-7deg" },
-    { left: 138, top: 18, width: 50, height: 50, rotate: "-5deg" },
-    { left: 180, top: 14, width: 52, height: 52, rotate: "-3deg" },
-    { left: 226, top: 12, width: 54, height: 54, rotate: "-1deg" },
+    { left: 20, top: 58, width: 34, height: 34, rotate: "1deg" },
+    { left: 44, top: 54, width: 38, height: 38, rotate: "1deg" },
+    { left: 74, top: 50, width: 42, height: 42, rotate: "0deg" },
+    { left: 108, top: 46, width: 46, height: 46, rotate: "0deg" },
+    { left: 146, top: 43, width: 50, height: 50, rotate: "-1deg" },
+    { left: 188, top: 40, width: 54, height: 54, rotate: "-1deg" },
+    { left: 234, top: 38, width: 56, height: 56, rotate: "-1deg" },
   ];
   const bodyLayout = bodyStyle === "tube" ? tubeBodyLayout : circleBodyLayout;
-  const headSegment = { left: 252, top: 9, size: 62 };
+  const headSegment = { left: 266, top: 24, size: 64 };
   const hasHeadCostume = !!headPreview;
   const segmentSource = flagSource || bodyTextureSource;
 
@@ -869,9 +868,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   previewHeadCostume: {
-    width: "132%",
-    height: "132%",
-    transform: [{ translateX: -12 }, { translateY: 2 }],
+    width: "126%",
+    height: "126%",
+    transform: [{ translateX: -10 }, { translateY: 4 }],
   },
   previewEyesRow: {
     flexDirection: "row",
