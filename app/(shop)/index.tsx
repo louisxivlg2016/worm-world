@@ -801,8 +801,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   previewHeadCostume: {
-    width: "100%",
-    height: "100%",
+    width: "108%",
+    height: "108%",
   },
   previewEyesRow: {
     flexDirection: "row",
