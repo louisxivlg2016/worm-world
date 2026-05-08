@@ -467,6 +467,7 @@ export default function ShopScreen() {
     ({ item, index }: { item: FlagSkin; index: number }) => {
       const img = FLAG_IMAGES[item.name];
       const isSelected = selectedFlag === item.name;
+      const costumeHead = selectedHeadMeta?.preview;
       return (
         <Animated.View entering={FadeInDown.delay(index * 50).springify()}>
           <Pressable
@@ -484,25 +485,32 @@ export default function ShopScreen() {
             ]}
           >
             <View style={styles.flagWormPreview}>
-              {/* head */}
-              <View style={styles.flagWormHead}>
-                {img ? (
-                  <ImageBackground
-                    source={img}
-                    resizeMode="cover"
-                    imageStyle={styles.flagWormHeadImage}
-                    style={styles.flagWormHeadFill}
-                  />
-                ) : (
-                  <View style={[styles.flagWormHeadFill, { backgroundColor: item.colors[0] || "#888" }]} />
-                )}
-                {/* eyes */}
-                <View style={styles.flagWormEyesRow}>
-                  <View style={styles.flagWormEye}><View style={styles.flagWormPupil} /></View>
-                  <View style={styles.flagWormEye}><View style={styles.flagWormPupil} /></View>
+              {/* head — costume head if any, otherwise flag-textured face */}
+              {costumeHead ? (
+                <Image
+                  source={{ uri: costumeHead }}
+                  style={styles.flagWormCostumeHead}
+                  resizeMode="contain"
+                />
+              ) : (
+                <View style={styles.flagWormHead}>
+                  {img ? (
+                    <ImageBackground
+                      source={img}
+                      resizeMode="cover"
+                      imageStyle={styles.flagWormHeadImage}
+                      style={styles.flagWormHeadFill}
+                    />
+                  ) : (
+                    <View style={[styles.flagWormHeadFill, { backgroundColor: item.colors[0] || "#888" }]} />
+                  )}
+                  <View style={styles.flagWormEyesRow}>
+                    <View style={styles.flagWormEye}><View style={styles.flagWormPupil} /></View>
+                    <View style={styles.flagWormEye}><View style={styles.flagWormPupil} /></View>
+                  </View>
                 </View>
-              </View>
-              {/* tube body */}
+              )}
+              {/* tube body — always the flag */}
               <View style={styles.flagWormTube}>
                 {img ? (
                   <ImageBackground
@@ -527,7 +535,7 @@ export default function ShopScreen() {
         </Animated.View>
       );
     },
-    [flagItemWidth, selectedFlag],
+    [flagItemWidth, selectedFlag, selectedHeadMeta, flagLang],
   );
 
   const desktopContainerStyle = isDesktop
@@ -1278,6 +1286,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
+  },
+  flagWormCostumeHead: {
+    width: 38,
+    height: 38,
+    marginRight: -6,
   },
   flagWormHead: {
     width: 28,
