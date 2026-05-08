@@ -103,9 +103,11 @@ const FLAG_SKINS: FlagSkin[] = [
   { name: "Emirats Arabes Unis", colors: ["#00843D", "#FFFFFF", "#000000", "#CE1126"] },
 ];
 
-type FlagRegion = "all" | "europe" | "ameriques" | "asie" | "afrique" | "oceanie" | "moyenorient";
+type ShopTab = "shop" | "all" | "europe" | "ameriques" | "asie" | "afrique" | "oceanie" | "moyenorient";
+type FlagRegion = Exclude<ShopTab, "shop">;
 
-const FLAG_REGION_LABELS: Record<FlagRegion, string> = {
+const SHOP_TAB_LABELS: Record<ShopTab, string> = {
+  shop: "Boutique",
   all: "Tous",
   europe: "Europe",
   ameriques: "Amériques",
@@ -115,8 +117,8 @@ const FLAG_REGION_LABELS: Record<FlagRegion, string> = {
   moyenorient: "Moyen-Orient",
 };
 
-const FLAG_REGION_ORDER: FlagRegion[] = [
-  "all", "europe", "ameriques", "asie", "afrique", "moyenorient", "oceanie",
+const SHOP_TAB_ORDER: ShopTab[] = [
+  "shop", "all", "europe", "ameriques", "asie", "afrique", "moyenorient", "oceanie",
 ];
 
 const FLAG_REGION_MAP: Record<string, Exclude<FlagRegion, "all">> = {
@@ -356,7 +358,8 @@ export default function ShopScreen() {
   const [mouthStyle, setMouthStyle] = useState<MouthOption["id"]>(() => (playerSkin?.mouthStyle as MouthOption["id"]) ?? "smile");
   const [bodyStyle, setBodyStyle] = useState<"circles" | "tube">(() => playerSkin?.bodyStyle ?? "circles");
   const [selectedFlag, setSelectedFlag] = useState<string | null>(() => (playerSkin?.isFlag && playerSkin?.flagName) ? playerSkin.flagName : null);
-  const [flagRegion, setFlagRegion] = useState<FlagRegion>("all");
+  const [activeTab, setActiveTab] = useState<ShopTab>("shop");
+  const flagRegion: FlagRegion = activeTab === "shop" ? "all" : activeTab;
 
   const [, setUnlockTick] = useState(0);
 
@@ -409,9 +412,7 @@ export default function ShopScreen() {
   const numColumns = isDesktop ? 3 : 2;
   const itemGap = spacing.sm;
   const effectiveWidth = isDesktop ? contentMaxWidth : width;
-  const FLAG_TAB_WIDTH = 100;
-  const flagGridWidth = effectiveWidth - spacing.md * 2 - FLAG_TAB_WIDTH - spacing.sm;
-  const flagItemWidth = (flagGridWidth - itemGap * (numColumns - 1)) / numColumns;
+  const flagItemWidth = (effectiveWidth - spacing.md * 2 - itemGap * (numColumns - 1)) / numColumns;
 
   const computePrice = useCallback(() => {
     if (selectedFlag) return FLAG_PRICE;
@@ -503,7 +504,24 @@ export default function ShopScreen() {
         <Text style={styles.coinText}>{"\u{1FA99}"} {coins}</Text>
       </View>
 
-      <View style={styles.previewNavRow}>
+      <View style={styles.topRow}>
+        <View style={styles.flagTabsTop}>
+          {SHOP_TAB_ORDER.map((tab) => {
+            const isActive = activeTab === tab;
+            return (
+              <Pressable
+                key={tab}
+                onPress={() => setActiveTab(tab)}
+                style={[styles.flagTab, isActive && styles.flagTabActive]}
+              >
+                <Text style={[styles.flagTabText, isActive && styles.flagTabTextActive]}>
+                  {SHOP_TAB_LABELS[tab]}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+        <View style={styles.previewNavRow}>
         <Pressable
           onPress={() => cycleHead(-1)}
           style={[styles.costumeArrowBtn, availableHeadIds.length === 0 && styles.costumeArrowBtnDisabled]}
@@ -530,8 +548,10 @@ export default function ShopScreen() {
         >
           <Text style={styles.costumeArrowText}>›</Text>
         </Pressable>
+        </View>
       </View>
 
+      {activeTab === "shop" && (<>
       {/* Preset Skins */}
       <Text style={styles.sectionTitle}>{t("shopPresets")}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.presetRow}>
@@ -669,6 +689,7 @@ export default function ShopScreen() {
           />
         ))}
       </View>
+      </>)}
 
       {/* Flag Grid */}
       <Text style={styles.sectionTitle}>{t("shopFlags")}</Text>
@@ -679,36 +700,16 @@ export default function ShopScreen() {
         value={flagSearch}
         onChangeText={setFlagSearch}
       />
-      <View style={styles.flagSectionRow}>
-        <View style={styles.flagTabs}>
-          {FLAG_REGION_ORDER.map((region) => {
-            const isActive = flagRegion === region;
-            return (
-              <Pressable
-                key={region}
-                onPress={() => setFlagRegion(region)}
-                style={[styles.flagTab, isActive && styles.flagTabActive]}
-              >
-                <Text style={[styles.flagTabText, isActive && styles.flagTabTextActive]}>
-                  {FLAG_REGION_LABELS[region]}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-        <View style={styles.flagGrid}>
-          <FlatList
-            key={numColumns}
-            data={filteredFlags}
-            renderItem={renderFlagItem}
-            keyExtractor={(item) => item.name}
-            numColumns={numColumns}
-            scrollEnabled={false}
-            columnWrapperStyle={{ gap: itemGap }}
-            contentContainerStyle={{ gap: itemGap }}
-          />
-        </View>
-      </View>
+      <FlatList
+        key={numColumns}
+        data={filteredFlags}
+        renderItem={renderFlagItem}
+        keyExtractor={(item) => item.name}
+        numColumns={numColumns}
+        scrollEnabled={false}
+        columnWrapperStyle={{ gap: itemGap }}
+        contentContainerStyle={{ gap: itemGap }}
+      />
 
       {/* Apply Button */}
       <Pressable
@@ -860,10 +861,10 @@ const styles = StyleSheet.create({
     borderRadius: 44,
   },
   previewNavRow: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
-    marginBottom: spacing.md,
   },
   previewNavCenter: {
     flex: 1,
@@ -1167,6 +1168,17 @@ const styles = StyleSheet.create({
     borderCurve: "continuous",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.2)",
+  },
+  topRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  flagTabsTop: {
+    width: 110,
+    flexDirection: "column",
+    gap: 6,
   },
   flagSectionRow: {
     flexDirection: "row",
