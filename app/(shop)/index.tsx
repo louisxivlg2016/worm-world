@@ -144,27 +144,9 @@ function ShopWormPreview({
   bodyTextureSource?: any;
   headPreview?: string;
 }) {
-  const tubeBodyLayout = [
-    { left: 18, top: 58, width: 64, height: 28, rotate: "1deg" },
-    { left: 58, top: 56, width: 68, height: 30, rotate: "1deg" },
-    { left: 102, top: 54, width: 70, height: 32, rotate: "0deg" },
-    { left: 148, top: 53, width: 72, height: 34, rotate: "0deg" },
-    { left: 196, top: 52, width: 72, height: 36, rotate: "-1deg" },
-    { left: 242, top: 51, width: 62, height: 38, rotate: "-1deg" },
-  ];
-  const circleBodyLayout = [
-    { left: 20, top: 58, width: 34, height: 34, rotate: "1deg" },
-    { left: 44, top: 54, width: 38, height: 38, rotate: "1deg" },
-    { left: 74, top: 50, width: 42, height: 42, rotate: "0deg" },
-    { left: 108, top: 46, width: 46, height: 46, rotate: "0deg" },
-    { left: 146, top: 43, width: 50, height: 50, rotate: "-1deg" },
-    { left: 188, top: 40, width: 54, height: 54, rotate: "-1deg" },
-    { left: 234, top: 38, width: 56, height: 56, rotate: "-1deg" },
-  ];
-  const bodyLayout = bodyStyle === "tube" ? tubeBodyLayout : circleBodyLayout;
-  const headSegment = { left: 266, top: 24, size: 64 };
   const hasHeadCostume = !!headPreview;
   const segmentSource = flagSource || bodyTextureSource;
+  const baseColor = palette[0] || "#9a9a9a";
 
   const renderEye = (side: "left" | "right") => {
     const closed = eyeStyle === "happy" || (eyeStyle === "wink" && side === "right");
@@ -196,122 +178,53 @@ function ShopWormPreview({
     <View style={styles.previewCard}>
       <Text style={styles.previewTitle}>Aperçu du ver</Text>
       <View style={styles.previewStage}>
-        {bodyLayout.map((segment, index) => {
-          const stripeColor = palette[(bodyLayout.length - 1 - index) % palette.length] || palette[0];
-          const commonStyle = [
-            styles.previewSegment,
-            {
-              left: segment.left,
-              top: segment.top,
-              width: segment.width,
-              height: segment.height,
-              borderRadius: segment.height / 2,
-              transform: [{ rotate: segment.rotate }],
-            },
-          ];
+        {/* Continuous tube body */}
+        <View style={[styles.previewTube, { backgroundColor: segmentSource ? "transparent" : baseColor }]}>
+          {segmentSource ? (
+            <ImageBackground
+              source={segmentSource}
+              resizeMode={flagSource ? "cover" : "repeat"}
+              imageStyle={styles.previewTubeImage}
+              style={styles.previewTubeFill}
+            />
+          ) : null}
+          <View style={styles.previewTubeShade} />
+          <View style={styles.previewTubeHighlight} />
+        </View>
 
-          if (segmentSource) {
-            return (
-              <ImageBackground
-                key={index}
-                source={segmentSource}
-                resizeMode={flagSource ? "cover" : "stretch"}
-                imageStyle={[
-                  styles.previewSegmentImage,
-                  bodyTextureSource && !flagSource && styles.previewBodyTextureImage,
-                ]}
-                style={commonStyle}
-              />
-            );
-          }
-
-          return (
+        {/* Head on the left, larger than the tube — same look as in-game */}
+        <View style={styles.previewHead}>
+          {hasHeadCostume ? (
+            <Image
+              source={{ uri: headPreview }}
+              style={styles.previewHeadImage}
+              resizeMode="contain"
+            />
+          ) : (
             <View
-              key={index}
               style={[
-                ...commonStyle,
-                { backgroundColor: stripeColor },
+                styles.previewHeadBubble,
+                { backgroundColor: segmentSource ? "transparent" : baseColor },
               ]}
             >
-              <View style={styles.previewHighlight} />
-            </View>
-          );
-        })}
-        {segmentSource ? (
-          <ImageBackground
-            source={segmentSource}
-            resizeMode={flagSource ? "cover" : "stretch"}
-            imageStyle={[
-              styles.previewSegmentImage,
-              bodyTextureSource && !flagSource && styles.previewBodyTextureImage,
-            ]}
-            style={[
-              styles.previewSegment,
-              styles.previewHeadShellBase,
-              {
-                left: headSegment.left,
-                top: headSegment.top,
-                width: headSegment.size,
-                height: headSegment.size,
-                borderRadius: headSegment.size / 2,
-              },
-              hasHeadCostume && styles.previewHeadShell,
-            ]}
-          >
-            <View style={styles.previewFaceWrap}>
-              {headPreview ? (
-                <Image
-                  source={{ uri: headPreview }}
-                  style={styles.previewHeadCostume}
-                  resizeMode="contain"
+              {segmentSource ? (
+                <ImageBackground
+                  source={segmentSource}
+                  resizeMode="cover"
+                  imageStyle={styles.previewHeadBubbleImage}
+                  style={styles.previewHeadBubbleFill}
                 />
               ) : null}
-              {!hasHeadCostume && (
-                <>
-                  <View style={styles.previewEyesRow}>
-                    {renderEye("left")}
-                    {renderEye("right")}
-                  </View>
-                  {mouthNode}
-                </>
-              )}
+              <View style={styles.previewFaceWrap}>
+                <View style={styles.previewEyesRow}>
+                  {renderEye("left")}
+                  {renderEye("right")}
+                </View>
+                {mouthNode}
+              </View>
             </View>
-          </ImageBackground>
-        ) : (
-          <View
-            style={[
-              styles.previewSegment,
-              styles.previewHeadShellBase,
-              {
-                left: headSegment.left,
-                top: headSegment.top,
-                width: headSegment.size,
-                height: headSegment.size,
-                borderRadius: headSegment.size / 2,
-              },
-              hasHeadCostume && styles.previewHeadShell,
-            ]}
-          >
-            <View style={styles.previewFaceWrap}>
-              {headPreview ? (
-                <Image
-                  source={{ uri: headPreview }}
-                  style={styles.previewHeadCostume}
-                  resizeMode="contain"
-                />
-              ) : null}
-              {!hasHeadCostume && (
-                <>
-                  <View style={styles.previewEyesRow}>
-                    {renderEye("left")}
-                    {renderEye("right")}
-                  </View>
-                  {mouthNode}
-                </>
-              )}
-            </View>
-          </View>
-        )}
+          )}
+        </View>
       </View>
     </View>
   );
@@ -806,9 +719,84 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   previewStage: {
-    height: 104,
+    height: 140,
     justifyContent: "center",
     width: "100%",
+    position: "relative",
+  },
+  previewTube: {
+    position: "absolute",
+    left: 90,
+    right: 16,
+    top: 50,
+    height: 60,
+    borderRadius: 30,
+    borderCurve: "continuous",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.18)",
+    boxShadow: "0 10px 22px rgba(0,0,0,0.25)",
+  },
+  previewTubeFill: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
+  previewTubeImage: {
+    borderRadius: 30,
+  },
+  previewTubeShade: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 18,
+    backgroundColor: "rgba(0,0,0,0.22)",
+  },
+  previewTubeHighlight: {
+    position: "absolute",
+    left: 12,
+    right: 12,
+    top: 6,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "rgba(255,255,255,0.18)",
+  },
+  previewHead: {
+    position: "absolute",
+    left: 4,
+    top: 8,
+    width: 120,
+    height: 120,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  previewHeadImage: {
+    width: "100%",
+    height: "100%",
+  },
+  previewHeadBubble: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.18)",
+    boxShadow: "0 8px 16px rgba(0,0,0,0.22)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  previewHeadBubbleFill: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
+  previewHeadBubbleImage: {
+    borderRadius: 44,
   },
   previewNavRow: {
     flexDirection: "row",
