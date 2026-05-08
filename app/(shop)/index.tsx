@@ -433,12 +433,15 @@ export default function ShopScreen() {
   const handleApply = () => {
     const price = computePrice();
     if (price > 0 && price > coins) return;
+    const selectedBodyTexture = selectedFlag
+      ? getFlagTextureUri(selectedFlag)
+      : (selectedHeadMeta?.bodyTexture ?? "");
     router.push({
       pathname: "/(shop)/buy-confirm",
       params: {
         price: String(price),
         flag: selectedFlag ?? "",
-        bodyTexture: getFlagTextureUri(selectedFlag),
+        bodyTexture: selectedBodyTexture,
         headType,
         eyeStyle,
         mouthStyle,
