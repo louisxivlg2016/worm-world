@@ -186,6 +186,23 @@ function ShopWormPreview({
   const hasHeadCostume = !!headPreview;
   const segmentSource = flagSource || bodyTextureSource;
   const baseColor = palette[0] || "#9a9a9a";
+  const flagUri = flagSource ? getAssetUri(flagSource) : "";
+  const flagTubeStyle: any = flagUri
+    ? {
+        backgroundImage: `url(${flagUri})`,
+        backgroundSize: "auto 100%",
+        backgroundRepeat: "repeat-x",
+        backgroundPosition: "left center",
+      }
+    : null;
+  const flagHeadStyle: any = flagUri
+    ? {
+        backgroundImage: `url(${flagUri})`,
+        backgroundSize: "auto 100%",
+        backgroundRepeat: "repeat-x",
+        backgroundPosition: "center center",
+      }
+    : null;
 
   const renderEye = (side: "left" | "right") => {
     const closed = eyeStyle === "happy" || (eyeStyle === "wink" && side === "right");
@@ -218,11 +235,17 @@ function ShopWormPreview({
       <Text style={styles.previewTitle}>Aperçu du ver</Text>
       <View style={styles.previewStage}>
         {/* Continuous tube body */}
-        <View style={[styles.previewTube, { backgroundColor: segmentSource ? "transparent" : baseColor }]}>
-          {segmentSource ? (
+        <View
+          style={[
+            styles.previewTube,
+            { backgroundColor: segmentSource ? "transparent" : baseColor },
+            flagTubeStyle,
+          ]}
+        >
+          {bodyTextureSource && !flagUri ? (
             <ImageBackground
-              source={segmentSource}
-              resizeMode={flagSource ? "cover" : "repeat"}
+              source={bodyTextureSource}
+              resizeMode="repeat"
               imageStyle={styles.previewTubeImage}
               style={styles.previewTubeFill}
             />
@@ -244,11 +267,12 @@ function ShopWormPreview({
               style={[
                 styles.previewHeadBubble,
                 { backgroundColor: segmentSource ? "transparent" : baseColor },
+                flagHeadStyle,
               ]}
             >
-              {segmentSource ? (
+              {bodyTextureSource && !flagUri ? (
                 <ImageBackground
-                  source={segmentSource}
+                  source={bodyTextureSource}
                   resizeMode="cover"
                   imageStyle={styles.previewHeadBubbleImage}
                   style={styles.previewHeadBubbleFill}
