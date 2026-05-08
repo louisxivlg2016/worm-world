@@ -483,15 +483,43 @@ export default function ShopScreen() {
               },
             ]}
           >
-            {img ? (
-              <Image source={img} style={styles.flagImage} resizeMode="cover" />
-            ) : (
-              <View style={styles.flagColorPreview}>
-                {item.colors.map((c, i) => (
-                  <View key={i} style={[styles.colorStripe, { backgroundColor: c }]} />
-                ))}
+            <View style={styles.flagWormPreview}>
+              {/* head */}
+              <View style={styles.flagWormHead}>
+                {img ? (
+                  <ImageBackground
+                    source={img}
+                    resizeMode="cover"
+                    imageStyle={styles.flagWormHeadImage}
+                    style={styles.flagWormHeadFill}
+                  />
+                ) : (
+                  <View style={[styles.flagWormHeadFill, { backgroundColor: item.colors[0] || "#888" }]} />
+                )}
+                {/* eyes */}
+                <View style={styles.flagWormEyesRow}>
+                  <View style={styles.flagWormEye}><View style={styles.flagWormPupil} /></View>
+                  <View style={styles.flagWormEye}><View style={styles.flagWormPupil} /></View>
+                </View>
               </View>
-            )}
+              {/* tube body */}
+              <View style={styles.flagWormTube}>
+                {img ? (
+                  <ImageBackground
+                    source={img}
+                    resizeMode="cover"
+                    imageStyle={styles.flagWormTubeImage}
+                    style={styles.flagWormTubeFill}
+                  />
+                ) : (
+                  <View style={[styles.flagWormTubeFill, { flexDirection: "row" }]}>
+                    {item.colors.map((c, i) => (
+                      <View key={i} style={[styles.colorStripe, { backgroundColor: c }]} />
+                    ))}
+                  </View>
+                )}
+              </View>
+            </View>
             <Text style={styles.flagLabel} numberOfLines={1} ellipsizeMode="tail">
               {translateFlag(item.name, flagLang)}
             </Text>
@@ -1245,6 +1273,72 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 6,
     borderCurve: "continuous",
+  },
+  flagWormPreview: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  flagWormHead: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderCurve: "continuous",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.25)",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.25)",
+  },
+  flagWormHeadFill: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
+  flagWormHeadImage: {
+    borderRadius: 14,
+  },
+  flagWormEyesRow: {
+    flexDirection: "row",
+    gap: 3,
+    zIndex: 2,
+  },
+  flagWormEye: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  flagWormPupil: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: "#111",
+  },
+  flagWormTube: {
+    width: 70,
+    height: 18,
+    borderRadius: 9,
+    borderCurve: "continuous",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.2)",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.25)",
+  },
+  flagWormTubeFill: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  },
+  flagWormTubeImage: {
+    borderRadius: 9,
   },
   flagColorPreview: {
     width: 52,
