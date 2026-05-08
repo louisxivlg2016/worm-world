@@ -163,8 +163,9 @@ function ShopWormPreview({
     { left: 226, top: 12, width: 54, height: 54, rotate: "-1deg" },
   ];
   const bodyLayout = bodyStyle === "tube" ? tubeBodyLayout : circleBodyLayout;
-  const headSegment = { left: 294, top: 8, size: 62 };
+  const headSegment = { left: 252, top: 9, size: 62 };
   const hasHeadCostume = !!headPreview;
+  const segmentSource = flagSource || bodyTextureSource;
 
   const renderEye = (side: "left" | "right") => {
     const closed = eyeStyle === "happy" || (eyeStyle === "wink" && side === "right");
@@ -210,8 +211,6 @@ function ShopWormPreview({
             },
           ];
 
-          const segmentSource = flagSource || bodyTextureSource;
-
           if (segmentSource) {
             return (
               <ImageBackground
@@ -239,39 +238,81 @@ function ShopWormPreview({
             </View>
           );
         })}
-        <View
-          style={[
-            styles.previewSegment,
-            styles.previewHeadShellBase,
-            {
-              left: headSegment.left,
-              top: headSegment.top,
-              width: headSegment.size,
-              height: headSegment.size,
-              borderRadius: headSegment.size / 2,
-            },
-            hasHeadCostume && styles.previewHeadShell,
-          ]}
-        >
-          <View style={styles.previewFaceWrap}>
-            {headPreview ? (
-              <Image
-                source={{ uri: headPreview }}
-                style={styles.previewHeadCostume}
-                resizeMode="contain"
-              />
-            ) : null}
-            {!hasHeadCostume && (
-              <>
-                <View style={styles.previewEyesRow}>
-                  {renderEye("left")}
-                  {renderEye("right")}
-                </View>
-                {mouthNode}
-              </>
-            )}
+        {segmentSource ? (
+          <ImageBackground
+            source={segmentSource}
+            resizeMode={flagSource ? "cover" : "stretch"}
+            imageStyle={[
+              styles.previewSegmentImage,
+              bodyTextureSource && !flagSource && styles.previewBodyTextureImage,
+            ]}
+            style={[
+              styles.previewSegment,
+              styles.previewHeadShellBase,
+              {
+                left: headSegment.left,
+                top: headSegment.top,
+                width: headSegment.size,
+                height: headSegment.size,
+                borderRadius: headSegment.size / 2,
+              },
+              hasHeadCostume && styles.previewHeadShell,
+            ]}
+          >
+            <View style={styles.previewFaceWrap}>
+              {headPreview ? (
+                <Image
+                  source={{ uri: headPreview }}
+                  style={styles.previewHeadCostume}
+                  resizeMode="contain"
+                />
+              ) : null}
+              {!hasHeadCostume && (
+                <>
+                  <View style={styles.previewEyesRow}>
+                    {renderEye("left")}
+                    {renderEye("right")}
+                  </View>
+                  {mouthNode}
+                </>
+              )}
+            </View>
+          </ImageBackground>
+        ) : (
+          <View
+            style={[
+              styles.previewSegment,
+              styles.previewHeadShellBase,
+              {
+                left: headSegment.left,
+                top: headSegment.top,
+                width: headSegment.size,
+                height: headSegment.size,
+                borderRadius: headSegment.size / 2,
+              },
+              hasHeadCostume && styles.previewHeadShell,
+            ]}
+          >
+            <View style={styles.previewFaceWrap}>
+              {headPreview ? (
+                <Image
+                  source={{ uri: headPreview }}
+                  style={styles.previewHeadCostume}
+                  resizeMode="contain"
+                />
+              ) : null}
+              {!hasHeadCostume && (
+                <>
+                  <View style={styles.previewEyesRow}>
+                    {renderEye("left")}
+                    {renderEye("right")}
+                  </View>
+                  {mouthNode}
+                </>
+              )}
+            </View>
           </View>
-        </View>
+        )}
       </View>
     </View>
   );
@@ -828,8 +869,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   previewHeadCostume: {
-    width: "108%",
-    height: "108%",
+    width: "132%",
+    height: "132%",
+    transform: [{ translateX: -12 }, { translateY: 2 }],
   },
   previewEyesRow: {
     flexDirection: "row",
