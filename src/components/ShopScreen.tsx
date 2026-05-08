@@ -513,11 +513,15 @@ interface ShopScreenProps {
 export function ShopScreen({ currentSkin, playerCoins, onApply, onBack }: ShopScreenProps) {
   const { t, i18n } = useTranslation()
   const lang = (i18n.language || 'fr').split('-')[0]
-  const [colors, setColors] = useState<string[]>(['#888888', '#999999', '#888888', '#999999'])
-  const [headType, setHeadType] = useState('default')
-  const [selectedBodyTexture, setSelectedBodyTexture] = useState<string | undefined>(undefined)
+  const [colors, setColors] = useState<string[]>(() =>
+    currentSkin?.colors?.length ? [...currentSkin.colors] : ['#888888', '#999999', '#888888', '#999999']
+  )
+  const [headType, setHeadType] = useState<string>(() => currentSkin?.headType ?? 'default')
+  const [selectedBodyTexture, setSelectedBodyTexture] = useState<string | undefined>(
+    () => currentSkin?.bodyTexture,
+  )
   const [activeSlot, setActiveSlot] = useState(0)
-  const [bodyStyle, setBodyStyle] = useState<'circles' | 'tube'>('circles')
+  const [bodyStyle, setBodyStyle] = useState<'circles' | 'tube'>(() => currentSkin?.bodyStyle ?? 'circles')
   const [headSearch, setHeadSearch] = useState('')
   const [flagSearch, setFlagSearch] = useState('')
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -557,7 +561,7 @@ export function ShopScreen({ currentSkin, playerCoins, onApply, onBack }: ShopSc
     setIsFlagSkin(false)
   }
 
-  const [isFlagSkin, setIsFlagSkin] = useState(false)
+  const [isFlagSkin, setIsFlagSkin] = useState<boolean>(() => Boolean(currentSkin?.isFlag))
 
   const applyFlag = (flagColors: string[], bodyTexture?: string) => {
     setColors([...flagColors])
@@ -952,7 +956,7 @@ export function ShopScreen({ currentSkin, playerCoins, onApply, onBack }: ShopSc
                     colors: [...colors],
                     eye: '#fff',
                     name: 'Custom',
-                    headType,
+                    headType: headType as WormSkin['headType'],
                     bodyTexture: selectedBodyTexture ?? selectedHead?.bodyTexture,
                     isFlag,
                     bodyStyle,

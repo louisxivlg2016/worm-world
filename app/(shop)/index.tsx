@@ -393,19 +393,20 @@ export default function ShopScreen() {
   const isDesktop = width >= 600;
   const contentMaxWidth = 600;
 
+  const { totalCoins: coins, eventGems, unlockEventCostumeForEvent, playerSkin } = useGameState();
+
   const [flagSearch, setFlagSearch] = useState("");
   const [headSearch, setHeadSearch] = useState("");
-  const [selectedColors, setSelectedColors] = useState<string[]>([
-    "#888888", "#999999", "#888888", "#999999",
-  ]);
+  const [selectedColors, setSelectedColors] = useState<string[]>(() =>
+    playerSkin?.colors?.length ? [...playerSkin.colors] : ["#888888", "#999999", "#888888", "#999999"],
+  );
   const [activeSlot, setActiveSlot] = useState(0);
-  const [headType, setHeadType] = useState("default");
-  const [eyeStyle, setEyeStyle] = useState<EyeOption["id"]>("classic");
-  const [mouthStyle, setMouthStyle] = useState<MouthOption["id"]>("smile");
-  const [bodyStyle, setBodyStyle] = useState<"circles" | "tube">("circles");
-  const [selectedFlag, setSelectedFlag] = useState<string | null>(null);
+  const [headType, setHeadType] = useState<string>(() => playerSkin?.headType ?? "default");
+  const [eyeStyle, setEyeStyle] = useState<EyeOption["id"]>(() => (playerSkin?.eyeStyle as EyeOption["id"]) ?? "classic");
+  const [mouthStyle, setMouthStyle] = useState<MouthOption["id"]>(() => (playerSkin?.mouthStyle as MouthOption["id"]) ?? "smile");
+  const [bodyStyle, setBodyStyle] = useState<"circles" | "tube">(() => playerSkin?.bodyStyle ?? "circles");
+  const [selectedFlag, setSelectedFlag] = useState<string | null>(() => (playerSkin?.isFlag && playerSkin?.flagName) ? playerSkin.flagName : null);
 
-  const { totalCoins: coins, eventGems, unlockEventCostumeForEvent } = useGameState();
   const [, setUnlockTick] = useState(0);
 
   const headOptions = useMemo(() => getHeadOptions(), [eventGems]);
