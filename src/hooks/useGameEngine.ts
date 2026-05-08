@@ -2207,9 +2207,9 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
       }
       // Flag skins use larger overlapping textured capsules so the seams disappear
       // without forcing the whole flag into a single straight strip.
-      const bigR = isFlag ? segR * 1.62 : segR * 1.3
-      const drawW = isFlag ? bigR * 2.7 : bigR * 2.8
-      const drawH = isFlag ? bigR * 1.9 : bigR * 2.8
+      const bigR = isFlag ? segR * 1.62 : segR
+      const drawW = isFlag ? bigR * 2.7 : bigR * 2.15
+      const drawH = isFlag ? bigR * 1.9 : bigR * 2.15
       ctx.save()
       ctx.beginPath()
       ctx.arc(p.x, p.y, bigR, 0, Math.PI * 2)
