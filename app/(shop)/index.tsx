@@ -131,6 +131,7 @@ function ShopWormPreview({
   colors: palette,
   eyeStyle,
   mouthStyle,
+  bodyStyle,
   flagSource,
   bodyTextureSource,
   headPreview,
@@ -138,20 +139,31 @@ function ShopWormPreview({
   colors: string[];
   eyeStyle: EyeOption["id"];
   mouthStyle: MouthOption["id"];
+  bodyStyle: "circles" | "tube";
   flagSource?: any;
   bodyTextureSource?: any;
   headPreview?: string;
 }) {
-  const segmentLayout = [
-    { left: 10, top: 50, size: 40 },
-    { left: 34, top: 42, size: 44 },
-    { left: 64, top: 33, size: 48 },
-    { left: 98, top: 25, size: 52 },
-    { left: 136, top: 18, size: 54 },
-    { left: 174, top: 14, size: 56 },
-    { left: 214, top: 12, size: 58 },
-    { left: 254, top: 10, size: 62, head: true },
+  const tubeBodyLayout = [
+    { left: 16, top: 52, width: 54, height: 28, rotate: "-14deg" },
+    { left: 48, top: 43, width: 60, height: 30, rotate: "-12deg" },
+    { left: 84, top: 34, width: 66, height: 32, rotate: "-9deg" },
+    { left: 124, top: 25, width: 70, height: 34, rotate: "-7deg" },
+    { left: 168, top: 19, width: 74, height: 36, rotate: "-5deg" },
+    { left: 214, top: 15, width: 76, height: 38, rotate: "-3deg" },
+    { left: 258, top: 13, width: 54, height: 40, rotate: "-1deg" },
   ];
+  const circleBodyLayout = [
+    { left: 18, top: 48, width: 34, height: 34, rotate: "-12deg" },
+    { left: 42, top: 40, width: 38, height: 38, rotate: "-11deg" },
+    { left: 70, top: 32, width: 42, height: 42, rotate: "-9deg" },
+    { left: 102, top: 24, width: 46, height: 46, rotate: "-7deg" },
+    { left: 138, top: 18, width: 50, height: 50, rotate: "-5deg" },
+    { left: 180, top: 14, width: 52, height: 52, rotate: "-3deg" },
+    { left: 226, top: 12, width: 54, height: 54, rotate: "-1deg" },
+  ];
+  const bodyLayout = bodyStyle === "tube" ? tubeBodyLayout : circleBodyLayout;
+  const headSegment = { left: 294, top: 8, size: 62 };
   const hasHeadCostume = !!headPreview;
 
   const renderEye = (side: "left" | "right") => {
@@ -184,45 +196,23 @@ function ShopWormPreview({
     <View style={styles.previewCard}>
       <Text style={styles.previewTitle}>Aperçu du ver</Text>
       <View style={styles.previewStage}>
-        {segmentLayout.map((segment, index) => {
-          const isHead = !!segment.head;
-          const stripeColor = palette[(segmentLayout.length - 1 - index) % palette.length] || palette[0];
+        {bodyLayout.map((segment, index) => {
+          const stripeColor = palette[(bodyLayout.length - 1 - index) % palette.length] || palette[0];
           const commonStyle = [
             styles.previewSegment,
             {
               left: segment.left,
               top: segment.top,
-              width: segment.size,
-              height: segment.size,
-              borderRadius: segment.size / 2,
+              width: segment.width,
+              height: segment.height,
+              borderRadius: segment.height / 2,
+              transform: [{ rotate: segment.rotate }],
             },
-            isHead && hasHeadCostume && styles.previewHeadShell,
           ];
-
-          const face = isHead ? (
-            <View style={styles.previewFaceWrap}>
-              {headPreview ? (
-                <Image
-                  source={{ uri: headPreview }}
-                  style={styles.previewHeadCostume}
-                  resizeMode="contain"
-                />
-              ) : null}
-              {!hasHeadCostume && (
-                <>
-                  <View style={styles.previewEyesRow}>
-                    {renderEye("left")}
-                    {renderEye("right")}
-                  </View>
-                  {mouthNode}
-                </>
-              )}
-            </View>
-          ) : null;
 
           const segmentSource = flagSource || bodyTextureSource;
 
-          if (segmentSource && !(isHead && hasHeadCostume)) {
+          if (segmentSource) {
             return (
               <ImageBackground
                 key={index}
@@ -233,9 +223,7 @@ function ShopWormPreview({
                   bodyTextureSource && !flagSource && styles.previewBodyTextureImage,
                 ]}
                 style={commonStyle}
-              >
-                {face}
-              </ImageBackground>
+              />
             );
           }
 
@@ -248,10 +236,42 @@ function ShopWormPreview({
               ]}
             >
               <View style={styles.previewHighlight} />
-              {face}
             </View>
           );
         })}
+        <View
+          style={[
+            styles.previewSegment,
+            styles.previewHeadShellBase,
+            {
+              left: headSegment.left,
+              top: headSegment.top,
+              width: headSegment.size,
+              height: headSegment.size,
+              borderRadius: headSegment.size / 2,
+            },
+            hasHeadCostume && styles.previewHeadShell,
+          ]}
+        >
+          <View style={styles.previewFaceWrap}>
+            {headPreview ? (
+              <Image
+                source={{ uri: headPreview }}
+                style={styles.previewHeadCostume}
+                resizeMode="contain"
+              />
+            ) : null}
+            {!hasHeadCostume && (
+              <>
+                <View style={styles.previewEyesRow}>
+                  {renderEye("left")}
+                  {renderEye("right")}
+                </View>
+                {mouthNode}
+              </>
+            )}
+          </View>
+        </View>
       </View>
     </View>
   );
@@ -498,6 +518,7 @@ export default function ShopScreen() {
             colors={selectedColors}
             eyeStyle={eyeStyle}
             mouthStyle={mouthStyle}
+            bodyStyle={bodyStyle}
             flagSource={selectedFlagSource}
             bodyTextureSource={selectedHeadBodySource}
             headPreview={selectedHeadPreview}
@@ -784,6 +805,9 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     borderColor: "transparent",
     boxShadow: "none",
+  },
+  previewHeadShellBase: {
+    backgroundColor: "#9a9a9a",
   },
   previewHighlight: {
     position: "absolute",
