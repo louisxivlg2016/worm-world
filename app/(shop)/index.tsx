@@ -757,7 +757,6 @@ export default function ShopScreen() {
       </>)}
 
       {/* Flag Grid */}
-      <Text style={styles.sectionTitle}>{t("shopFlags")}</Text>
       <TextInput
         style={styles.searchInput}
         placeholder={t("searchFlag")}
