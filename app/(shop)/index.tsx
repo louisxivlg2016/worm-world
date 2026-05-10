@@ -425,6 +425,17 @@ export default function ShopScreen() {
     setHeadType(availableHeadIds[nextIndex]);
   }, [availableHeadIds, headType]);
 
+  const cycleFlag = useCallback((direction: -1 | 1) => {
+    if (filteredFlags.length === 0) return;
+    const currentIndex = filteredFlags.findIndex((f) => f.name === selectedFlag);
+    const safeIndex = currentIndex >= 0 ? currentIndex : (direction > 0 ? -1 : 0);
+    const nextIndex = (safeIndex + direction + filteredFlags.length) % filteredFlags.length;
+    const next = filteredFlags[nextIndex];
+    setSelectedFlag(next.name);
+    setSelectedColors([...next.colors]);
+    setHeadType("default");
+  }, [filteredFlags, selectedFlag]);
+
   const numColumns = isDesktop ? 3 : 2;
   const itemGap = spacing.sm;
   const effectiveWidth = isDesktop ? contentMaxWidth : width;
@@ -566,15 +577,16 @@ export default function ShopScreen() {
           })}
         </View>
         <View style={styles.previewNavRow}>
-        {activeTab === "shop" && (
-          <Pressable
-            onPress={() => cycleHead(-1)}
-            style={[styles.costumeArrowBtn, availableHeadIds.length === 0 && styles.costumeArrowBtnDisabled]}
-            disabled={availableHeadIds.length === 0}
-          >
-            <Text style={styles.costumeArrowText}>‹</Text>
-          </Pressable>
-        )}
+        <Pressable
+          onPress={() => activeTab === "shop" ? cycleHead(-1) : cycleFlag(-1)}
+          style={[
+            styles.costumeArrowBtn,
+            (activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0) && styles.costumeArrowBtnDisabled,
+          ]}
+          disabled={activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0}
+        >
+          <Text style={styles.costumeArrowText}>‹</Text>
+        </Pressable>
         <View style={styles.previewNavCenter}>
           <ShopWormPreview
             colors={selectedColors}
@@ -585,19 +597,22 @@ export default function ShopScreen() {
             bodyTextureSource={activeTab === "shop" ? selectedHeadBodySource : undefined}
             headPreview={activeTab === "shop" ? selectedHeadPreview : undefined}
           />
-          {activeTab === "shop" && (
+          {activeTab === "shop" ? (
             <Text style={styles.previewCostumeName}>{selectedHeadMeta?.label ?? "Classique"}</Text>
-          )}
+          ) : selectedFlag ? (
+            <Text style={styles.previewCostumeName}>{translateFlag(selectedFlag, flagLang)}</Text>
+          ) : null}
         </View>
-        {activeTab === "shop" && (
-          <Pressable
-            onPress={() => cycleHead(1)}
-            style={[styles.costumeArrowBtn, availableHeadIds.length === 0 && styles.costumeArrowBtnDisabled]}
-            disabled={availableHeadIds.length === 0}
-          >
-            <Text style={styles.costumeArrowText}>›</Text>
-          </Pressable>
-        )}
+        <Pressable
+          onPress={() => activeTab === "shop" ? cycleHead(1) : cycleFlag(1)}
+          style={[
+            styles.costumeArrowBtn,
+            (activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0) && styles.costumeArrowBtnDisabled,
+          ]}
+          disabled={activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0}
+        >
+          <Text style={styles.costumeArrowText}>›</Text>
+        </Pressable>
         </View>
       </View>
 
