@@ -757,13 +757,6 @@ export default function ShopScreen() {
       </>)}
 
       {/* Flag Grid */}
-      <TextInput
-        style={styles.searchInput}
-        placeholder={t("searchFlag")}
-        placeholderTextColor={colors.textSecondary}
-        value={flagSearch}
-        onChangeText={setFlagSearch}
-      />
       <FlatList
         key={numColumns}
         data={filteredFlags}
