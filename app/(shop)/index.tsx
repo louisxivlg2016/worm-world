@@ -566,13 +566,15 @@ export default function ShopScreen() {
           })}
         </View>
         <View style={styles.previewNavRow}>
-        <Pressable
-          onPress={() => cycleHead(-1)}
-          style={[styles.costumeArrowBtn, availableHeadIds.length === 0 && styles.costumeArrowBtnDisabled]}
-          disabled={availableHeadIds.length === 0}
-        >
-          <Text style={styles.costumeArrowText}>‹</Text>
-        </Pressable>
+        {activeTab === "shop" && (
+          <Pressable
+            onPress={() => cycleHead(-1)}
+            style={[styles.costumeArrowBtn, availableHeadIds.length === 0 && styles.costumeArrowBtnDisabled]}
+            disabled={availableHeadIds.length === 0}
+          >
+            <Text style={styles.costumeArrowText}>‹</Text>
+          </Pressable>
+        )}
         <View style={styles.previewNavCenter}>
           <ShopWormPreview
             colors={selectedColors}
@@ -580,18 +582,22 @@ export default function ShopScreen() {
             mouthStyle={mouthStyle}
             bodyStyle={bodyStyle}
             flagSource={selectedFlagSource}
-            bodyTextureSource={selectedHeadBodySource}
-            headPreview={selectedHeadPreview}
+            bodyTextureSource={activeTab === "shop" ? selectedHeadBodySource : undefined}
+            headPreview={activeTab === "shop" ? selectedHeadPreview : undefined}
           />
-          <Text style={styles.previewCostumeName}>{selectedHeadMeta?.label ?? "Classique"}</Text>
+          {activeTab === "shop" && (
+            <Text style={styles.previewCostumeName}>{selectedHeadMeta?.label ?? "Classique"}</Text>
+          )}
         </View>
-        <Pressable
-          onPress={() => cycleHead(1)}
-          style={[styles.costumeArrowBtn, availableHeadIds.length === 0 && styles.costumeArrowBtnDisabled]}
-          disabled={availableHeadIds.length === 0}
-        >
-          <Text style={styles.costumeArrowText}>›</Text>
-        </Pressable>
+        {activeTab === "shop" && (
+          <Pressable
+            onPress={() => cycleHead(1)}
+            style={[styles.costumeArrowBtn, availableHeadIds.length === 0 && styles.costumeArrowBtnDisabled]}
+            disabled={availableHeadIds.length === 0}
+          >
+            <Text style={styles.costumeArrowText}>›</Text>
+          </Pressable>
+        )}
         </View>
       </View>
 
