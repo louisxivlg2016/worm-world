@@ -184,6 +184,7 @@ function ShopWormPreview({
   headPreview?: string;
 }) {
   const hasHeadCostume = !!headPreview;
+  const isFlagPreview = !!flagSource;
   const segmentSource = flagSource || bodyTextureSource;
   const baseColor = palette[0] || "#9a9a9a";
 
@@ -221,21 +222,18 @@ function ShopWormPreview({
         <View
           style={[
             styles.previewTube,
+            isFlagPreview && styles.previewTubeFlag,
             { backgroundColor: segmentSource ? "transparent" : baseColor },
           ]}
         >
-          {flagSource ? (
+          {segmentSource ? (
             <ImageBackground
-              source={flagSource}
-              resizeMode="cover"
-              imageStyle={styles.previewTubeImage}
-              style={styles.previewTubeFill}
-            />
-          ) : bodyTextureSource ? (
-            <ImageBackground
-              source={bodyTextureSource}
-              resizeMode="repeat"
-              imageStyle={styles.previewTubeImage}
+              source={segmentSource}
+              resizeMode={isFlagPreview ? "repeat" : "stretch"}
+              imageStyle={[
+                styles.previewTubeImage,
+                isFlagPreview && styles.previewTubeRepeatImage,
+              ]}
               style={styles.previewTubeFill}
             />
           ) : null}
@@ -243,7 +241,7 @@ function ShopWormPreview({
           <View style={styles.previewTubeHighlight} />
         </View>
 
-        {/* Head on the left, larger than the tube — same look as in-game */}
+        {/* Head on the right, attached to the body like in-game */}
         <View style={styles.previewHead}>
           {hasHeadCostume ? (
             <Image
@@ -261,8 +259,11 @@ function ShopWormPreview({
               {segmentSource ? (
                 <ImageBackground
                   source={segmentSource}
-                  resizeMode="cover"
-                  imageStyle={styles.previewHeadBubbleImage}
+                  resizeMode={isFlagPreview ? "repeat" : "stretch"}
+                  imageStyle={[
+                    styles.previewHeadBubbleImage,
+                    isFlagPreview && styles.previewHeadRepeatImage,
+                  ]}
                   style={styles.previewHeadBubbleFill}
                 />
               ) : null}
@@ -845,9 +846,9 @@ const styles = StyleSheet.create({
   },
   previewTube: {
     position: "absolute",
-    left: 90,
-    right: 16,
-    top: 50,
+    left: 18,
+    right: 88,
+    top: 56,
     height: 60,
     borderRadius: 30,
     borderCurve: "continuous",
@@ -855,6 +856,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(0,0,0,0.18)",
     boxShadow: "0 10px 22px rgba(0,0,0,0.25)",
+  },
+  previewTubeFlag: {
+    height: 56,
+    top: 58,
+    borderRadius: 28,
   },
   previewTubeFill: {
     position: "absolute",
@@ -864,6 +870,9 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   previewTubeImage: {
+    borderRadius: 30,
+  },
+  previewTubeRepeatImage: {
     borderRadius: 30,
   },
   previewTubeShade: {
@@ -885,8 +894,8 @@ const styles = StyleSheet.create({
   },
   previewHead: {
     position: "absolute",
-    left: 4,
-    top: 8,
+    right: 2,
+    top: 16,
     width: 120,
     height: 120,
     alignItems: "center",
@@ -915,6 +924,9 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   previewHeadBubbleImage: {
+    borderRadius: 44,
+  },
+  previewHeadRepeatImage: {
     borderRadius: 44,
   },
   previewNavRow: {
