@@ -187,10 +187,10 @@ function ShopWormPreview({
   const baseColor = palette[0] || "#9a9a9a";
   const previewBands = palette.length ? palette : [baseColor];
   const circleSegmentSize = 58;
-  const circleSegmentStep = 22;
+  const circleSegmentStep = 18;
   const circleHeadSize = 58;
-  const previewSegments = Array.from({ length: 11 }, (_, index) => ({
-    left: 44 + index * circleSegmentStep,
+  const previewSegments = Array.from({ length: 15 }, (_, index) => ({
+    left: 12 + index * circleSegmentStep,
     color: previewBands[index % previewBands.length] || baseColor,
   }));
 
@@ -856,7 +856,7 @@ const styles = StyleSheet.create({
   },
   previewHeadCircleMode: {
     left: 18,
-    top: 40,
+    top: 34,
     width: 58,
     height: 58,
   },
@@ -899,9 +899,9 @@ const styles = StyleSheet.create({
   },
   previewCircleBody: {
     position: "absolute",
-    left: 18,
+    left: 8,
     right: 18,
-    top: 40,
+    top: 34,
     height: 64,
   },
   previewCostumeName: {
