@@ -184,6 +184,15 @@ function ShopWormPreview({
   const isFlagPreview = !!flagSource;
   const segmentSource = flagSource || bodyTextureSource;
   const baseColor = palette[0] || "#9a9a9a";
+  const previewBands = (palette.length ? [...palette, ...palette] : [baseColor]).slice(0, 8);
+
+  const renderPaletteFill = (roundedStyle: object) => (
+    <View style={[styles.previewPaletteFill, roundedStyle]}>
+      {previewBands.map((color, index) => (
+        <View key={`${color}-${index}`} style={[styles.previewPaletteBand, { backgroundColor: color }]} />
+      ))}
+    </View>
+  );
 
   const renderEye = (side: "left" | "right") => {
     const closed = eyeStyle === "happy" || (eyeStyle === "wink" && side === "right");
@@ -233,7 +242,7 @@ function ShopWormPreview({
               ]}
               style={styles.previewTubeFill}
             />
-          ) : null}
+          ) : renderPaletteFill(styles.previewTubeImage)}
           <View style={styles.previewTubeShade} />
           <View style={styles.previewTubeHighlight} />
         </View>
@@ -263,7 +272,7 @@ function ShopWormPreview({
                   ]}
                   style={styles.previewHeadBubbleFill}
                 />
-              ) : null}
+              ) : renderPaletteFill(styles.previewHeadBubbleImage)}
               <View style={styles.previewFaceWrap}>
                 <View style={styles.previewEyesRow}>
                   {renderEye("left")}
@@ -767,6 +776,17 @@ const styles = StyleSheet.create({
   },
   previewTubeRepeatImage: {
     borderRadius: 30,
+  },
+  previewPaletteFill: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    flexDirection: "row",
+  },
+  previewPaletteBand: {
+    flex: 1,
   },
   previewTubeShade: {
     position: "absolute",
