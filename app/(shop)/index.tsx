@@ -183,10 +183,15 @@ function ShopWormPreview({
   const hasHeadCostume = !!headPreview;
   const isFlagPreview = !!flagSource;
   const segmentSource = flagSource || bodyTextureSource;
+  const showsTubeBody = !!segmentSource || bodyStyle === "tube";
   const baseColor = palette[0] || "#9a9a9a";
-  const previewBands = (palette.length ? [...palette, ...palette] : [baseColor]).slice(0, 8);
+  const previewBands = palette.length ? palette : [baseColor];
+  const previewSegments = Array.from({ length: 6 }, (_, index) => ({
+    left: 24 + index * 52,
+    color: previewBands[index % previewBands.length] || baseColor,
+  }));
 
-  const renderPaletteFill = (roundedStyle: object) => (
+  const renderTubePaletteFill = (roundedStyle: object) => (
     <View style={[styles.previewPaletteFill, roundedStyle]}>
       {previewBands.map((color, index) => (
         <View key={`${color}-${index}`} style={[styles.previewPaletteBand, { backgroundColor: color }]} />
@@ -224,28 +229,47 @@ function ShopWormPreview({
     <View style={styles.previewCard}>
       <Text style={styles.previewTitle}>Aperçu du ver</Text>
       <View style={styles.previewStage}>
-        {/* Continuous tube body */}
-        <View
-          style={[
-            styles.previewTube,
-            isFlagPreview && styles.previewTubeFlag,
-            { backgroundColor: segmentSource ? "transparent" : baseColor },
-          ]}
-        >
-          {segmentSource ? (
-            <ImageBackground
-              source={segmentSource}
-              resizeMode={isFlagPreview ? "repeat" : "stretch"}
-              imageStyle={[
-                styles.previewTubeImage,
-                isFlagPreview && styles.previewTubeRepeatImage,
-              ]}
-              style={styles.previewTubeFill}
-            />
-          ) : renderPaletteFill(styles.previewTubeImage)}
-          <View style={styles.previewTubeShade} />
-          <View style={styles.previewTubeHighlight} />
-        </View>
+        {showsTubeBody ? (
+          <View
+            style={[
+              styles.previewTube,
+              isFlagPreview && styles.previewTubeFlag,
+              { backgroundColor: segmentSource ? "transparent" : baseColor },
+            ]}
+          >
+            {segmentSource ? (
+              <ImageBackground
+                source={segmentSource}
+                resizeMode={isFlagPreview ? "repeat" : "stretch"}
+                imageStyle={[
+                  styles.previewTubeImage,
+                  isFlagPreview && styles.previewTubeRepeatImage,
+                ]}
+                style={styles.previewTubeFill}
+              />
+            ) : renderTubePaletteFill(styles.previewTubeImage)}
+            <View style={styles.previewTubeShade} />
+            <View style={styles.previewTubeHighlight} />
+          </View>
+        ) : (
+          <View style={styles.previewCircleBody}>
+            {previewSegments.map((segment, index) => (
+              <View
+                key={`segment-${index}`}
+                style={[
+                  styles.previewSegment,
+                  {
+                    left: segment.left,
+                    backgroundColor: segment.color,
+                    borderColor: "rgba(0,0,0,0.18)",
+                  },
+                ]}
+              >
+                <View style={styles.previewHighlight} />
+              </View>
+            ))}
+          </View>
+        )}
 
         {/* Head on the right, attached to the body like in-game */}
         <View style={styles.previewHead}>
@@ -272,7 +296,7 @@ function ShopWormPreview({
                   ]}
                   style={styles.previewHeadBubbleFill}
                 />
-              ) : renderPaletteFill(styles.previewHeadBubbleImage)}
+              ) : null}
               <View style={styles.previewFaceWrap}>
                 <View style={styles.previewEyesRow}>
                   {renderEye("left")}
@@ -783,7 +807,7 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     bottom: 0,
-    flexDirection: "row",
+    flexDirection: "column",
   },
   previewPaletteBand: {
     flex: 1,
@@ -850,6 +874,13 @@ const styles = StyleSheet.create({
   },
   previewNavCenter: {
     flex: 1,
+  },
+  previewCircleBody: {
+    position: "absolute",
+    left: 0,
+    right: 88,
+    top: 42,
+    height: 74,
   },
   previewCostumeName: {
     color: colors.text,
