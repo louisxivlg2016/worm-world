@@ -532,9 +532,6 @@ export default function ShopScreen() {
                 )}
               </View>
             </View>
-            <Text style={styles.flagLabel} numberOfLines={1} ellipsizeMode="tail">
-              {translateFlag(item.name, flagLang)}
-            </Text>
           </Pressable>
         </Animated.View>
       );
