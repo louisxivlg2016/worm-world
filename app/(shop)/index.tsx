@@ -5,7 +5,6 @@ import {
   Text,
   TextInput,
   ScrollView,
-  FlatList,
   Image,
   ImageBackground,
   Pressable,
@@ -13,7 +12,6 @@ import {
   useWindowDimensions,
   Alert,
 } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
 import { useRouter } from "expo-router";
 import { colors, spacing } from "@/expo/theme";
 import { useGameState } from "@/context/GameStateContext";
@@ -436,11 +434,6 @@ export default function ShopScreen() {
     setHeadType("default");
   }, [filteredFlags, selectedFlag]);
 
-  const numColumns = isDesktop ? 3 : 2;
-  const itemGap = spacing.sm;
-  const effectiveWidth = isDesktop ? contentMaxWidth : width;
-  const flagItemWidth = (effectiveWidth - spacing.md * 2 - itemGap * (numColumns - 1)) / numColumns;
-
   const computePrice = useCallback(() => {
     if (selectedFlag) return FLAG_PRICE;
     if (headType === "dragon") return DRAGON_PRICE;
@@ -473,70 +466,6 @@ export default function ShopScreen() {
       },
     });
   };
-
-  const renderFlagItem = useCallback(
-    ({ item, index }: { item: FlagSkin; index: number }) => {
-      const img = FLAG_IMAGES[item.name];
-      const isSelected = selectedFlag === item.name;
-      return (
-        <Animated.View entering={FadeInDown.delay(index * 50).springify()}>
-          <Pressable
-            onPress={() => {
-              setSelectedFlag(item.name);
-              setSelectedColors([...item.colors]);
-              setHeadType("default");
-            }}
-            style={[
-              styles.flagItem,
-              {
-                width: flagItemWidth,
-                borderColor: isSelected ? colors.gold : "rgba(255,255,255,0.1)",
-                borderWidth: isSelected ? 2 : 1,
-              },
-            ]}
-          >
-            <View style={styles.flagWormPreview}>
-              {/* head — flag-textured face with eyes */}
-              <View style={styles.flagWormHead}>
-                {img ? (
-                  <ImageBackground
-                    source={img}
-                    resizeMode="cover"
-                    imageStyle={styles.flagWormHeadImage}
-                    style={styles.flagWormHeadFill}
-                  />
-                ) : (
-                  <View style={[styles.flagWormHeadFill, { backgroundColor: item.colors[0] || "#888" }]} />
-                )}
-                <View style={styles.flagWormEyesRow}>
-                  <View style={styles.flagWormEye}><View style={styles.flagWormPupil} /></View>
-                  <View style={styles.flagWormEye}><View style={styles.flagWormPupil} /></View>
-                </View>
-              </View>
-              {/* tube body — flag */}
-              <View style={styles.flagWormTube}>
-                {img ? (
-                  <ImageBackground
-                    source={img}
-                    resizeMode="cover"
-                    imageStyle={styles.flagWormTubeImage}
-                    style={styles.flagWormTubeFill}
-                  />
-                ) : (
-                  <View style={[styles.flagWormTubeFill, { flexDirection: "row" }]}>
-                    {item.colors.map((c, i) => (
-                      <View key={i} style={[styles.colorStripe, { backgroundColor: c }]} />
-                    ))}
-                  </View>
-                )}
-              </View>
-            </View>
-          </Pressable>
-        </Animated.View>
-      );
-    },
-    [flagItemWidth, selectedFlag, flagLang],
-  );
 
   const desktopContainerStyle = isDesktop
     ? { maxWidth: contentMaxWidth, alignSelf: 'center' as const, width: '100%' as any, paddingHorizontal: spacing.md }
@@ -730,18 +659,6 @@ export default function ShopScreen() {
         ))}
       </View>
       </>)}
-
-      {/* Flag Grid */}
-      <FlatList
-        key={numColumns}
-        data={filteredFlags}
-        renderItem={renderFlagItem}
-        keyExtractor={(item) => item.name}
-        numColumns={numColumns}
-        scrollEnabled={false}
-        columnWrapperStyle={{ gap: itemGap }}
-        contentContainerStyle={{ gap: itemGap }}
-      />
 
       {/* Apply Button */}
       <Pressable
@@ -1225,109 +1142,6 @@ const styles = StyleSheet.create({
   },
   flagTabTextActive: {
     color: colors.gold,
-  },
-  flagGrid: {
-    flex: 1,
-  },
-  flagItem: {
-    borderRadius: 12,
-    borderCurve: "continuous",
-    overflow: "hidden",
-    backgroundColor: "rgba(39,71,99,0.94)",
-    flexDirection: "column",
-    alignItems: "stretch",
-    gap: 8,
-    padding: 12,
-  },
-  flagImage: {
-    width: 52,
-    height: 36,
-    borderRadius: 6,
-    borderCurve: "continuous",
-  },
-  flagWormPreview: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  flagWormHead: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderCurve: "continuous",
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.25)",
-    alignItems: "center",
-    justifyContent: "center",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-    marginRight: -10,
-    zIndex: 2,
-  },
-  flagWormHeadFill: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-  },
-  flagWormHeadImage: {
-    borderRadius: 20,
-  },
-  flagWormEyesRow: {
-    flexDirection: "row",
-    gap: 3,
-    zIndex: 2,
-  },
-  flagWormEye: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  flagWormPupil: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: "#111",
-  },
-  flagWormTube: {
-    flex: 1,
-    height: 28,
-    borderRadius: 14,
-    borderCurve: "continuous",
-    overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.25)",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-  },
-  flagWormTubeFill: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
-  },
-  flagWormTubeImage: {
-    borderRadius: 14,
-  },
-  flagColorPreview: {
-    width: 52,
-    height: 36,
-    borderRadius: 6,
-    borderCurve: "continuous",
-    flexDirection: "row",
-    overflow: "hidden",
-  },
-  colorStripe: {
-    flex: 1,
-  },
-  flagLabel: {
-    color: "rgba(255,255,255,0.85)",
-    fontSize: 13,
-    fontWeight: "700",
-    textAlign: "center",
   },
   applyBtn: {
     marginTop: spacing.lg,
