@@ -451,7 +451,7 @@ export default function ShopScreen() {
     if (price > 0 && price > coins) return;
     const selectedBodyTexture = selectedFlag
       ? getFlagTextureUri(selectedFlag)
-      : (selectedHeadMeta?.bodyTexture ?? "");
+      : (selectedHeadMeta?.bodyTexture ?? selectedHeadMeta?.preview ?? "");
     router.push({
       pathname: "/(shop)/buy-confirm",
       params: {
@@ -473,7 +473,9 @@ export default function ShopScreen() {
 
   const selectedFlagSource = selectedFlag ? FLAG_IMAGES[selectedFlag] : undefined;
   const selectedHeadPreview = selectedHeadMeta?.preview;
-  const selectedHeadBodySource = selectedHeadMeta?.bodyTexture ? { uri: selectedHeadMeta.bodyTexture } : undefined;
+  const selectedHeadBodySource = (selectedHeadMeta?.bodyTexture || selectedHeadMeta?.preview)
+    ? { uri: selectedHeadMeta.bodyTexture ?? selectedHeadMeta.preview! }
+    : undefined;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
