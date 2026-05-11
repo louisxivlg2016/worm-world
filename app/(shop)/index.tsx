@@ -186,8 +186,11 @@ function ShopWormPreview({
   const showsTubeBody = !!segmentSource || bodyStyle === "tube";
   const baseColor = palette[0] || "#9a9a9a";
   const previewBands = palette.length ? palette : [baseColor];
+  const circleSegmentSize = 58;
+  const circleSegmentStep = 40;
+  const circleHeadSize = 58;
   const previewSegments = Array.from({ length: 6 }, (_, index) => ({
-    left: 24 + index * 52,
+    left: 18 + index * circleSegmentStep,
     color: previewBands[index % previewBands.length] || baseColor,
   }));
 
@@ -260,6 +263,9 @@ function ShopWormPreview({
                   styles.previewSegment,
                   {
                     left: segment.left,
+                    width: circleSegmentSize,
+                    height: circleSegmentSize,
+                    borderRadius: circleSegmentSize / 2,
                     backgroundColor: segment.color,
                     borderColor: "rgba(0,0,0,0.18)",
                   },
@@ -272,7 +278,12 @@ function ShopWormPreview({
         )}
 
         {/* Head on the right, attached to the body like in-game */}
-        <View style={styles.previewHead}>
+        <View
+          style={[
+            styles.previewHead,
+            !showsTubeBody && styles.previewHeadCircleMode,
+          ]}
+        >
           {hasHeadCostume ? (
             <Image
               source={{ uri: headPreview }}
@@ -283,6 +294,11 @@ function ShopWormPreview({
             <View
               style={[
                 styles.previewHeadBubble,
+                !showsTubeBody && {
+                  width: circleHeadSize,
+                  height: circleHeadSize,
+                  borderRadius: circleHeadSize / 2,
+                },
                 { backgroundColor: segmentSource ? "transparent" : baseColor },
               ]}
             >
@@ -838,6 +854,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  previewHeadCircleMode: {
+    right: 34,
+    top: 40,
+    width: 58,
+    height: 58,
+  },
   previewHeadImage: {
     width: "100%",
     height: "100%",
@@ -878,9 +900,9 @@ const styles = StyleSheet.create({
   previewCircleBody: {
     position: "absolute",
     left: 0,
-    right: 88,
-    top: 42,
-    height: 74,
+    right: 44,
+    top: 34,
+    height: 64,
   },
   previewCostumeName: {
     color: colors.text,
