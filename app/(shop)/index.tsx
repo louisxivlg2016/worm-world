@@ -19,7 +19,6 @@ import { colors, spacing } from "@/expo/theme";
 import { useGameState } from "@/context/GameStateContext";
 import { FLAG_IMAGES } from "@/assets/flags";
 import { translateFlag } from "@/i18n/flagNames";
-import { SKINS } from "@/types/game";
 import { getStorage } from "@/services/StorageService";
 import { GAME_EVENTS } from "@/config/events";
 
@@ -615,28 +614,6 @@ export default function ShopScreen() {
       </View>
 
       {activeTab === "shop" && (<>
-      {/* Preset Skins */}
-      <Text style={styles.sectionTitle}>{t("shopPresets")}</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.presetRow}>
-        {SKINS.map((skin) => (
-          <Pressable
-            key={skin.name}
-            onPress={() => {
-              setSelectedFlag(null);
-              setSelectedColors([...skin.colors]);
-            }}
-            style={styles.presetItem}
-          >
-            <View style={styles.presetSwatches}>
-              {skin.colors.slice(0, 4).map((c, i) => (
-                <View key={i} style={[styles.presetSwatch, { backgroundColor: c }]} />
-              ))}
-            </View>
-            <Text style={styles.presetLabel}>{skin.name}</Text>
-          </Pressable>
-        ))}
-      </ScrollView>
-
       {/* Head / Costume Selector */}
       <Text style={styles.sectionTitle}>{t("shopHead")}</Text>
       {/* Per-event currency balances */}
@@ -1066,34 +1043,6 @@ const styles = StyleSheet.create({
     color: colors.text,
     fontSize: 15,
     marginBottom: spacing.sm,
-  },
-  presetRow: {
-    flexDirection: "row",
-    marginBottom: spacing.sm,
-  },
-  presetItem: {
-    alignItems: "center",
-    marginRight: spacing.md,
-    padding: spacing.sm,
-    backgroundColor: "rgba(39,71,99,0.94)",
-    borderRadius: 12,
-    borderCurve: "continuous",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
-  },
-  presetSwatches: {
-    flexDirection: "row",
-    gap: 2,
-    marginBottom: 4,
-  },
-  presetSwatch: {
-    width: 16,
-    height: 16,
-    borderRadius: 4,
-    borderCurve: "continuous",
-  },
-  presetLabel: {
-    color: colors.textSecondary,
-    fontSize: 11,
   },
   gemsBar: {
     flexDirection: "row", alignItems: "center", gap: 6,
