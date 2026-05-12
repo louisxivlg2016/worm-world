@@ -190,7 +190,7 @@ function ShopWormPreview({
   const circleSegmentStep = 16;
   const circleHeadSize = 58;
   const circleBodyLeft = 20;
-  const previewSegments = Array.from({ length: 16 }, (_, index) => ({
+  const previewSegments = Array.from({ length: 15 }, (_, index) => ({
     left: circleBodyLeft + 6 + index * circleSegmentStep,
     color: previewBands[(index + 1) % previewBands.length] || baseColor,
   }));
