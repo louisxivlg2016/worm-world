@@ -530,6 +530,13 @@ function getWormRadius(worm: Worm): number {
   return BASE_RADIUS + Math.min(growth, 10)
 }
 
+function getWormSegmentGap(worm: Worm): number {
+  const len = worm.segments.length
+  const dynamicGap = BASE_SEGMENT_GAP + Math.min(Math.pow(Math.max(len - 30, 0) / 50, 2) * 6, 10)
+  // Keep circle bodies visually connected as the worm radius grows.
+  return Math.min(dynamicGap, getWormRadius(worm) * 0.38)
+}
+
 function getWormSpeed(worm: Worm): number {
   const len = worm.segments.length
   const slowdown = Math.pow(len / 80000, 2) * 1.3
@@ -621,7 +628,7 @@ function updateWorm(worm: Worm, dt: number, foods: Food[], coins: Coin[], partic
   }
 
   // Move segments
-  const gap = BASE_SEGMENT_GAP + Math.min(Math.pow(Math.max(worm.segments.length - 30, 0) / 50, 2) * 6, 10)
+  const gap = getWormSegmentGap(worm)
   for (let i = 1; i < worm.segments.length; i++) {
     const prev = worm.segments[i - 1]
     const curr = worm.segments[i]
@@ -2776,7 +2783,7 @@ export function useGameEngine(
             rp.boosting = data.boosting
 
             // Body follows head — same gap logic as local worm
-            const gap = BASE_SEGMENT_GAP + Math.min(Math.pow(Math.max(rp.segments.length - 30, 0) / 50, 2) * 6, 10)
+            const gap = getWormSegmentGap(rp)
             for (let i = 1; i < rp.segments.length; i++) {
               const prev = rp.segments[i - 1]
               const seg = rp.segments[i]
