@@ -186,11 +186,11 @@ function ShopWormPreview({
   const showsTubeBody = !!segmentSource || bodyStyle === "tube";
   const baseColor = palette[0] || "#9a9a9a";
   const previewBands = palette.length ? palette : [baseColor];
-  const circleSegmentSize = 66;
-  const circleSegmentStep = 17;
-  const circleHeadSize = 66;
+  const circleSegmentSize = 76;
+  const circleSegmentStep = 16;
+  const circleHeadSize = 76;
   const circleBodyLeft = 20;
-  const previewSegments = Array.from({ length: 13 }, (_, index) => ({
+  const previewSegments = Array.from({ length: 12 }, (_, index) => ({
     left: circleBodyLeft + index * circleSegmentStep,
     color: previewBands[(index + 1) % previewBands.length] || baseColor,
   }));
@@ -858,9 +858,9 @@ const styles = StyleSheet.create({
   },
   previewHeadCircleMode: {
     right: 18,
-    top: 30,
-    width: 66,
-    height: 66,
+    top: 25,
+    width: 76,
+    height: 76,
     zIndex: 20,
   },
   previewHeadImage: {
@@ -904,9 +904,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 20,
     right: 20,
-    top: 30,
-    height: 66,
-    borderRadius: 33,
+    top: 25,
+    height: 76,
+    borderRadius: 38,
     overflow: "hidden",
   },
   previewCircleShadow: {
@@ -914,8 +914,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 4,
     bottom: -1,
-    height: 16,
-    borderRadius: 16,
+    height: 18,
+    borderRadius: 18,
     backgroundColor: "rgba(0,0,0,0.22)",
   },
   previewCostumeName: {
@@ -927,9 +927,9 @@ const styles = StyleSheet.create({
   },
   previewSegment: {
     position: "absolute",
-    width: 66,
-    height: 66,
-    borderRadius: 33,
+    width: 76,
+    height: 76,
+    borderRadius: 38,
     borderCurve: "continuous",
     overflow: "hidden",
     borderWidth: 1,
@@ -954,11 +954,11 @@ const styles = StyleSheet.create({
   },
   previewHighlight: {
     position: "absolute",
-    top: 9,
-    left: 10,
-    width: 20,
-    height: 11,
-    borderRadius: 10,
+    top: 10,
+    left: 11,
+    width: 22,
+    height: 12,
+    borderRadius: 12,
     backgroundColor: "rgba(255,255,255,0.18)",
   },
   previewFaceWrap: {
