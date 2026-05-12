@@ -187,10 +187,10 @@ function ShopWormPreview({
   const baseColor = palette[0] || "#9a9a9a";
   const previewBands = palette.length ? palette : [baseColor];
   const circleSegmentSize = 76;
-  const circleSegmentStep = 19;
+  const circleSegmentStep = 21;
   const circleHeadSize = 76;
   const circleBodyLeft = 20;
-  const previewSegments = Array.from({ length: 18 }, (_, index) => ({
+  const previewSegments = Array.from({ length: 22 }, (_, index) => ({
     left: circleBodyLeft + index * circleSegmentStep,
     color: previewBands[(index + 1) % previewBands.length] || baseColor,
   }));
