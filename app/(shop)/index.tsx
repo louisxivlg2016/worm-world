@@ -904,9 +904,10 @@ const styles = StyleSheet.create({
   previewCircleBody: {
     position: "absolute",
     left: 20,
-    right: 20,
+    right: 78,
     top: 34,
     height: 58,
+    overflow: "hidden",
   },
   previewCircleGlow: {
     position: "absolute",
