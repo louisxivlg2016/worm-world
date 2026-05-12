@@ -858,7 +858,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   previewHeadCircleMode: {
-    right: 24,
+    right: 18,
     top: 34,
     width: 58,
     height: 58,
@@ -904,9 +904,10 @@ const styles = StyleSheet.create({
   previewCircleBody: {
     position: "absolute",
     left: 20,
-    right: 78,
+    right: 34,
     top: 34,
     height: 58,
+    borderRadius: 29,
     overflow: "hidden",
   },
   previewCircleGlow: {
