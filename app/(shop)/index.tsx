@@ -186,9 +186,9 @@ function ShopWormPreview({
   const showsTubeBody = !!segmentSource || bodyStyle === "tube";
   const baseColor = palette[0] || "#9a9a9a";
   const previewBands = palette.length ? palette : [baseColor];
-  const circleSegmentSize = 52;
-  const circleSegmentStep = 14;
-  const circleHeadSize = 52;
+  const circleSegmentSize = 56;
+  const circleSegmentStep = 15;
+  const circleHeadSize = 56;
   const circleBodyLeft = 20;
   const previewSegments = Array.from({ length: 14 }, (_, index) => ({
     left: circleBodyLeft + 8 + index * circleSegmentStep,
@@ -859,9 +859,9 @@ const styles = StyleSheet.create({
   },
   previewHeadCircleMode: {
     right: 18,
-    top: 37,
-    width: 52,
-    height: 52,
+    top: 35,
+    width: 56,
+    height: 56,
     zIndex: 20,
   },
   previewHeadImage: {
@@ -905,9 +905,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 20,
     right: 20,
-    top: 37,
-    height: 52,
-    borderRadius: 26,
+    top: 35,
+    height: 56,
+    borderRadius: 28,
     overflow: "hidden",
   },
   previewCircleGlow: {
@@ -916,7 +916,7 @@ const styles = StyleSheet.create({
     right: 0,
     top: -8,
     bottom: -8,
-    borderRadius: 32,
+    borderRadius: 34,
     backgroundColor: "rgba(74, 225, 240, 0.24)",
   },
   previewCircleShadow: {
@@ -937,9 +937,9 @@ const styles = StyleSheet.create({
   },
   previewSegment: {
     position: "absolute",
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     borderCurve: "continuous",
     overflow: "hidden",
     borderWidth: 1,
@@ -964,9 +964,9 @@ const styles = StyleSheet.create({
   },
   previewHighlight: {
     position: "absolute",
-    top: 7,
-    left: 8,
-    width: 16,
+    top: 8,
+    left: 9,
+    width: 17,
     height: 9,
     borderRadius: 10,
     backgroundColor: "rgba(255,255,255,0.18)",
