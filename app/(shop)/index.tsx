@@ -270,7 +270,7 @@ function ShopWormPreview({
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      const R = 23;
+      const R = 18;
       const points = Array.from({ length: 16 }, (_, index) => ({
         x: 248 - index * 17,
         y: 65,
