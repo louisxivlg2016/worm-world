@@ -271,7 +271,11 @@ function ShopWormPreview({
       if (!ctx) return;
 
       const R = 23;
-      const head = { x: 170, y: 65 };
+      const points = Array.from({ length: 16 }, (_, index) => ({
+        x: 248 - index * 17,
+        y: 65,
+      }));
+      const head = points[0];
       ctx.save();
       ctx.beginPath();
       ctx.arc(head.x, head.y, R * 0.98, 0, Math.PI * 2);
