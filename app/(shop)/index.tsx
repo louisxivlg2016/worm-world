@@ -183,13 +183,19 @@ function ShopWormPreview({
   const hasHeadCostume = !!headPreview;
   const isFlagPreview = !!flagSource;
   const segmentSource = flagSource || bodyTextureSource;
-  const showsTubeBody = true;
+  const showsTubeBody = bodyStyle === "tube" || isFlagPreview;
   const baseColor = palette[0] || "#9a9a9a";
   const previewBands = palette.length ? palette : [baseColor];
   const repeatedPreviewBands = Array.from({ length: Math.max(28, previewBands.length * 9) }, (_, index) => (
     previewBands[index % previewBands.length] || baseColor
   ));
   const circleHeadSize = 60;
+  const circleSegmentSize = segmentSource ? 54 : 50;
+  const circleSegmentStep = 17;
+  const previewSegments = Array.from({ length: 16 }, (_, index) => ({
+    left: 26 + index * circleSegmentStep,
+    color: previewBands[(index + 1) % previewBands.length] || baseColor,
+  }));
 
   const renderTubePaletteFill = (roundedStyle: object) => (
     <View style={[styles.previewPaletteFill, roundedStyle]}>
@@ -229,27 +235,59 @@ function ShopWormPreview({
     <View style={styles.previewCard}>
       <Text style={styles.previewTitle}>Aperçu du ver</Text>
       <View style={styles.previewStage}>
-        <View
-          style={[
-            styles.previewTube,
-            isFlagPreview && styles.previewTubeFlag,
-            { backgroundColor: segmentSource ? "transparent" : baseColor },
-          ]}
-        >
-          {segmentSource ? (
-            <ImageBackground
-              source={segmentSource}
-              resizeMode={isFlagPreview ? "repeat" : "stretch"}
-              imageStyle={[
-                styles.previewTubeImage,
-                isFlagPreview && styles.previewTubeRepeatImage,
-              ]}
-              style={styles.previewTubeFill}
-            />
-          ) : renderTubePaletteFill(styles.previewTubeImage)}
-          <View style={styles.previewTubeShade} />
-          <View style={styles.previewTubeHighlight} />
-        </View>
+        {showsTubeBody ? (
+          <View
+            style={[
+              styles.previewTube,
+              isFlagPreview && styles.previewTubeFlag,
+              { backgroundColor: segmentSource ? "transparent" : baseColor },
+            ]}
+          >
+            {segmentSource ? (
+              <ImageBackground
+                source={segmentSource}
+                resizeMode={isFlagPreview ? "repeat" : "stretch"}
+                imageStyle={[
+                  styles.previewTubeImage,
+                  isFlagPreview && styles.previewTubeRepeatImage,
+                ]}
+                style={styles.previewTubeFill}
+              />
+            ) : renderTubePaletteFill(styles.previewTubeImage)}
+            <View style={styles.previewTubeShade} />
+            <View style={styles.previewTubeHighlight} />
+          </View>
+        ) : (
+          <View style={styles.previewCircleBody}>
+            <View style={styles.previewCircleShadow} />
+            {previewSegments.map((segment, index) => (
+              <View
+                key={`preview-segment-${index}`}
+                style={[
+                  styles.previewSegment,
+                  {
+                    left: segment.left,
+                    width: circleSegmentSize,
+                    height: circleSegmentSize,
+                    borderRadius: circleSegmentSize / 2,
+                    backgroundColor: segmentSource ? "transparent" : segment.color,
+                    zIndex: index + 1,
+                  },
+                ]}
+              >
+                {segmentSource ? (
+                  <ImageBackground
+                    source={segmentSource}
+                    resizeMode="stretch"
+                    imageStyle={styles.previewSegmentImage}
+                    style={styles.previewHeadBubbleFill}
+                  />
+                ) : null}
+                <View style={styles.previewHighlight} />
+              </View>
+            ))}
+          </View>
+        )}
 
         <View
           style={[
@@ -874,20 +912,20 @@ const styles = StyleSheet.create({
   },
   previewCircleBody: {
     position: "absolute",
-    left: -4,
-    right: 0,
-    top: 34,
-    height: 58,
-    borderRadius: 29,
+    left: 8,
+    right: 8,
+    top: 30,
+    height: 62,
+    borderRadius: 31,
     overflow: "hidden",
   },
   previewCircleShadow: {
     position: "absolute",
-    left: 0,
-    right: 4,
-    bottom: -1,
-    height: 14,
-    borderRadius: 14,
+    left: 10,
+    right: 12,
+    bottom: 1,
+    height: 12,
+    borderRadius: 12,
     backgroundColor: "rgba(0,0,0,0.22)",
   },
   previewCostumeName: {
@@ -905,8 +943,8 @@ const styles = StyleSheet.create({
     borderCurve: "continuous",
     overflow: "hidden",
     borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.08)",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.12)",
+    borderColor: "rgba(0,0,0,0.12)",
+    boxShadow: "0 3px 8px rgba(0,0,0,0.16)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -926,10 +964,10 @@ const styles = StyleSheet.create({
   },
   previewHighlight: {
     position: "absolute",
-    top: 8,
-    left: 8,
-    width: 16,
-    height: 9,
+    top: 7,
+    left: 7,
+    width: 15,
+    height: 8,
     borderRadius: 12,
     backgroundColor: "rgba(255,255,255,0.18)",
   },
