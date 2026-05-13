@@ -183,17 +183,10 @@ function ShopWormPreview({
   const hasHeadCostume = !!headPreview;
   const isFlagPreview = !!flagSource;
   const segmentSource = flagSource || bodyTextureSource;
-  const showsTubeBody = !!segmentSource || bodyStyle === "tube";
+  const showsTubeBody = true;
   const baseColor = palette[0] || "#9a9a9a";
   const previewBands = palette.length ? palette : [baseColor];
-  const circleSegmentSize = 58;
-  const circleSegmentStep = 21;
   const circleHeadSize = 58;
-  const circleBodyLeft = -12;
-  const previewSegments = Array.from({ length: 32 }, (_, index) => ({
-    left: circleBodyLeft + index * circleSegmentStep,
-    color: previewBands[(index + 1) % previewBands.length] || baseColor,
-  }));
 
   const renderTubePaletteFill = (roundedStyle: object) => (
     <View style={[styles.previewPaletteFill, roundedStyle]}>
@@ -233,57 +226,32 @@ function ShopWormPreview({
     <View style={styles.previewCard}>
       <Text style={styles.previewTitle}>Aperçu du ver</Text>
       <View style={styles.previewStage}>
-        {showsTubeBody ? (
-          <View
-            style={[
-              styles.previewTube,
-              isFlagPreview && styles.previewTubeFlag,
-              { backgroundColor: segmentSource ? "transparent" : baseColor },
-            ]}
-          >
-            {segmentSource ? (
-              <ImageBackground
-                source={segmentSource}
-                resizeMode={isFlagPreview ? "repeat" : "stretch"}
-                imageStyle={[
-                  styles.previewTubeImage,
-                  isFlagPreview && styles.previewTubeRepeatImage,
-                ]}
-                style={styles.previewTubeFill}
-              />
-            ) : renderTubePaletteFill(styles.previewTubeImage)}
-            <View style={styles.previewTubeShade} />
-            <View style={styles.previewTubeHighlight} />
-          </View>
-        ) : (
-          <View style={styles.previewCircleBody}>
-            <View style={styles.previewCircleShadow} />
-            {previewSegments.map((segment, index) => (
-              <View
-                key={`segment-${index}`}
-                style={[
-                  styles.previewSegment,
-                  {
-                    left: segment.left,
-                    width: circleSegmentSize,
-                    height: circleSegmentSize,
-                    borderRadius: circleSegmentSize / 2,
-                    backgroundColor: segment.color,
-                    borderColor: "rgba(0,0,0,0.18)",
-                    zIndex: index + 1,
-                  },
-                ]}
-              >
-                <View style={styles.previewHighlight} />
-              </View>
-            ))}
-          </View>
-        )}
+        <View
+          style={[
+            styles.previewTube,
+            isFlagPreview && styles.previewTubeFlag,
+            { backgroundColor: segmentSource ? "transparent" : baseColor },
+          ]}
+        >
+          {segmentSource ? (
+            <ImageBackground
+              source={segmentSource}
+              resizeMode={isFlagPreview ? "repeat" : "stretch"}
+              imageStyle={[
+                styles.previewTubeImage,
+                isFlagPreview && styles.previewTubeRepeatImage,
+              ]}
+              style={styles.previewTubeFill}
+            />
+          ) : renderTubePaletteFill(styles.previewTubeImage)}
+          <View style={styles.previewTubeShade} />
+          <View style={styles.previewTubeHighlight} />
+        </View>
 
         <View
           style={[
             styles.previewHead,
-            !showsTubeBody && styles.previewHeadCircleMode,
+            !hasHeadCostume && styles.previewHeadCircleMode,
           ]}
         >
           {hasHeadCostume ? (
@@ -296,7 +264,7 @@ function ShopWormPreview({
             <View
               style={[
                 styles.previewHeadBubble,
-                !showsTubeBody && {
+                {
                   width: circleHeadSize,
                   height: circleHeadSize,
                   borderRadius: circleHeadSize / 2,
