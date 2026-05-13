@@ -270,13 +270,44 @@ function ShopWormPreview({
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      const R = 18;
-      const segments = Array.from({ length: 16 }, (_, index) => ({
-        x: 248 - index * 17,
-        y: 65,
+      const R = 22;
+      const segCount = 14;
+      const segGap = 18;
+      const startX = 60; // head on the left, like in image #10
+      const segments = Array.from({ length: segCount }, (_, index) => ({
+        x: startX + index * segGap,
+        y: 70,
       }));
       const head = segments[0];
+      const tail = segments[segCount - 1];
       const hp = { x: head.x, y: head.y };
+
+      // Body — long horizontal pill clipped to flag-texture repeat
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(head.x, head.y - R);
+      ctx.lineTo(tail.x, tail.y - R);
+      ctx.arc(tail.x, tail.y, R, -Math.PI / 2, Math.PI / 2);
+      ctx.lineTo(head.x, head.y + R);
+      ctx.arc(head.x, head.y, R, Math.PI / 2, -Math.PI / 2);
+      ctx.closePath();
+      ctx.clip();
+      const aspect = img.naturalWidth / Math.max(1, img.naturalHeight);
+      const texH = R * 2;
+      const texW = texH * aspect;
+      for (let x = head.x - R; x < tail.x + R; x += texW) {
+        ctx.drawImage(img, x, head.y - R, texW, texH);
+      }
+      // soft bottom shadow + top highlight, like in-game tube shading
+      const shadeGrad = ctx.createLinearGradient(0, head.y - R, 0, head.y + R);
+      shadeGrad.addColorStop(0, "rgba(255,255,255,0.18)");
+      shadeGrad.addColorStop(0.55, "rgba(0,0,0,0)");
+      shadeGrad.addColorStop(1, "rgba(0,0,0,0.28)");
+      ctx.fillStyle = shadeGrad;
+      ctx.fillRect(head.x - R, head.y - R, (tail.x - head.x) + R * 2, R * 2);
+      ctx.restore();
+
+      // Head — same code as in-game drawTexturedHeadFace
       ctx.save();
       ctx.beginPath();
       ctx.arc(hp.x, hp.y, R * 0.98, 0, Math.PI * 2);
