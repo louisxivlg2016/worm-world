@@ -186,11 +186,14 @@ function ShopWormPreview({
   const showsTubeBody = true;
   const baseColor = palette[0] || "#9a9a9a";
   const previewBands = palette.length ? palette : [baseColor];
+  const repeatedPreviewBands = Array.from({ length: Math.max(18, previewBands.length * 6) }, (_, index) => (
+    previewBands[index % previewBands.length] || baseColor
+  ));
   const circleHeadSize = 58;
 
   const renderTubePaletteFill = (roundedStyle: object) => (
     <View style={[styles.previewPaletteFill, roundedStyle]}>
-      {previewBands.map((color, index) => (
+      {repeatedPreviewBands.map((color, index) => (
         <View key={`${color}-${index}`} style={[styles.previewPaletteBand, { backgroundColor: color }]} />
       ))}
     </View>
@@ -758,9 +761,9 @@ const styles = StyleSheet.create({
   },
   previewTube: {
     position: "absolute",
-    left: -4,
-    right: 64,
-    top: 56,
+    left: 28,
+    right: 12,
+    top: 34,
     height: 60,
     borderRadius: 30,
     borderCurve: "continuous",
@@ -771,7 +774,7 @@ const styles = StyleSheet.create({
   },
   previewTubeFlag: {
     height: 56,
-    top: 58,
+    top: 36,
     borderRadius: 28,
   },
   previewTubeFill: {
@@ -793,10 +796,11 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     bottom: 0,
-    flexDirection: "column",
+    flexDirection: "row",
   },
   previewPaletteBand: {
-    flex: 1,
+    width: 24,
+    height: "100%",
   },
   previewTubeShade: {
     position: "absolute",
@@ -817,7 +821,7 @@ const styles = StyleSheet.create({
   },
   previewHead: {
     position: "absolute",
-    right: 2,
+    left: 0,
     top: 16,
     width: 120,
     height: 120,
@@ -825,7 +829,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   previewHeadCircleMode: {
-    right: 0,
+    left: 0,
     top: 34,
     width: 58,
     height: 58,
