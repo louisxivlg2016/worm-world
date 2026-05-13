@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   View,
@@ -191,6 +191,7 @@ function ShopWormPreview({
   const hasHeadCostume = !!headPreview;
   const isFlagPreview = !!flagSource;
   const segmentSource = flagSource || bodyTextureSource;
+  const [flagPreviewUri, setFlagPreviewUri] = useState<string>("");
   const showsTubeBody = bodyStyle === "tube" || isFlagPreview;
   const flagTextureScale = isFlagPreview && segmentSource ? (FLAG_TEXTURE_SCALES[segmentSource] ?? DEFAULT_FLAG_TEXTURE_SCALE) : 1;
   const flagTextureOffset = isFlagPreview && segmentSource ? (FLAG_TEXTURE_OFFSETS[segmentSource] ?? 0) : 0;
@@ -252,11 +253,177 @@ function ShopWormPreview({
         />
       );
 
+  useEffect(() => {
+    if (typeof window === "undefined" || !isFlagPreview || !segmentSource || hasHeadCostume) {
+      setFlagPreviewUri("");
+      return;
+    }
+
+    const img = new window.Image();
+    img.crossOrigin = "anonymous";
+    img.src = segmentSource;
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 340;
+      canvas.height = 140;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      const points = Array.from({ length: 16 }, (_, index) => ({
+        x: 30 + index * 17,
+        y: 65,
+      }));
+      const head = { x: 314, y: 64 };
+      const R = 23;
+
+      const lengths = [0];
+      for (let i = 1; i < points.length; i++) {
+        const dx = points[i].x - points[i - 1].x;
+        const dy = points[i].y - points[i - 1].y;
+        lengths.push(lengths[lengths.length - 1] + Math.sqrt(dx * dx + dy * dy));
+      }
+
+      const normals = points.map((_, i) => {
+        let dx = 0;
+        let dy = 0;
+        const range = 3;
+        for (let j = Math.max(0, i - range); j < Math.min(points.length - 1, i + range); j++) {
+          dx += points[j + 1].x - points[j].x;
+          dy += points[j + 1].y - points[j].y;
+        }
+        const len = Math.sqrt(dx * dx + dy * dy) || 1;
+        return { nx: -dy / len, ny: dx / len };
+      });
+
+      const upper = points.map((p, i) => ({ x: p.x + normals[i].nx * R, y: p.y + normals[i].ny * R }));
+      const lower = points.map((p, i) => ({ x: p.x - normals[i].nx * R, y: p.y - normals[i].ny * R }));
+
+      const drawSmoothCurve = (curvePoints: { x: number; y: number }[]) => {
+        if (curvePoints.length < 2) return;
+        ctx.moveTo(curvePoints[0].x, curvePoints[0].y);
+        for (let i = 0; i < curvePoints.length - 1; i++) {
+          const cx = (curvePoints[i].x + curvePoints[i + 1].x) / 2;
+          const cy = (curvePoints[i].y + curvePoints[i + 1].y) / 2;
+          ctx.quadraticCurveTo(curvePoints[i].x, curvePoints[i].y, cx, cy);
+        }
+        const last = curvePoints[curvePoints.length - 1];
+        ctx.lineTo(last.x, last.y);
+      };
+
+      const traceTubePath = () => {
+        ctx.beginPath();
+        drawSmoothCurve(upper);
+        const tail = points[points.length - 1];
+        ctx.arc(
+          tail.x,
+          tail.y,
+          R,
+          Math.atan2(upper[upper.length - 1].y - tail.y, upper[upper.length - 1].x - tail.x),
+          Math.atan2(lower[lower.length - 1].y - tail.y, lower[lower.length - 1].x - tail.x),
+        );
+        drawSmoothCurve([...lower].reverse());
+        ctx.arc(
+          head.x,
+          head.y,
+          R,
+          Math.atan2(lower[0].y - head.y, lower[0].x - head.x),
+          Math.atan2(upper[0].y - head.y, upper[0].x - head.x),
+        );
+        ctx.closePath();
+      };
+
+      const repeatScreenWidth = Math.max(R * 2.08 * (img.naturalWidth / img.naturalHeight), R * 3.6);
+      const repeatTextureWidth = img.naturalWidth;
+
+      ctx.save();
+      traceTubePath();
+      ctx.clip();
+
+      for (let i = 0; i < points.length - 1; i++) {
+        const p = points[i];
+        const next = points[i + 1];
+        const dx = next.x - p.x;
+        const dy = next.y - p.y;
+        const sliceLen = Math.max(1, Math.sqrt(dx * dx + dy * dy) + R * 0.85);
+        const angle = Math.atan2(dy, dx);
+        const sx = (lengths[i] / repeatScreenWidth) * repeatTextureWidth;
+        const sw = Math.max(1, (sliceLen / repeatScreenWidth) * repeatTextureWidth);
+        ctx.save();
+        ctx.translate((p.x + next.x) * 0.5, (p.y + next.y) * 0.5);
+        ctx.rotate(angle);
+        ctx.drawImage(
+          img,
+          sx,
+          0,
+          sw,
+          img.naturalHeight,
+          -sliceLen / 2,
+          -R * 1.04,
+          sliceLen,
+          R * 2.08,
+        );
+        ctx.restore();
+      }
+      ctx.restore();
+
+      const shine = ctx.createLinearGradient(0, 40, 0, 92);
+      shine.addColorStop(0, "rgba(255,255,255,0.22)");
+      shine.addColorStop(0.28, "rgba(255,255,255,0.08)");
+      shine.addColorStop(0.55, "rgba(255,255,255,0)");
+      shine.addColorStop(1, "rgba(0,0,0,0.18)");
+      ctx.save();
+      traceTubePath();
+      ctx.clip();
+      ctx.fillStyle = shine;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.restore();
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(head.x, head.y, R * 0.98, 0, Math.PI * 2);
+      ctx.clip();
+      const drawR = R * 1.9;
+      ctx.drawImage(img, head.x - drawR * 1.25, head.y - drawR, drawR * 2.5, drawR * 2);
+      ctx.restore();
+
+      const eyeR = R * 0.32;
+      const pupilR = eyeR * 0.55;
+      const eyeSpacing = R * 0.35;
+      const eyeY = head.y - R * 0.1;
+      [-1, 1].forEach((side) => {
+        const ex = head.x + side * eyeSpacing;
+        ctx.beginPath();
+        ctx.arc(ex, eyeY, eyeR, 0, Math.PI * 2);
+        ctx.fillStyle = "#fff";
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(ex, eyeY, pupilR, 0, Math.PI * 2);
+        ctx.fillStyle = "#111";
+        ctx.fill();
+      });
+      ctx.beginPath();
+      ctx.lineWidth = Math.max(2, R * 0.1);
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "#111";
+      ctx.moveTo(head.x - R * 0.3, head.y + R * 0.4);
+      ctx.quadraticCurveTo(head.x, head.y + R * 0.56, head.x + R * 0.3, head.y + R * 0.4);
+      ctx.stroke();
+
+      setFlagPreviewUri(canvas.toDataURL("image/png"));
+    };
+
+    img.onerror = () => setFlagPreviewUri("");
+  }, [hasHeadCostume, isFlagPreview, segmentSource]);
+
   return (
     <View style={styles.previewCard}>
       <Text style={styles.previewTitle}>Aperçu du ver</Text>
       <View style={styles.previewStage}>
-        {showsTubeBody ? (
+        {flagPreviewUri ? (
+          <Image source={{ uri: flagPreviewUri }} style={styles.previewCanvasImage} resizeMode="contain" />
+        ) : null}
+        {!flagPreviewUri && showsTubeBody ? (
           <>
             {isFlagPreview ? (
               <View
@@ -872,6 +1039,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
     position: "relative",
+  },
+  previewCanvasImage: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    width: "100%",
+    height: "100%",
   },
   previewTube: {
     position: "absolute",
