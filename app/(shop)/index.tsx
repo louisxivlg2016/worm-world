@@ -192,10 +192,11 @@ function ShopWormPreview({
   const previewRadius = segmentSource ? 26 : 24;
   const circleHeadSize = previewRadius * 2;
   const circleSegmentSize = previewRadius * 2;
-  const circleSegmentStep = Math.round(previewRadius * 0.62);
+  const circleSegmentStep = Math.max(8, Math.round(previewRadius * 0.38));
   const circleBodyTop = 26;
-  const previewSegments = Array.from({ length: 18 }, (_, index) => ({
-    left: 22 + index * circleSegmentStep,
+  const circleStartLeft = 16;
+  const previewSegments = Array.from({ length: 30 }, (_, index) => ({
+    left: circleStartLeft + index * circleSegmentStep,
     color: previewBands[index % previewBands.length] || baseColor,
   }));
   const classicHeadLeft = previewSegments[0].left + (circleSegmentSize - circleHeadSize) / 2;
