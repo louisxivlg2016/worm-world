@@ -186,10 +186,10 @@ function ShopWormPreview({
   const showsTubeBody = true;
   const baseColor = palette[0] || "#9a9a9a";
   const previewBands = palette.length ? palette : [baseColor];
-  const repeatedPreviewBands = Array.from({ length: Math.max(18, previewBands.length * 6) }, (_, index) => (
+  const repeatedPreviewBands = Array.from({ length: Math.max(24, previewBands.length * 8) }, (_, index) => (
     previewBands[index % previewBands.length] || baseColor
   ));
-  const circleHeadSize = 58;
+  const circleHeadSize = 60;
 
   const renderTubePaletteFill = (roundedStyle: object) => (
     <View style={[styles.previewPaletteFill, roundedStyle]}>
@@ -761,11 +761,11 @@ const styles = StyleSheet.create({
   },
   previewTube: {
     position: "absolute",
-    left: 28,
-    right: 12,
-    top: 34,
-    height: 60,
-    borderRadius: 30,
+    left: 18,
+    right: 18,
+    top: 38,
+    height: 52,
+    borderRadius: 26,
     borderCurve: "continuous",
     overflow: "hidden",
     borderWidth: 1,
@@ -773,9 +773,9 @@ const styles = StyleSheet.create({
     boxShadow: "0 10px 22px rgba(0,0,0,0.25)",
   },
   previewTubeFlag: {
-    height: 56,
-    top: 36,
-    borderRadius: 28,
+    height: 50,
+    top: 39,
+    borderRadius: 25,
   },
   previewTubeFill: {
     position: "absolute",
@@ -785,10 +785,10 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   previewTubeImage: {
-    borderRadius: 30,
+    borderRadius: 26,
   },
   previewTubeRepeatImage: {
-    borderRadius: 30,
+    borderRadius: 26,
   },
   previewPaletteFill: {
     position: "absolute",
@@ -799,7 +799,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   previewPaletteBand: {
-    width: 24,
+    width: 18,
     height: "100%",
   },
   previewTubeShade: {
@@ -807,21 +807,21 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: 18,
+    height: 14,
     backgroundColor: "rgba(0,0,0,0.22)",
   },
   previewTubeHighlight: {
     position: "absolute",
-    left: 12,
-    right: 12,
+    left: 14,
+    right: 20,
     top: 6,
-    height: 8,
+    height: 7,
     borderRadius: 4,
     backgroundColor: "rgba(255,255,255,0.18)",
   },
   previewHead: {
     position: "absolute",
-    left: 0,
+    left: 2,
     top: 16,
     width: 120,
     height: 120,
@@ -830,9 +830,9 @@ const styles = StyleSheet.create({
   },
   previewHeadCircleMode: {
     left: 0,
-    top: 34,
-    width: 58,
-    height: 58,
+    top: 33,
+    width: 60,
+    height: 60,
     zIndex: 20,
   },
   previewHeadImage: {
@@ -846,7 +846,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 1,
     borderColor: "rgba(0,0,0,0.18)",
-    boxShadow: "0 8px 16px rgba(0,0,0,0.22)",
+    boxShadow: "0 6px 12px rgba(0,0,0,0.22)",
     alignItems: "center",
     justifyContent: "center",
   },
