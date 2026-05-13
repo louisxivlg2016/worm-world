@@ -367,18 +367,6 @@ function ShopWormPreview({
       }
       ctx.restore();
 
-      const shine = ctx.createLinearGradient(0, 40, 0, 92);
-      shine.addColorStop(0, "rgba(255,255,255,0.22)");
-      shine.addColorStop(0.28, "rgba(255,255,255,0.08)");
-      shine.addColorStop(0.55, "rgba(255,255,255,0)");
-      shine.addColorStop(1, "rgba(0,0,0,0.18)");
-      ctx.save();
-      traceTubePath();
-      ctx.clip();
-      ctx.fillStyle = shine;
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.restore();
-
       ctx.save();
       ctx.beginPath();
       ctx.arc(head.x, head.y, R * 0.98, 0, Math.PI * 2);
