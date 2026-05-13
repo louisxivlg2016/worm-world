@@ -271,7 +271,7 @@ function ShopWormPreview({
       if (!ctx) return;
 
       const points = Array.from({ length: 16 }, (_, index) => ({
-        x: 30 + index * 17,
+        x: 286 - index * 17,
         y: 65,
       }));
       const head = { x: 314, y: 64 };
@@ -514,69 +514,71 @@ function ShopWormPreview({
           </View>
         )}
 
-        <View
-          style={[
-            styles.previewHead,
-            !hasHeadCostume && styles.previewHeadCircleMode,
-            isFlagPreview && {
-              left: undefined,
-              right: 6,
-              top: tubeTop - 2,
-              width: flagHeadSize,
-              height: flagHeadSize,
-              zIndex: 20,
-            },
-            !showsTubeBody && {
-              left: classicHeadLeft,
-              top: classicHeadTop,
-              width: circleHeadSize,
-              height: circleHeadSize,
-            },
-          ]}
-        >
-          {hasHeadCostume ? (
-            <Image
-              source={{ uri: headPreview }}
-              style={styles.previewHeadImage}
-              resizeMode="contain"
-            />
-          ) : (
-            <View
-              style={[
-                styles.previewHeadBubble,
-                {
-                  width: isFlagPreview ? flagHeadSize : circleHeadSize,
-                  height: isFlagPreview ? flagHeadSize : circleHeadSize,
-                  borderRadius: (isFlagPreview ? flagHeadSize : circleHeadSize) / 2,
-                },
-                { backgroundColor: segmentSource ? "transparent" : baseColor },
-                isFlagPreview && styles.previewFlagHeadBubble,
-              ]}
-            >
-              {segmentSource ? (
-                <ImageBackground
-                  source={segmentSource}
-                  resizeMode={isFlagPreview ? "repeat" : "stretch"}
-                  imageStyle={[
-                    styles.previewHeadBubbleImage,
-                    isFlagPreview && styles.previewHeadRepeatImage,
-                    isFlagPreview && {
-                      transform: [{ scale: flagTextureScale }, { translateX: flagTextureOffset * 24 }],
-                    },
-                  ]}
-                  style={styles.previewHeadBubbleFill}
-                />
-              ) : null}
-              <View style={styles.previewFaceWrap}>
-                <View style={styles.previewEyesRow}>
-                  {renderEye("left")}
-                  {renderEye("right")}
+        {!flagPreviewUri ? (
+          <View
+            style={[
+              styles.previewHead,
+              !hasHeadCostume && styles.previewHeadCircleMode,
+              isFlagPreview && {
+                left: undefined,
+                right: 6,
+                top: tubeTop - 2,
+                width: flagHeadSize,
+                height: flagHeadSize,
+                zIndex: 20,
+              },
+              !showsTubeBody && {
+                left: classicHeadLeft,
+                top: classicHeadTop,
+                width: circleHeadSize,
+                height: circleHeadSize,
+              },
+            ]}
+          >
+            {hasHeadCostume ? (
+              <Image
+                source={{ uri: headPreview }}
+                style={styles.previewHeadImage}
+                resizeMode="contain"
+              />
+            ) : (
+              <View
+                style={[
+                  styles.previewHeadBubble,
+                  {
+                    width: isFlagPreview ? flagHeadSize : circleHeadSize,
+                    height: isFlagPreview ? flagHeadSize : circleHeadSize,
+                    borderRadius: (isFlagPreview ? flagHeadSize : circleHeadSize) / 2,
+                  },
+                  { backgroundColor: segmentSource ? "transparent" : baseColor },
+                  isFlagPreview && styles.previewFlagHeadBubble,
+                ]}
+              >
+                {segmentSource ? (
+                  <ImageBackground
+                    source={segmentSource}
+                    resizeMode={isFlagPreview ? "repeat" : "stretch"}
+                    imageStyle={[
+                      styles.previewHeadBubbleImage,
+                      isFlagPreview && styles.previewHeadRepeatImage,
+                      isFlagPreview && {
+                        transform: [{ scale: flagTextureScale }, { translateX: flagTextureOffset * 24 }],
+                      },
+                    ]}
+                    style={styles.previewHeadBubbleFill}
+                  />
+                ) : null}
+                <View style={styles.previewFaceWrap}>
+                  <View style={styles.previewEyesRow}>
+                    {renderEye("left")}
+                    {renderEye("right")}
+                  </View>
+                  {mouthNode}
                 </View>
-                {mouthNode}
               </View>
-            </View>
-          )}
-        </View>
+            )}
+          </View>
+        ) : null}
       </View>
     </View>
   );
