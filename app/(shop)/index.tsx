@@ -189,12 +189,12 @@ function ShopWormPreview({
   const repeatedPreviewBands = Array.from({ length: Math.max(28, previewBands.length * 9) }, (_, index) => (
     previewBands[index % previewBands.length] || baseColor
   ));
-  const circleHeadSize = 60;
-  const circleSegmentSize = segmentSource ? 54 : 50;
-  const circleSegmentStep = 17;
-  const previewSegments = Array.from({ length: 16 }, (_, index) => ({
-    left: 26 + index * circleSegmentStep,
-    color: previewBands[(index + 1) % previewBands.length] || baseColor,
+  const circleHeadSize = 58;
+  const circleSegmentSize = segmentSource ? 50 : 46;
+  const circleSegmentStep = 15;
+  const previewSegments = Array.from({ length: 18 }, (_, index) => ({
+    left: 22 + index * circleSegmentStep,
+    color: previewBands[index % previewBands.length] || baseColor,
   }));
 
   const renderTubePaletteFill = (roundedStyle: object) => (
@@ -912,20 +912,18 @@ const styles = StyleSheet.create({
   },
   previewCircleBody: {
     position: "absolute",
-    left: 8,
-    right: 8,
-    top: 30,
-    height: 62,
-    borderRadius: 31,
-    overflow: "hidden",
+    left: 0,
+    right: 0,
+    top: 26,
+    height: 66,
   },
   previewCircleShadow: {
     position: "absolute",
-    left: 10,
-    right: 12,
-    bottom: 1,
-    height: 12,
-    borderRadius: 12,
+    left: 18,
+    right: 28,
+    bottom: 3,
+    height: 10,
+    borderRadius: 10,
     backgroundColor: "rgba(0,0,0,0.22)",
   },
   previewCostumeName: {
@@ -942,9 +940,9 @@ const styles = StyleSheet.create({
     borderRadius: 29,
     borderCurve: "continuous",
     overflow: "hidden",
-    borderWidth: 1,
-    borderColor: "rgba(0,0,0,0.12)",
-    boxShadow: "0 3px 8px rgba(0,0,0,0.16)",
+    borderWidth: 0,
+    borderColor: "transparent",
+    boxShadow: "0 5px 10px rgba(0,0,0,0.18)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -964,10 +962,10 @@ const styles = StyleSheet.create({
   },
   previewHighlight: {
     position: "absolute",
-    top: 7,
-    left: 7,
-    width: 15,
-    height: 8,
+    top: 6,
+    left: 6,
+    width: 14,
+    height: 7,
     borderRadius: 12,
     backgroundColor: "rgba(255,255,255,0.18)",
   },
