@@ -189,6 +189,10 @@ function ShopWormPreview({
   const repeatedPreviewBands = Array.from({ length: Math.max(28, previewBands.length * 9) }, (_, index) => (
     previewBands[index % previewBands.length] || baseColor
   ));
+  const tubeTop = isFlagPreview ? 42 : 38;
+  const tubeHeight = isFlagPreview ? 44 : 50;
+  const tubeRadius = tubeHeight / 2;
+  const flagHeadSize = tubeHeight + 4;
   const previewRadius = segmentSource ? 26 : 24;
   const circleHeadSize = previewRadius * 2;
   const circleSegmentSize = previewRadius * 2;
@@ -245,7 +249,12 @@ function ShopWormPreview({
             style={[
               styles.previewTube,
               isFlagPreview && styles.previewTubeFlag,
-              { backgroundColor: segmentSource ? "transparent" : baseColor },
+              {
+                top: tubeTop,
+                height: tubeHeight,
+                borderRadius: tubeRadius,
+                backgroundColor: segmentSource ? "transparent" : baseColor,
+              },
             ]}
           >
             {segmentSource ? (
@@ -298,6 +307,14 @@ function ShopWormPreview({
           style={[
             styles.previewHead,
             !hasHeadCostume && styles.previewHeadCircleMode,
+            isFlagPreview && {
+              left: undefined,
+              right: 6,
+              top: tubeTop - 2,
+              width: flagHeadSize,
+              height: flagHeadSize,
+              zIndex: 20,
+            },
             !showsTubeBody && {
               left: classicHeadLeft,
               top: classicHeadTop,
@@ -317,11 +334,12 @@ function ShopWormPreview({
               style={[
                 styles.previewHeadBubble,
                 {
-                  width: circleHeadSize,
-                  height: circleHeadSize,
-                  borderRadius: circleHeadSize / 2,
+                  width: isFlagPreview ? flagHeadSize : circleHeadSize,
+                  height: isFlagPreview ? flagHeadSize : circleHeadSize,
+                  borderRadius: (isFlagPreview ? flagHeadSize : circleHeadSize) / 2,
                 },
                 { backgroundColor: segmentSource ? "transparent" : baseColor },
+                isFlagPreview && styles.previewFlagHeadBubble,
               ]}
             >
               {segmentSource ? (
@@ -822,9 +840,10 @@ const styles = StyleSheet.create({
     boxShadow: "0 10px 22px rgba(0,0,0,0.25)",
   },
   previewTubeFlag: {
-    height: 48,
-    top: 39,
-    borderRadius: 24,
+    left: 18,
+    right: 20,
+    borderWidth: 0,
+    boxShadow: "0 8px 18px rgba(0,0,0,0.18)",
   },
   previewTubeFill: {
     position: "absolute",
@@ -898,6 +917,10 @@ const styles = StyleSheet.create({
     boxShadow: "0 5px 10px rgba(0,0,0,0.22)",
     alignItems: "center",
     justifyContent: "center",
+  },
+  previewFlagHeadBubble: {
+    borderWidth: 0,
+    boxShadow: "0 4px 10px rgba(0,0,0,0.14)",
   },
   previewHeadBubbleFill: {
     position: "absolute",
