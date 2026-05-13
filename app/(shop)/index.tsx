@@ -203,6 +203,8 @@ function ShopWormPreview({
   const tubeHeight = isFlagPreview ? 44 : 50;
   const tubeRadius = tubeHeight / 2;
   const flagHeadSize = tubeHeight + 4;
+  const flagTailSize = Math.round(tubeRadius * 2.04);
+  const flagTailTop = tubeTop + (tubeHeight - flagTailSize) / 2;
   const previewRadius = segmentSource ? 26 : 24;
   const circleHeadSize = previewRadius * 2;
   const circleSegmentSize = previewRadius * 2;
@@ -255,35 +257,64 @@ function ShopWormPreview({
       <Text style={styles.previewTitle}>Aperçu du ver</Text>
       <View style={styles.previewStage}>
         {showsTubeBody ? (
-          <View
-            style={[
-              styles.previewTube,
-              isFlagPreview && styles.previewTubeFlag,
-              {
-                top: tubeTop,
-                height: tubeHeight,
-                borderRadius: tubeRadius,
-                backgroundColor: segmentSource ? "transparent" : baseColor,
-              },
-            ]}
-          >
-            {segmentSource ? (
-              <ImageBackground
-                source={segmentSource}
-                resizeMode={isFlagPreview ? "repeat" : "stretch"}
-                imageStyle={[
-                  styles.previewTubeImage,
-                  isFlagPreview && styles.previewTubeRepeatImage,
-                  isFlagPreview && {
-                    transform: [{ scale: flagTextureScale }, { translateX: flagTextureOffset * 100 }],
+          <>
+            {isFlagPreview ? (
+              <View
+                style={[
+                  styles.previewFlagTailCap,
+                  {
+                    top: flagTailTop,
+                    width: flagTailSize,
+                    height: flagTailSize,
+                    borderRadius: flagTailSize / 2,
                   },
                 ]}
-                style={styles.previewTubeFill}
-              />
-            ) : renderTubePaletteFill(styles.previewTubeImage)}
-            <View style={styles.previewTubeShade} />
-            <View style={styles.previewTubeHighlight} />
-          </View>
+              >
+                <ImageBackground
+                  source={segmentSource}
+                  resizeMode="repeat"
+                  imageStyle={[
+                    styles.previewHeadRepeatImage,
+                    {
+                      transform: [{ scale: flagTextureScale }, { translateX: flagTextureOffset * 24 }],
+                    },
+                  ]}
+                  style={styles.previewHeadBubbleFill}
+                />
+                <View style={styles.previewFlagTailGloss} />
+              </View>
+            ) : null}
+
+            <View
+              style={[
+                styles.previewTube,
+                isFlagPreview && styles.previewTubeFlag,
+                {
+                  top: tubeTop,
+                  height: tubeHeight,
+                  borderRadius: tubeRadius,
+                  backgroundColor: segmentSource ? "transparent" : baseColor,
+                },
+              ]}
+            >
+              {segmentSource ? (
+                <ImageBackground
+                  source={segmentSource}
+                  resizeMode={isFlagPreview ? "repeat" : "stretch"}
+                  imageStyle={[
+                    styles.previewTubeImage,
+                    isFlagPreview && styles.previewTubeRepeatImage,
+                    isFlagPreview && {
+                      transform: [{ scale: flagTextureScale }, { translateX: flagTextureOffset * 100 }],
+                    },
+                  ]}
+                  style={styles.previewTubeFill}
+                />
+              ) : renderTubePaletteFill(styles.previewTubeImage)}
+              <View style={styles.previewTubeShade} />
+              <View style={styles.previewTubeHighlight} />
+            </View>
+          </>
         ) : (
           <View style={styles.previewCircleBody}>
             <View style={styles.previewCircleShadow} />
@@ -856,10 +887,24 @@ const styles = StyleSheet.create({
     boxShadow: "0 10px 22px rgba(0,0,0,0.25)",
   },
   previewTubeFlag: {
-    left: 18,
+    left: 30,
     right: 20,
     borderWidth: 0,
     boxShadow: "0 8px 18px rgba(0,0,0,0.18)",
+  },
+  previewFlagTailCap: {
+    position: "absolute",
+    left: 18,
+    overflow: "hidden",
+    boxShadow: "0 5px 10px rgba(0,0,0,0.14)",
+  },
+  previewFlagTailGloss: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: "rgba(255,255,255,0.05)",
   },
   previewTubeFill: {
     position: "absolute",
