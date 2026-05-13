@@ -271,16 +271,17 @@ function ShopWormPreview({
       if (!ctx) return;
 
       const R = 18;
-      const points = Array.from({ length: 16 }, (_, index) => ({
+      const segments = Array.from({ length: 16 }, (_, index) => ({
         x: 248 - index * 17,
         y: 65,
       }));
-      const head = points[0];
+      const head = segments[0];
+      const hp = { x: head.x, y: head.y };
       ctx.save();
       ctx.beginPath();
-      ctx.arc(head.x, head.y, R * 0.98, 0, Math.PI * 2);
+      ctx.arc(hp.x, hp.y, R * 0.98, 0, Math.PI * 2);
       ctx.clip();
-      ctx.translate(head.x, head.y);
+      ctx.translate(hp.x, hp.y);
       const drawR = R * 1.9;
       ctx.drawImage(img, -drawR * 1.25, -drawR, drawR * 2.5, drawR * 2);
       ctx.restore();
@@ -288,9 +289,9 @@ function ShopWormPreview({
       const eyeR = R * 0.32;
       const pupilR = eyeR * 0.55;
       const eyeSpacing = R * 0.35;
-      const eyeY = head.y - R * 0.1;
+      const eyeY = hp.y - R * 0.1;
       [-1, 1].forEach((side) => {
-        const ex = head.x + side * eyeSpacing;
+        const ex = hp.x + side * eyeSpacing;
         ctx.beginPath();
         ctx.arc(ex, eyeY, eyeR, 0, Math.PI * 2);
         ctx.fillStyle = "#fff";
@@ -304,8 +305,8 @@ function ShopWormPreview({
       ctx.lineWidth = Math.max(2, R * 0.1);
       ctx.lineCap = "round";
       ctx.strokeStyle = "#111";
-      ctx.moveTo(head.x - R * 0.3, head.y + R * 0.4);
-      ctx.quadraticCurveTo(head.x, head.y + R * 0.56, head.x + R * 0.3, head.y + R * 0.4);
+      ctx.moveTo(hp.x - R * 0.3, hp.y + R * 0.4);
+      ctx.quadraticCurveTo(hp.x, hp.y + R * 0.56, hp.x + R * 0.3, hp.y + R * 0.4);
       ctx.stroke();
 
       setFlagPreviewUri(canvas.toDataURL("image/png"));
