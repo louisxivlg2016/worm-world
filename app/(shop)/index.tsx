@@ -186,7 +186,7 @@ function ShopWormPreview({
   const showsTubeBody = true;
   const baseColor = palette[0] || "#9a9a9a";
   const previewBands = palette.length ? palette : [baseColor];
-  const repeatedPreviewBands = Array.from({ length: Math.max(24, previewBands.length * 8) }, (_, index) => (
+  const repeatedPreviewBands = Array.from({ length: Math.max(28, previewBands.length * 9) }, (_, index) => (
     previewBands[index % previewBands.length] || baseColor
   ));
   const circleHeadSize = 60;
@@ -761,11 +761,11 @@ const styles = StyleSheet.create({
   },
   previewTube: {
     position: "absolute",
-    left: 18,
-    right: 18,
+    left: 20,
+    right: 14,
     top: 38,
-    height: 52,
-    borderRadius: 26,
+    height: 50,
+    borderRadius: 25,
     borderCurve: "continuous",
     overflow: "hidden",
     borderWidth: 1,
@@ -773,9 +773,9 @@ const styles = StyleSheet.create({
     boxShadow: "0 10px 22px rgba(0,0,0,0.25)",
   },
   previewTubeFlag: {
-    height: 50,
+    height: 48,
     top: 39,
-    borderRadius: 25,
+    borderRadius: 24,
   },
   previewTubeFill: {
     position: "absolute",
@@ -785,10 +785,10 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   previewTubeImage: {
-    borderRadius: 26,
+    borderRadius: 25,
   },
   previewTubeRepeatImage: {
-    borderRadius: 26,
+    borderRadius: 25,
   },
   previewPaletteFill: {
     position: "absolute",
@@ -799,7 +799,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   previewPaletteBand: {
-    width: 18,
+    width: 17,
     height: "100%",
   },
   previewTubeShade: {
@@ -807,15 +807,15 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: 14,
+    height: 13,
     backgroundColor: "rgba(0,0,0,0.22)",
   },
   previewTubeHighlight: {
     position: "absolute",
-    left: 14,
-    right: 20,
-    top: 6,
-    height: 7,
+    left: 16,
+    right: 24,
+    top: 5,
+    height: 6,
     borderRadius: 4,
     backgroundColor: "rgba(255,255,255,0.18)",
   },
@@ -830,7 +830,7 @@ const styles = StyleSheet.create({
   },
   previewHeadCircleMode: {
     left: 0,
-    top: 33,
+    top: 32,
     width: 60,
     height: 60,
     zIndex: 20,
@@ -846,7 +846,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     borderWidth: 1,
     borderColor: "rgba(0,0,0,0.18)",
-    boxShadow: "0 6px 12px rgba(0,0,0,0.22)",
+    boxShadow: "0 5px 10px rgba(0,0,0,0.22)",
     alignItems: "center",
     justifyContent: "center",
   },
