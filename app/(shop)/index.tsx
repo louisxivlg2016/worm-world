@@ -192,10 +192,13 @@ function ShopWormPreview({
   const circleHeadSize = 58;
   const circleSegmentSize = segmentSource ? 50 : 46;
   const circleSegmentStep = 15;
+  const circleBodyTop = 26;
   const previewSegments = Array.from({ length: 18 }, (_, index) => ({
     left: 22 + index * circleSegmentStep,
     color: previewBands[index % previewBands.length] || baseColor,
   }));
+  const classicHeadLeft = previewSegments[0].left + (circleSegmentSize - circleHeadSize) / 2;
+  const classicHeadTop = circleBodyTop + (circleSegmentSize - circleHeadSize) / 2;
 
   const renderTubePaletteFill = (roundedStyle: object) => (
     <View style={[styles.previewPaletteFill, roundedStyle]}>
@@ -293,6 +296,12 @@ function ShopWormPreview({
           style={[
             styles.previewHead,
             !hasHeadCostume && styles.previewHeadCircleMode,
+            !showsTubeBody && {
+              left: classicHeadLeft,
+              top: classicHeadTop,
+              width: circleHeadSize,
+              height: circleHeadSize,
+            },
           ]}
         >
           {hasHeadCostume ? (
