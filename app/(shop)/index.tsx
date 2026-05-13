@@ -271,7 +271,7 @@ function ShopWormPreview({
       if (!ctx) return;
 
       const points = Array.from({ length: 16 }, (_, index) => ({
-        x: 286 - index * 17,
+        x: 248 - index * 17,
         y: 65,
       }));
       const R = 23;
