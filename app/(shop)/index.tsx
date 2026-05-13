@@ -100,6 +100,14 @@ const FLAG_SKINS: FlagSkin[] = [
   { name: "Emirats Arabes Unis", colors: ["#00843D", "#FFFFFF", "#000000", "#CE1126"] },
 ];
 
+const DEFAULT_FLAG_TEXTURE_SCALE = 1.4;
+const FLAG_TEXTURE_OFFSETS: Record<string, number> = {
+  "/assets/france.png": 0.18,
+};
+const FLAG_TEXTURE_SCALES: Record<string, number> = {
+  "/assets/france.png": DEFAULT_FLAG_TEXTURE_SCALE,
+};
+
 type ShopTab = "shop" | "all" | "europe" | "ameriques" | "asie" | "afrique" | "oceanie" | "moyenorient";
 type FlagRegion = Exclude<ShopTab, "shop">;
 
@@ -184,6 +192,8 @@ function ShopWormPreview({
   const isFlagPreview = !!flagSource;
   const segmentSource = flagSource || bodyTextureSource;
   const showsTubeBody = bodyStyle === "tube" || isFlagPreview;
+  const flagTextureScale = isFlagPreview && segmentSource ? (FLAG_TEXTURE_SCALES[segmentSource] ?? DEFAULT_FLAG_TEXTURE_SCALE) : 1;
+  const flagTextureOffset = isFlagPreview && segmentSource ? (FLAG_TEXTURE_OFFSETS[segmentSource] ?? 0) : 0;
   const baseColor = palette[0] || "#9a9a9a";
   const previewBands = palette.length ? palette : [baseColor];
   const repeatedPreviewBands = Array.from({ length: Math.max(28, previewBands.length * 9) }, (_, index) => (
@@ -264,6 +274,9 @@ function ShopWormPreview({
                 imageStyle={[
                   styles.previewTubeImage,
                   isFlagPreview && styles.previewTubeRepeatImage,
+                  isFlagPreview && {
+                    transform: [{ scale: flagTextureScale }, { translateX: flagTextureOffset * 100 }],
+                  },
                 ]}
                 style={styles.previewTubeFill}
               />
@@ -349,6 +362,9 @@ function ShopWormPreview({
                   imageStyle={[
                     styles.previewHeadBubbleImage,
                     isFlagPreview && styles.previewHeadRepeatImage,
+                    isFlagPreview && {
+                      transform: [{ scale: flagTextureScale }, { translateX: flagTextureOffset * 24 }],
+                    },
                   ]}
                   style={styles.previewHeadBubbleFill}
                 />
