@@ -199,7 +199,7 @@ function ShopWormPreview({
     left: circleStartLeft + index * circleSegmentStep,
     color: previewBands[index % previewBands.length] || baseColor,
   }));
-  const classicHeadLeft = previewSegments[0].left + (circleSegmentSize - circleHeadSize) / 2;
+  const classicHeadLeft = previewSegments[previewSegments.length - 1].left + (circleSegmentSize - circleHeadSize) / 2;
   const classicHeadTop = circleBodyTop + (circleSegmentSize - circleHeadSize) / 2;
 
   const renderTubePaletteFill = (roundedStyle: object) => (
