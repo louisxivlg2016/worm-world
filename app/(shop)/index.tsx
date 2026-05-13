@@ -412,7 +412,7 @@ function ShopWormPreview({
               <View style={styles.previewTubeHighlight} />
             </View>
           </>
-        ) : (
+        ) : !flagPreviewUri ? (
           <View style={styles.previewCircleBody}>
             <View style={styles.previewCircleShadow} />
             {previewSegments.map((segment, index) => (
@@ -442,7 +442,7 @@ function ShopWormPreview({
               </View>
             ))}
           </View>
-        )}
+        ) : null}
 
         {!flagPreviewUri ? (
           <View
