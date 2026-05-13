@@ -271,10 +271,9 @@ function ShopWormPreview({
       if (!ctx) return;
 
       const points = Array.from({ length: 16 }, (_, index) => ({
-        x: 286 - index * 17,
+        x: 314 - index * 17,
         y: 65,
       }));
-      const head = { x: 314, y: 64 };
       const R = 23;
 
       const lengths = [0];
@@ -323,6 +322,7 @@ function ShopWormPreview({
           Math.atan2(lower[lower.length - 1].y - tail.y, lower[lower.length - 1].x - tail.x),
         );
         drawSmoothCurve([...lower].reverse());
+        const head = points[0];
         ctx.arc(
           head.x,
           head.y,
@@ -367,12 +367,14 @@ function ShopWormPreview({
       }
       ctx.restore();
 
+      const head = points[0];
       ctx.save();
       ctx.beginPath();
       ctx.arc(head.x, head.y, R * 0.98, 0, Math.PI * 2);
       ctx.clip();
+      ctx.translate(head.x, head.y);
       const drawR = R * 1.9;
-      ctx.drawImage(img, head.x - drawR * 1.25, head.y - drawR, drawR * 2.5, drawR * 2);
+      ctx.drawImage(img, -drawR * 1.25, -drawR, drawR * 2.5, drawR * 2);
       ctx.restore();
 
       const eyeR = R * 0.32;
