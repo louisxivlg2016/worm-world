@@ -935,7 +935,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   previewStage: {
-    height: 340,
+    height: 460,
     justifyContent: "center",
     width: "100%",
     position: "relative",
