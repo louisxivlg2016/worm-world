@@ -563,6 +563,7 @@ export default function ShopScreen() {
   const router = useRouter();
   const isDesktop = width >= 600;
   const contentMaxWidth = 600;
+  const previewRowWidth = Math.min(width - spacing.md * 2, 1100);
 
   const { totalCoins: coins, eventGems, unlockEventCostumeForEvent, playerSkin } = useGameState();
 
@@ -690,7 +691,7 @@ export default function ShopScreen() {
         <Text style={styles.coinText}>{"\u{1FA99}"} {coins}</Text>
       </View>
 
-      <View style={styles.topRow}>
+      <View style={[styles.topRow, isDesktop && { width: previewRowWidth, alignSelf: "center" }]}>
         <View style={styles.flagTabsTop}>
           {SHOP_TAB_ORDER.map((tab) => {
             const isActive = activeTab === tab;
