@@ -235,18 +235,18 @@ function ShopWormPreview({
 
     img.onload = () => {
       const canvas = document.createElement("canvas");
-      canvas.width = 680;
-      canvas.height = 280;
+      canvas.width = 820;
+      canvas.height = 300;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
-      const R = 44;
+      const R = 110;
       const segCount = 14;
-      const segGap = 36;
-      const startX = 120; // head on the left, like in image #10
+      const segGap = 41;
+      const startX = 130; // head on the left, like in image #10
       const segments = Array.from({ length: segCount }, (_, index) => ({
         x: startX + index * segGap,
-        y: 140,
+        y: 150,
       }));
       const head = segments[0];
       const tail = segments[segCount - 1];
@@ -935,7 +935,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   previewStage: {
-    height: 260,
+    height: 340,
     justifyContent: "center",
     width: "100%",
     position: "relative",
@@ -1243,9 +1243,9 @@ const styles = StyleSheet.create({
     color: colors.textSecondary, fontSize: 12,
   },
   costumeArrowBtn: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     borderCurve: "continuous",
     backgroundColor: colors.primary,
     alignItems: "center",
@@ -1371,12 +1371,12 @@ const styles = StyleSheet.create({
   },
   topRow: {
     flexDirection: "row",
-    alignItems: "flex-start",
+    alignItems: "center",
     gap: spacing.sm,
     marginBottom: spacing.md,
   },
   flagTabsTop: {
-    width: 110,
+    width: 92,
     flexDirection: "column",
     gap: 6,
   },
