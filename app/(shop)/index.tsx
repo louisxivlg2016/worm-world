@@ -170,17 +170,17 @@ function ShopWormPreview({
   const repeatedPreviewBands = Array.from({ length: Math.max(28, previewBands.length * 9) }, (_, index) => (
     previewBands[index % previewBands.length] || baseColor
   ));
-  const tubeTop = isFlagPreview ? 42 : 38;
-  const tubeHeight = isFlagPreview ? 44 : 50;
+  const tubeTop = isFlagPreview ? 42 : 168;
+  const tubeHeight = isFlagPreview ? 44 : 124;
   const tubeRadius = tubeHeight / 2;
   const flagHeadSize = tubeHeight + 4;
   const flagTailSize = Math.round(tubeRadius * 2.04);
   const flagTailTop = tubeTop + (tubeHeight - flagTailSize) / 2;
-  const previewRadius = segmentSource ? 26 : 24;
+  const previewRadius = 68;
   const circleHeadSize = previewRadius * 2;
   const circleSegmentSize = previewRadius * 2;
   const circleSegmentStep = Math.max(8, Math.round(previewRadius * 0.38));
-  const circleBodyTop = 26;
+  const circleBodyTop = 150;
   const circleStartLeft = 16;
   const previewSegments = Array.from({ length: 30 }, (_, index) => ({
     left: circleStartLeft + index * circleSegmentStep,
