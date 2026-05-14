@@ -1355,13 +1355,13 @@ const styles = StyleSheet.create({
     color: colors.gold,
   },
   colorColumn: {
-    width: 168,
+    width: 232,
     flexDirection: "column",
   },
   colorColumnTitle: {
     color: colors.text,
     fontWeight: "700",
-    fontSize: 14,
+    fontSize: 17,
     marginBottom: spacing.sm,
   },
   slotRow: {
@@ -1370,9 +1370,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   slotBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     borderCurve: "continuous",
     borderWidth: 2,
     borderColor: "rgba(255,255,255,0.2)",
@@ -1384,13 +1384,13 @@ const styles = StyleSheet.create({
   paletteGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 6,
+    gap: 8,
     marginBottom: spacing.sm,
   },
   paletteColor: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     borderCurve: "continuous",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.2)",
