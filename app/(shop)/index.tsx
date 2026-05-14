@@ -235,14 +235,14 @@ function ShopWormPreview({
 
     img.onload = () => {
       const canvas = document.createElement("canvas");
-      canvas.width = 820;
+      canvas.width = 1320;
       canvas.height = 300;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
       const R = 110;
-      const segCount = 14;
-      const segGap = 41;
+      const segCount = 26;
+      const segGap = 42;
       const startX = 130; // head on the left, like in image #10
       const segments = Array.from({ length: segCount }, (_, index) => ({
         x: startX + index * segGap,
@@ -946,8 +946,8 @@ const styles = StyleSheet.create({
   },
   previewCanvasImage: {
     alignSelf: "center",
-    width: 620,
-    height: 227,
+    width: 1100,
+    height: 250,
     maxWidth: "100%",
   },
   previewTube: {
