@@ -708,6 +708,39 @@ export default function ShopScreen() {
             );
           })}
         </View>
+
+        {activeTab === "shop" && (
+          <View style={styles.colorColumn}>
+            <Text style={styles.colorColumnTitle}>{t("shopColors")}</Text>
+            <View style={styles.slotRow}>
+              {selectedColors.map((c, i) => (
+                <Pressable
+                  key={i}
+                  onPress={() => setActiveSlot(i)}
+                  style={[
+                    styles.slotBtn,
+                    { backgroundColor: c },
+                    activeSlot === i && styles.slotBtnActive,
+                  ]}
+                />
+              ))}
+            </View>
+            <View style={styles.paletteGrid}>
+              {COLOR_PALETTE.map((c, i) => (
+                <Pressable
+                  key={`${c}-${i}`}
+                  onPress={() => {
+                    setSelectedFlag(null);
+                    const next = [...selectedColors];
+                    next[activeSlot] = c;
+                    setSelectedColors(next);
+                  }}
+                  style={[styles.paletteColor, { backgroundColor: c }]}
+                />
+              ))}
+            </View>
+          </View>
+        )}
         <View style={styles.previewNavCenter}>
           <ShopWormPreview
             colors={selectedColors}
@@ -834,36 +867,6 @@ export default function ShopScreen() {
           </Pressable>
         ))}
       </ScrollView>
-
-      {/* Color Picker */}
-      <Text style={styles.sectionTitle}>{t("shopColors")}</Text>
-      <View style={styles.slotRow}>
-        {selectedColors.map((c, i) => (
-          <Pressable
-            key={i}
-            onPress={() => setActiveSlot(i)}
-            style={[
-              styles.slotBtn,
-              { backgroundColor: c },
-              activeSlot === i && styles.slotBtnActive,
-            ]}
-          />
-        ))}
-      </View>
-      <View style={styles.paletteGrid}>
-        {COLOR_PALETTE.map((c, i) => (
-          <Pressable
-            key={`${c}-${i}`}
-            onPress={() => {
-              setSelectedFlag(null);
-              const next = [...selectedColors];
-              next[activeSlot] = c;
-              setSelectedColors(next);
-            }}
-            style={[styles.paletteColor, { backgroundColor: c }]}
-          />
-        ))}
-      </View>
       </>)}
 
       {/* Apply Button */}
@@ -1350,6 +1353,16 @@ const styles = StyleSheet.create({
   },
   toggleTextActive: {
     color: colors.gold,
+  },
+  colorColumn: {
+    width: 168,
+    flexDirection: "column",
+  },
+  colorColumnTitle: {
+    color: colors.text,
+    fontWeight: "700",
+    fontSize: 14,
+    marginBottom: spacing.sm,
   },
   slotRow: {
     flexDirection: "row",
