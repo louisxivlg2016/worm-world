@@ -383,7 +383,7 @@ function ShopWormPreview({
             </View>
           </>
         ) : !flagPreviewUri ? (
-          <View style={styles.previewCircleBody}>
+          <View style={[styles.previewCircleBody, { top: circleBodyTop, height: circleSegmentSize }]}>
             <View style={styles.previewCircleShadow} />
             {previewSegments.map((segment, index) => (
               <View
