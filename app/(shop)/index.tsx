@@ -108,44 +108,14 @@ const FLAG_TEXTURE_SCALES: Record<string, number> = {
   "/assets/france.png": DEFAULT_FLAG_TEXTURE_SCALE,
 };
 
-type ShopTab = "shop" | "all" | "europe" | "ameriques" | "asie" | "afrique" | "oceanie" | "moyenorient";
-type FlagRegion = Exclude<ShopTab, "shop">;
+type ShopTab = "shop" | "flags";
 
 const SHOP_TAB_LABELS: Record<ShopTab, string> = {
   shop: "Boutique",
-  all: "Tous",
-  europe: "Europe",
-  ameriques: "Amériques",
-  asie: "Asie",
-  afrique: "Afrique",
-  oceanie: "Océanie",
-  moyenorient: "Moyen-Orient",
+  flags: "Drapeaux",
 };
 
-const SHOP_TAB_ORDER: ShopTab[] = [
-  "shop", "all", "europe", "ameriques", "asie", "afrique", "moyenorient", "oceanie",
-];
-
-const FLAG_REGION_MAP: Record<string, Exclude<FlagRegion, "all">> = {
-  France: "europe", Allemagne: "europe", Italie: "europe", Espagne: "europe",
-  Portugal: "europe", "Royaume-Uni": "europe", Belgique: "europe", "Pays-Bas": "europe",
-  Suisse: "europe", Suede: "europe", Pologne: "europe", Ukraine: "europe",
-  Grece: "europe", Roumanie: "europe", Irlande: "europe", Croatie: "europe",
-  Norvege: "europe", Danemark: "europe", Finlande: "europe", Russie: "europe",
-  USA: "ameriques", Canada: "ameriques", Mexique: "ameriques", Bresil: "ameriques",
-  Argentine: "ameriques", Colombie: "ameriques", Chili: "ameriques", Perou: "ameriques",
-  Jamaique: "ameriques", Haiti: "ameriques", Cuba: "ameriques",
-  Japon: "asie", Chine: "asie", "Coree du Sud": "asie", Inde: "asie",
-  Pakistan: "asie", Indonesie: "asie", Philippines: "asie", Vietnam: "asie",
-  Thailande: "asie",
-  Maroc: "afrique", Algerie: "afrique", Tunisie: "afrique", Egypte: "afrique",
-  Senegal: "afrique", Nigeria: "afrique", "Afrique du Sud": "afrique",
-  Cameroun: "afrique", Ghana: "afrique", Congo: "afrique", Ethiopie: "afrique",
-  Kenya: "afrique",
-  Australie: "oceanie", "Nouvelle-Zelande": "oceanie",
-  Turquie: "moyenorient", Iran: "moyenorient", "Arabie Saoudite": "moyenorient",
-  Israel: "moyenorient", Palestine: "moyenorient", "Emirats Arabes Unis": "moyenorient",
-};
+const SHOP_TAB_ORDER: ShopTab[] = ["shop", "flags"];
 
 type HeadOption = {
   id: string;
@@ -608,7 +578,6 @@ export default function ShopScreen() {
   const [bodyStyle, setBodyStyle] = useState<"circles" | "tube">(() => playerSkin?.bodyStyle ?? "circles");
   const [selectedFlag, setSelectedFlag] = useState<string | null>(() => (playerSkin?.isFlag && playerSkin?.flagName) ? playerSkin.flagName : null);
   const [activeTab, setActiveTab] = useState<ShopTab>("shop");
-  const flagRegion: FlagRegion = activeTab === "shop" ? "all" : activeTab;
 
   const [, setUnlockTick] = useState(0);
 
@@ -631,12 +600,11 @@ export default function ShopScreen() {
 
   const filteredFlags = useMemo(() => {
     const q = flagSearch.trim().toLowerCase();
-    return FLAG_SKINS.filter((f) => {
-      if (flagRegion !== "all" && FLAG_REGION_MAP[f.name] !== flagRegion) return false;
-      if (!q) return true;
-      return f.name.toLowerCase().includes(q) || translateFlag(f.name, flagLang).toLowerCase().includes(q);
-    });
-  }, [flagSearch, flagLang, flagRegion]);
+    if (!q) return FLAG_SKINS;
+    return FLAG_SKINS.filter((f) =>
+      f.name.toLowerCase().includes(q) || translateFlag(f.name, flagLang).toLowerCase().includes(q)
+    );
+  }, [flagSearch, flagLang]);
 
   const filteredHeads = useMemo(() => headOptions, [headOptions]);
 
