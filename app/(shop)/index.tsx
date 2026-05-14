@@ -946,8 +946,8 @@ const styles = StyleSheet.create({
   },
   previewCanvasImage: {
     alignSelf: "center",
-    width: 760,
-    height: 278,
+    width: 300,
+    height: 110,
     maxWidth: "100%",
   },
   previewTube: {
