@@ -563,7 +563,7 @@ export default function ShopScreen() {
   const router = useRouter();
   const isDesktop = width >= 600;
   const contentMaxWidth = 600;
-  const previewRowWidth = Math.min(width - spacing.md * 2, 1100);
+  const previewRowWidth = width - spacing.md * 2;
 
   const { totalCoins: coins, eventGems, unlockEventCostumeForEvent, playerSkin } = useGameState();
 
