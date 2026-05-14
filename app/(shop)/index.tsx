@@ -707,17 +707,6 @@ export default function ShopScreen() {
             );
           })}
         </View>
-        <View style={styles.previewNavRow}>
-        <Pressable
-          onPress={() => activeTab === "shop" ? cycleHead(-1) : cycleFlag(-1)}
-          style={[
-            styles.costumeArrowBtn,
-            (activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0) && styles.costumeArrowBtnDisabled,
-          ]}
-          disabled={activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0}
-        >
-          <Text style={styles.costumeArrowText}>‹</Text>
-        </Pressable>
         <View style={styles.previewNavCenter}>
           <ShopWormPreview
             colors={selectedColors}
@@ -733,17 +722,28 @@ export default function ShopScreen() {
           ) : selectedFlag ? (
             <Text style={styles.previewCostumeName}>{translateFlag(selectedFlag, flagLang)}</Text>
           ) : null}
-        </View>
-        <Pressable
-          onPress={() => activeTab === "shop" ? cycleHead(1) : cycleFlag(1)}
-          style={[
-            styles.costumeArrowBtn,
-            (activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0) && styles.costumeArrowBtnDisabled,
-          ]}
-          disabled={activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0}
-        >
-          <Text style={styles.costumeArrowText}>›</Text>
-        </Pressable>
+          <Pressable
+            onPress={() => activeTab === "shop" ? cycleHead(-1) : cycleFlag(-1)}
+            style={[
+              styles.costumeArrowBtn,
+              styles.costumeArrowBtnLeft,
+              (activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0) && styles.costumeArrowBtnDisabled,
+            ]}
+            disabled={activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0}
+          >
+            <Text style={styles.costumeArrowText}>‹</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => activeTab === "shop" ? cycleHead(1) : cycleFlag(1)}
+            style={[
+              styles.costumeArrowBtn,
+              styles.costumeArrowBtnRight,
+              (activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0) && styles.costumeArrowBtnDisabled,
+            ]}
+            disabled={activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0}
+          >
+            <Text style={styles.costumeArrowText}>›</Text>
+          </Pressable>
         </View>
       </View>
 
@@ -1080,6 +1080,7 @@ const styles = StyleSheet.create({
   },
   previewNavCenter: {
     flex: 1,
+    position: "relative",
   },
   previewCircleBody: {
     position: "absolute",
@@ -1252,6 +1253,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     boxShadow: "0 6px 16px rgba(0,0,0,0.18)",
   },
+  costumeArrowBtnLeft: {
+    position: "absolute",
+    left: 8,
+    top: "50%",
+    marginTop: -20,
+    zIndex: 30,
+  },
+  costumeArrowBtnRight: {
+    position: "absolute",
+    right: 8,
+    top: "50%",
+    marginTop: -20,
+    zIndex: 30,
+  },
   costumeArrowBtnDisabled: {
     opacity: 0.45,
   },
@@ -1376,7 +1391,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   flagTabsTop: {
-    width: 92,
+    width: 76,
     flexDirection: "column",
     gap: 6,
   },
@@ -1392,7 +1407,7 @@ const styles = StyleSheet.create({
   },
   flagTab: {
     paddingVertical: 10,
-    paddingHorizontal: 10,
+    paddingHorizontal: 6,
     borderRadius: 10,
     borderCurve: "continuous",
     backgroundColor: "rgba(255,255,255,0.06)",
