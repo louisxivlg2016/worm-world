@@ -186,7 +186,7 @@ function ShopWormPreview({
     left: circleStartLeft + index * circleSegmentStep,
     color: previewBands[index % previewBands.length] || baseColor,
   }));
-  const classicHeadLeft = previewSegments[previewSegments.length - 1].left + (circleSegmentSize - circleHeadSize) / 2;
+  const classicHeadLeft = previewSegments[0].left + (circleSegmentSize - circleHeadSize) / 2;
   const classicHeadTop = circleBodyTop + (circleSegmentSize - circleHeadSize) / 2;
 
   const renderTubePaletteFill = (roundedStyle: object) => (
@@ -396,7 +396,7 @@ function ShopWormPreview({
                     height: circleSegmentSize,
                     borderRadius: circleSegmentSize / 2,
                     backgroundColor: segmentSource ? "transparent" : segment.color,
-                    zIndex: index + 1,
+                    zIndex: previewSegments.length - index,
                   },
                 ]}
               >
@@ -432,6 +432,7 @@ function ShopWormPreview({
                 top: classicHeadTop,
                 width: circleHeadSize,
                 height: circleHeadSize,
+                zIndex: 50,
               },
             ]}
           >
