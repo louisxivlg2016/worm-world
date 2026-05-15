@@ -6,7 +6,7 @@ import {
   BASE_SPEED, BASE_SEGMENT_GAP, BASE_RADIUS, TURN_SPEED, COIN_COUNT,
   BATTLE_MAX_DEATHS,
   SKINS, AI_SKINS, AI_NAMES,
-  FOOD_EMOJIS, SPECIAL_FOOD_EMOJIS, FOOD_IMAGES, SPECIAL_FOOD_IMAGES,
+  FOOD_EMOJIS, SPECIAL_FOOD_EMOJIS, FOOD_IMAGES, SPECIAL_FOOD_IMAGES, FOOD_PACK_IMAGES,
   type Worm, type Food, type Coin, type Particle, type Camera, type Potion, type Chest, type FlyingCoin,
   type Segment, type WormSkin, type AIStrategy, type GameMode, type HeadType, type PotionType,
   POTION_DURATION, POTION_COUNT, CHEST_COUNT, type EyeStyle, type MouthStyle,
@@ -415,7 +415,10 @@ interface EngineState {
 // HELPERS
 // ============================================
 function createFood(x?: number, y?: number, special?: boolean): Food {
-  const images = special ? SPECIAL_FOOD_IMAGES : FOOD_IMAGES
+  const packImages = !special && currentFoodPack && FOOD_PACK_IMAGES[currentFoodPack]
+  const images = packImages && packImages.length > 0
+    ? packImages
+    : (special ? SPECIAL_FOOD_IMAGES : FOOD_IMAGES)
   const img = images[Math.floor(Math.random() * images.length)]
   const emojis = special ? SPECIAL_FOOD_EMOJIS : FOOD_EMOJIS
   const emoji = emojis[Math.floor(Math.random() * emojis.length)]
@@ -1479,7 +1482,8 @@ const foodImgCache = new Map<string, HTMLImageElement>()
 
 function preloadFoodImages() {
   if (!IS_DOM) return
-  const allPaths = [...new Set([...FOOD_IMAGES, ...SPECIAL_FOOD_IMAGES])]
+  const packPaths = Object.values(FOOD_PACK_IMAGES).flat()
+  const allPaths = [...new Set([...FOOD_IMAGES, ...SPECIAL_FOOD_IMAGES, ...packPaths])]
   for (const src of allPaths) {
     if (foodImgCache.has(src)) continue
     const img = new Image()
@@ -1491,12 +1495,15 @@ preloadFoodImages()
 
 // Food style setting — read from storage
 let currentFoodStyle: 'images' | 'circles' | 'emojis' = 'images'
+let currentFoodPack: string | null = null
 function loadFoodStyle() {
   try {
     const s = (typeof localStorage !== 'undefined' ? localStorage : null)?.getItem('foodStyle')
     if (s === 'circles' || s === 'emojis') currentFoodStyle = s
     else currentFoodStyle = 'images'
-  } catch { currentFoodStyle = 'images' }
+    const p = (typeof localStorage !== 'undefined' ? localStorage : null)?.getItem('foodPack')
+    currentFoodPack = p && FOOD_PACK_IMAGES[p] ? p : null
+  } catch { currentFoodStyle = 'images'; currentFoodPack = null }
 }
 loadFoodStyle()
 

@@ -250,6 +250,53 @@ export const SPECIAL_FOOD_IMAGES = [
 export const FOOD_EMOJIS = ['🍖','🍗','🍕','🍔','🍩','🍓','🍌','🍎','🍣','🌭','🧁','🍰']
 export const SPECIAL_FOOD_EMOJIS = ['🍖','🍕','🍔','🍗','🍩','🍣']
 
+// Image sets for each food pack — selected via foodPack setting
+export const FOOD_PACK_IMAGES: Record<string, string[]> = {
+  classic: ['/food/burger.png','/food/pizza.png','/food/donut.png','/food/hot-dog.png','/food/muffin.png','/food/sushi.png'],
+  fruits: ['/food/fraise.png','/food/banane.png','/food/pomme.png','/food/gateau.png','/food/susette.png','/food/poulet.png'],
+  francaise: [
+    '/food/baguette.png','/food/borgignon.png','/food/brie.png','/food/camenbert.png',
+    '/food/coq-au-vin.png','/food/creme-brule.png','/food/crepe.png','/food/croissant.png',
+    '/food/eclair.png','/food/entrecote.png','/food/escargo.png','/food/flan.png',
+    '/food/fruit-de-mer.png','/food/gallete.png','/food/macaran.png','/food/mille-feuille.png',
+    '/food/pain-au-chocolat.png','/food/paris-brest.png','/food/poulet-a-la-francaise.png',
+    '/food/profitorelle.png','/food/purre-de-pomme-de-terre.png','/food/quiche-lorraine.png',
+    '/food/raclette.png','/food/ratatouille.png','/food/saussison.png','/food/soupe-au-pain.png',
+    '/food/soupe-au-saussice.png','/food/tartarre.png','/food/tarte-au-abricot.png',
+  ],
+  italienne: [
+    '/food/pizza-margherita.png','/food/alasagna-alla-bognese.png','/food/amaretti.png',
+    '/food/antipasto-misto.png','/food/aracini.png','/food/bombolone.png',
+    '/food/boulette-de-viande.png','/food/caponata-sicilienne.png','/food/carpacio-di-manz.png',
+    '/food/cornetto.png','/food/cotoletta-alla-milanese.png','/food/croissant-nutella.png',
+    '/food/crostata.png','/food/fromage-bleu.png','/food/gelato.png','/food/osso-buco.png',
+    '/food/paneton.png','/food/panna-cotta.png','/food/parmezan.png',
+    '/food/pollo-ala-cacciatora.png','/food/pollo-al-limone-.png','/food/ribollita.png',
+    '/food/risotto-ai-funghi.png','/food/saltimbocca-alla-romana-.png','/food/tiramisu.png',
+    '/food/torta-della-nona.png','/food/zuppa-inglese.png',
+  ],
+  americaine: [
+    '/food/americaine-donut.png','/food/americaine-burger.png','/food/americaine-hot-dog.png',
+    '/food/americaine-steak.png','/food/americaine-nugget.png','/food/americaine-pankake.png',
+    '/food/americaine-biscuit.png','/food/americaine-chedar.png','/food/americaine-crabe.png',
+    '/food/americaine-crevette-frit.png','/food/americaine-dessert.png','/food/americaine-dessert-.png',
+    '/food/americaine-donut-vide.png','/food/americaine-gallete.png','/food/americaine-glace.png',
+    '/food/americaine-sandhiwh.png','/food/americaine-sandwhich.png','/food/americaine-viande.png',
+  ],
+  chinoise: [
+    '/food/youtiao.png','/food/baozi.png','/food/tangyuan.png','/food/fermented-tofu.png',
+    '/food/gong-bao-jiding.png','/food/yangzhou-fried-rice.png','/food/cashew-chicken.png','/food/peking-duck.png',
+    '/food/xiaolongbao.png','/food/stir-fried-eggplant-with-garlic.png','/food/jianbing.png','/food/zongzi.png',
+    '/food/ma-po-tofu.png','/food/dim-sum-chicken-feet.png','/food/cantonese-roast-chicken.png','/food/dongpo-rou.png',
+    '/food/egg-tart.png','/food/wonton-soup.png','/food/hot-and-sour-soup.png','/food/sesame-balls.png',
+    '/food/sweet-tofu-with-goji-berries.png','/food/mango-pudding.png','/food/lanzhou-beef-noodle-soup.png','/food/yu-xiang-rou-si.png',
+    '/food/egg-tart-alt.png','/food/pineapple-bun.png','/food/chinese-mochi.png','/food/mooncake.png',
+    '/food/red-bean-cake.png','/food/nian-gao.png','/food/chinese-fruit-salad.png','/food/fortune-cookies.png',
+    '/food/chinese-sausage-platter.png','/food/century-egg-tofu.png','/food/preserved-egg-box.png','/food/oyster-platter.png',
+    '/food/hot-pot.png','/food/lo-mein.png','/food/dumpling-greens-soup.png','/food/sweet-and-sour-dish.png',
+  ],
+}
+
 // ============================================
 // MULTIPLAYER EVENT TYPES
 // ============================================
