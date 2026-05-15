@@ -811,7 +811,7 @@ export default function ShopScreen() {
                 style={[styles.flagTab, isActive && styles.flagTabActive]}
               >
                 <Text style={[styles.flagTabText, isActive && styles.flagTabTextActive]}>
-                  {SHOP_TAB_LABELS[tab]}
+                  {tab === "fetes" ? t("fetesTab") : SHOP_TAB_LABELS[tab]}
                 </Text>
               </Pressable>
             );
