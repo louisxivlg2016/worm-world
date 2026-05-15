@@ -62,13 +62,13 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
   const [playerSkin, setPlayerSkin] = useState<WormSkin>(() => {
     try {
       const saved = getStorage().getItem("playerSkin");
-      return saved ? normalizeFlagSkin(JSON.parse(saved)) : SKINS[0];
+      return saved ? { ...normalizeFlagSkin(JSON.parse(saved)), bodyStyle: 'circles' } : SKINS[0];
     } catch { return SKINS[0]; }
   });
   const [customSkin, setCustomSkin] = useState<WormSkin | null>(() => {
     try {
       const saved = getStorage().getItem("customSkin");
-      return saved ? normalizeFlagSkin(JSON.parse(saved)) : null;
+      return saved ? { ...normalizeFlagSkin(JSON.parse(saved)), bodyStyle: 'circles' } : null;
     } catch { return null; }
   });
   const [totalCoins, setTotalCoins] = useState(() => {
