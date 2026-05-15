@@ -439,7 +439,7 @@ function ShopWormPreview({
             {hasHeadCostume ? (
               <Image
                 source={{ uri: headPreview }}
-                style={styles.previewHeadImage}
+                style={[styles.previewHeadImage, styles.previewHeadCostume]}
                 resizeMode="contain"
               />
             ) : (
