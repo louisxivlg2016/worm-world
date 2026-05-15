@@ -779,6 +779,29 @@ export default function ShopScreen() {
             </View>
           </View>
         )}
+        {activeTab === "mouths" && (
+          <View style={styles.colorColumn}>
+            <Text style={styles.colorColumnTitle}>Bouches</Text>
+            <View style={styles.faceGrid}>
+              {MOUTH_OPTIONS.map((option) => (
+                <Pressable
+                  key={option.id}
+                  onPress={() => setMouthStyle(option.id)}
+                  style={[
+                    styles.faceOption,
+                    styles.faceOptionGrid,
+                    mouthStyle === option.id && styles.faceOptionSelected,
+                  ]}
+                >
+                  <Text style={styles.facePreview}>{option.preview}</Text>
+                  <Text style={[styles.faceLabel, mouthStyle === option.id && styles.faceLabelSelected]}>
+                    {option.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        )}
         <View style={styles.previewNavCenter}>
           <ShopWormPreview
             colors={selectedColors}
@@ -868,28 +891,6 @@ export default function ShopScreen() {
         </>
       )}
 
-      {activeTab === "mouths" && (
-        <>
-          <Text style={styles.sectionTitle}>Bouches</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionRow}>
-            {MOUTH_OPTIONS.map((option) => (
-              <Pressable
-                key={option.id}
-                onPress={() => setMouthStyle(option.id)}
-                style={[
-                  styles.faceOption,
-                  mouthStyle === option.id && styles.faceOptionSelected,
-                ]}
-              >
-                <Text style={styles.facePreview}>{option.preview}</Text>
-                <Text style={[styles.faceLabel, mouthStyle === option.id && styles.faceLabelSelected]}>
-                  {option.label}
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </>
-      )}
 
       {/* Apply Button */}
       <Pressable
