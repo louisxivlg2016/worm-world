@@ -756,6 +756,29 @@ export default function ShopScreen() {
             </View>
           </View>
         )}
+        {activeTab === "eyes" && (
+          <View style={styles.colorColumn}>
+            <Text style={styles.colorColumnTitle}>Yeux</Text>
+            <View style={styles.faceGrid}>
+              {EYE_OPTIONS.map((option) => (
+                <Pressable
+                  key={option.id}
+                  onPress={() => setEyeStyle(option.id)}
+                  style={[
+                    styles.faceOption,
+                    styles.faceOptionGrid,
+                    eyeStyle === option.id && styles.faceOptionSelected,
+                  ]}
+                >
+                  <Text style={styles.facePreview}>{option.preview}</Text>
+                  <Text style={[styles.faceLabel, eyeStyle === option.id && styles.faceLabelSelected]}>
+                    {option.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        )}
         <View style={styles.previewNavCenter}>
           <ShopWormPreview
             colors={selectedColors}
@@ -842,29 +865,6 @@ export default function ShopScreen() {
               </Pressable>
             ))}
           </View>
-        </>
-      )}
-
-      {activeTab === "eyes" && (
-        <>
-          <Text style={styles.sectionTitle}>Yeux</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionRow}>
-            {EYE_OPTIONS.map((option) => (
-              <Pressable
-                key={option.id}
-                onPress={() => setEyeStyle(option.id)}
-                style={[
-                  styles.faceOption,
-                  eyeStyle === option.id && styles.faceOptionSelected,
-                ]}
-              >
-                <Text style={styles.facePreview}>{option.preview}</Text>
-                <Text style={[styles.faceLabel, eyeStyle === option.id && styles.faceLabelSelected]}>
-                  {option.label}
-                </Text>
-              </Pressable>
-            ))}
-          </ScrollView>
         </>
       )}
 
@@ -1334,6 +1334,16 @@ const styles = StyleSheet.create({
   faceOptionSelected: {
     borderColor: colors.gold,
     backgroundColor: "rgba(255,215,0,0.15)",
+  },
+  faceGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  faceOptionGrid: {
+    width: 112,
+    minWidth: 112,
+    marginRight: 0,
   },
   facePreview: {
     color: colors.text,
