@@ -143,6 +143,94 @@ type MouthOption = {
   preview: string;
 };
 
+function drawPreviewFaceDetails(
+  ctx: CanvasRenderingContext2D,
+  hp: { x: number; y: number },
+  headR: number,
+  eyeStyle: EyeOption["id"],
+  mouthStyle: MouthOption["id"],
+) {
+  const eyeR = headR * 0.32;
+  const pupilR = eyeR * 0.55;
+  const eyeSpacing = headR * 0.35;
+  const eyeY = hp.y - headR * 0.1;
+
+  const drawClosedEye = (ex: number, arch = 0.45) => {
+    ctx.beginPath();
+    ctx.lineWidth = Math.max(2, headR * 0.11);
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#111";
+    ctx.moveTo(ex - eyeR * 0.7, eyeY);
+    ctx.quadraticCurveTo(ex, eyeY - eyeR * arch, ex + eyeR * 0.7, eyeY);
+    ctx.stroke();
+  };
+
+  for (let side = -1; side <= 1; side += 2) {
+    const ex = hp.x + side * eyeSpacing;
+    const winkEye = eyeStyle === "wink" && side === 1;
+    const happyEye = eyeStyle === "happy";
+    const angryEye = eyeStyle === "angry";
+
+    if (winkEye || happyEye) {
+      drawClosedEye(ex, happyEye ? 0.6 : 0.18);
+      continue;
+    }
+
+    const eyeOffsetY = angryEye ? eyeR * 0.06 : 0;
+
+    ctx.beginPath();
+    ctx.arc(ex, eyeY + eyeOffsetY, eyeR, 0, Math.PI * 2);
+    ctx.fillStyle = "#fff";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(ex, eyeY + eyeOffsetY, pupilR, 0, Math.PI * 2);
+    ctx.fillStyle = "#111";
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(ex - pupilR * 0.3, eyeY + eyeOffsetY - pupilR * 0.3, pupilR * 0.35, 0, Math.PI * 2);
+    ctx.fillStyle = "#fff";
+    ctx.fill();
+
+    if (angryEye) {
+      ctx.beginPath();
+      ctx.lineWidth = Math.max(2, headR * 0.09);
+      ctx.lineCap = "round";
+      ctx.strokeStyle = "#111";
+      ctx.moveTo(ex - eyeR * 0.8, eyeY - eyeR * 0.95);
+      ctx.lineTo(ex + side * eyeR * 0.55, eyeY - eyeR * 1.2);
+      ctx.stroke();
+    }
+  }
+
+  if (mouthStyle === "none") return;
+
+  const mouthY = hp.y + headR * 0.42;
+  ctx.beginPath();
+  ctx.lineWidth = Math.max(2, headR * 0.1);
+  ctx.lineCap = "round";
+  ctx.strokeStyle = "#111";
+
+  if (mouthStyle === "surprised") {
+    ctx.arc(hp.x, mouthY - headR * 0.02, headR * 0.15, 0, Math.PI * 2);
+    ctx.stroke();
+    return;
+  }
+
+  if (mouthStyle === "angry") {
+    ctx.moveTo(hp.x - headR * 0.28, mouthY + headR * 0.08);
+    ctx.quadraticCurveTo(hp.x, mouthY - headR * 0.18, hp.x + headR * 0.28, mouthY + headR * 0.08);
+    ctx.stroke();
+    return;
+  }
+
+  const smileDepth = mouthStyle === "grin" ? headR * 0.22 : headR * 0.14;
+  ctx.moveTo(hp.x - headR * 0.3, mouthY - headR * 0.02);
+  ctx.quadraticCurveTo(hp.x, mouthY + smileDepth, hp.x + headR * 0.3, mouthY - headR * 0.02);
+  ctx.stroke();
+}
+
 function ShopWormPreview({
   colors: palette,
   eyeStyle,
@@ -290,34 +378,13 @@ function ShopWormPreview({
       ctx.drawImage(img, -drawR * 1.25, -drawR, drawR * 2.5, drawR * 2);
       ctx.restore();
 
-      const eyeR = R * 0.32;
-      const pupilR = eyeR * 0.55;
-      const eyeSpacing = R * 0.35;
-      const eyeY = hp.y - R * 0.1;
-      [-1, 1].forEach((side) => {
-        const ex = hp.x + side * eyeSpacing;
-        ctx.beginPath();
-        ctx.arc(ex, eyeY, eyeR, 0, Math.PI * 2);
-        ctx.fillStyle = "#fff";
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(ex, eyeY, pupilR, 0, Math.PI * 2);
-        ctx.fillStyle = "#111";
-        ctx.fill();
-      });
-      ctx.beginPath();
-      ctx.lineWidth = Math.max(2, R * 0.1);
-      ctx.lineCap = "round";
-      ctx.strokeStyle = "#111";
-      ctx.moveTo(hp.x - R * 0.3, hp.y + R * 0.4);
-      ctx.quadraticCurveTo(hp.x, hp.y + R * 0.56, hp.x + R * 0.3, hp.y + R * 0.4);
-      ctx.stroke();
+      drawPreviewFaceDetails(ctx, hp, R, eyeStyle, mouthStyle);
 
       setFlagPreviewUri(canvas.toDataURL("image/png"));
     };
 
     img.onerror = () => setFlagPreviewUri("");
-  }, [hasHeadCostume, isFlagPreview, segmentSource]);
+  }, [eyeStyle, mouthStyle, hasHeadCostume, isFlagPreview, segmentSource]);
 
   return (
     <View style={styles.previewCard}>
