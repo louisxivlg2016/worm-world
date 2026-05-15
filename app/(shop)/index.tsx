@@ -108,15 +108,16 @@ const FLAG_TEXTURE_SCALES: Record<string, number> = {
   "/assets/france.png": DEFAULT_FLAG_TEXTURE_SCALE,
 };
 
-type ShopTab = "shop" | "flags";
-type ShopSectionTab = "costumes" | "eyes" | "mouths";
+type ShopTab = "shop" | "flags" | "eyes" | "mouths";
 
-const SHOP_TAB_LABEL_KEYS: Record<ShopTab, string> = {
-  shop: "shopTab",
-  flags: "flagsTab",
+const SHOP_TAB_LABELS: Record<ShopTab, string> = {
+  shop: "Shop",
+  flags: "Flags",
+  eyes: "Yeux",
+  mouths: "Bouches",
 };
 
-const SHOP_TAB_ORDER: ShopTab[] = ["shop", "flags"];
+const SHOP_TAB_ORDER: ShopTab[] = ["shop", "flags", "eyes", "mouths"];
 
 type HeadOption = {
   id: string;
@@ -582,7 +583,6 @@ export default function ShopScreen() {
   const [bodyStyle, setBodyStyle] = useState<"circles" | "tube">(() => playerSkin?.bodyStyle ?? "circles");
   const [selectedFlag, setSelectedFlag] = useState<string | null>(() => (playerSkin?.isFlag && playerSkin?.flagName) ? playerSkin.flagName : null);
   const [activeTab, setActiveTab] = useState<ShopTab>("shop");
-  const [shopSectionTab, setShopSectionTab] = useState<ShopSectionTab>("costumes");
 
   const [, setUnlockTick] = useState(0);
 
@@ -687,15 +687,13 @@ export default function ShopScreen() {
   const selectedEyeMeta = EYE_OPTIONS.find((option) => option.id === eyeStyle) ?? EYE_OPTIONS[0];
   const selectedMouthMeta = MOUTH_OPTIONS.find((option) => option.id === mouthStyle) ?? MOUTH_OPTIONS[0];
   const previewLabel = activeTab === "shop"
-    ? shopSectionTab === "eyes"
-      ? selectedEyeMeta.label
-      : shopSectionTab === "mouths"
-        ? selectedMouthMeta.label
-        : (selectedHeadMeta?.label ?? "Classique")
-    : selectedFlag
-      ? translateFlag(selectedFlag, flagLang)
-      : null;
-  const showCycleArrows = activeTab === "flags" || shopSectionTab === "costumes";
+    ? (selectedHeadMeta?.label ?? "Classique")
+    : activeTab === "flags"
+      ? (selectedFlag ? translateFlag(selectedFlag, flagLang) : null)
+      : activeTab === "eyes"
+        ? selectedEyeMeta.label
+        : selectedMouthMeta.label;
+  const showCycleArrows = activeTab === "shop" || activeTab === "flags";
   const cycleDisabled = activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0;
 
   return (
@@ -719,7 +717,7 @@ export default function ShopScreen() {
                 style={[styles.flagTab, isActive && styles.flagTabActive]}
               >
                 <Text style={[styles.flagTabText, isActive && styles.flagTabTextActive]}>
-                  {t(SHOP_TAB_LABEL_KEYS[tab])}
+                  {SHOP_TAB_LABELS[tab]}
                 </Text>
               </Pressable>
             );
@@ -798,29 +796,7 @@ export default function ShopScreen() {
         </View>
       </View>
 
-      {activeTab === "shop" && (<>
-      <View style={styles.shopSectionTabs}>
-        <Pressable
-          onPress={() => setShopSectionTab("costumes")}
-          style={[styles.shopSectionTab, shopSectionTab === "costumes" && styles.shopSectionTabActive]}
-        >
-          <Text style={[styles.shopSectionTabText, shopSectionTab === "costumes" && styles.shopSectionTabTextActive]}>Costumes</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => setShopSectionTab("eyes")}
-          style={[styles.shopSectionTab, shopSectionTab === "eyes" && styles.shopSectionTabActive]}
-        >
-          <Text style={[styles.shopSectionTabText, shopSectionTab === "eyes" && styles.shopSectionTabTextActive]}>Yeux</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => setShopSectionTab("mouths")}
-          style={[styles.shopSectionTab, shopSectionTab === "mouths" && styles.shopSectionTabActive]}
-        >
-          <Text style={[styles.shopSectionTabText, shopSectionTab === "mouths" && styles.shopSectionTabTextActive]}>Bouches</Text>
-        </Pressable>
-      </View>
-
-      {shopSectionTab === "costumes" ? (
+      {activeTab === "shop" && (
         <>
           <Text style={styles.sectionTitle}>{t("shopHead")}</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.sm }}>
@@ -867,9 +843,9 @@ export default function ShopScreen() {
             ))}
           </View>
         </>
-      ) : null}
+      )}
 
-      {shopSectionTab === "eyes" ? (
+      {activeTab === "eyes" && (
         <>
           <Text style={styles.sectionTitle}>Yeux</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionRow}>
@@ -890,9 +866,9 @@ export default function ShopScreen() {
             ))}
           </ScrollView>
         </>
-      ) : null}
+      )}
 
-      {shopSectionTab === "mouths" ? (
+      {activeTab === "mouths" && (
         <>
           <Text style={styles.sectionTitle}>Bouches</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionRow}>
@@ -913,8 +889,7 @@ export default function ShopScreen() {
             ))}
           </ScrollView>
         </>
-      ) : null}
-      </>)}
+      )}
 
       {/* Apply Button */}
       <Pressable
@@ -1482,35 +1457,6 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   flagTabTextActive: {
-    color: colors.gold,
-  },
-  shopSectionTabs: {
-    flexDirection: "row",
-    gap: spacing.sm,
-    marginBottom: spacing.md,
-  },
-  shopSectionTab: {
-    flex: 1,
-    minHeight: 44,
-    borderRadius: 14,
-    borderCurve: "continuous",
-    backgroundColor: "rgba(255,255,255,0.07)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.10)",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: spacing.sm,
-  },
-  shopSectionTabActive: {
-    backgroundColor: "rgba(246,196,83,0.18)",
-    borderColor: colors.gold,
-  },
-  shopSectionTabText: {
-    color: colors.textSecondary,
-    fontSize: 14,
-    fontWeight: "800",
-  },
-  shopSectionTabTextActive: {
     color: colors.gold,
   },
   applyBtn: {
