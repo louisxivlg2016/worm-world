@@ -415,7 +415,7 @@ interface EngineState {
 // HELPERS
 // ============================================
 function createFood(x?: number, y?: number, special?: boolean): Food {
-  const packImages = !special && currentFoodPack && FOOD_PACK_IMAGES[currentFoodPack]
+  const packImages = currentFoodPack ? FOOD_PACK_IMAGES[currentFoodPack] : null
   const images = packImages && packImages.length > 0
     ? packImages
     : (special ? SPECIAL_FOOD_IMAGES : FOOD_IMAGES)
