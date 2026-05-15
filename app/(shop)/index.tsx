@@ -977,14 +977,19 @@ export default function ShopScreen() {
 
 
       {/* Apply Button */}
-      <Pressable
-        onPress={handleApply}
-        style={[styles.applyBtn, computePrice() > coins && styles.applyBtnDisabled]}
-      >
-        <Text style={styles.applyBtnText}>
-          {computePrice() > 0 ? `${t("shopApply")} (${computePrice()} 🪙)` : t("shopApply")}
-        </Text>
-      </Pressable>
+      <View style={{ marginTop: spacing.lg, alignItems: "center", gap: 6 }}>
+        {computePrice() > 0 && (
+          <Text style={{ color: "#ffd700", fontSize: 14, fontWeight: "800" }}>
+            💰 {computePrice()} 🪙
+          </Text>
+        )}
+        <Pressable
+          onPress={handleApply}
+          style={computePrice() > coins && styles.applyBtnDisabled}
+        >
+          <Image source={require("../../assets/buy-btn.png")} style={{ width: 140, height: 50 }} resizeMode="contain" />
+        </Pressable>
+      </View>
 
       <View style={{ height: spacing.xxl }} />
       </View>
