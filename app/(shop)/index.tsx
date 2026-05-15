@@ -108,16 +108,17 @@ const FLAG_TEXTURE_SCALES: Record<string, number> = {
   "/assets/france.png": DEFAULT_FLAG_TEXTURE_SCALE,
 };
 
-type ShopTab = "shop" | "flags" | "eyes" | "mouths";
+type ShopTab = "shop" | "fetes" | "flags" | "eyes" | "mouths";
 
 const SHOP_TAB_LABELS: Record<ShopTab, string> = {
   shop: "Shop",
+  fetes: "Fêtes",
   flags: "Flags",
   eyes: "Yeux",
   mouths: "Bouches",
 };
 
-const SHOP_TAB_ORDER: ShopTab[] = ["shop", "flags", "eyes", "mouths"];
+const SHOP_TAB_ORDER: ShopTab[] = ["shop", "fetes", "flags", "eyes", "mouths"];
 
 type HeadOption = {
   id: string;
@@ -587,6 +588,10 @@ function getHeadOptions(): HeadOption[] {
   return [...base, ...eventHeads];
 }
 
+function isEventHeadOption(option: HeadOption) {
+  return !!option.eventId;
+}
+
 const FLAG_PRICE = 200;
 const DRAGON_PRICE = 2000;
 const TUBE_PRICE = 500;
@@ -647,7 +652,7 @@ export default function ShopScreen() {
   const [headType, setHeadType] = useState<string>(() => playerSkin?.headType ?? "default");
   const [eyeStyle, setEyeStyle] = useState<EyeOption["id"]>(() => (playerSkin?.eyeStyle as EyeOption["id"]) ?? "classic");
   const [mouthStyle, setMouthStyle] = useState<MouthOption["id"]>(() => (playerSkin?.mouthStyle as MouthOption["id"]) ?? "smile");
-  const [bodyStyle, setBodyStyle] = useState<"circles" | "tube">(() => playerSkin?.bodyStyle ?? "circles");
+  const bodyStyle: "tube" = "tube";
   const [selectedFlag, setSelectedFlag] = useState<string | null>(() => (playerSkin?.isFlag && playerSkin?.flagName) ? playerSkin.flagName : null);
   const [activeTab, setActiveTab] = useState<ShopTab>("shop");
 
@@ -678,12 +683,32 @@ export default function ShopScreen() {
     );
   }, [flagSearch, flagLang]);
 
-  const filteredHeads = useMemo(() => headOptions, [headOptions]);
+  const baseHeadOptions = useMemo(
+    () => headOptions.filter((option) => !isEventHeadOption(option)),
+    [headOptions],
+  );
+
+  const eventHeadOptions = useMemo(
+    () => headOptions.filter((option) => isEventHeadOption(option)),
+    [headOptions],
+  );
+
+  const filteredHeads = useMemo(
+    () => (activeTab === "fetes" ? eventHeadOptions : baseHeadOptions),
+    [activeTab, baseHeadOptions, eventHeadOptions],
+  );
 
   const availableHeadIds = useMemo(
     () => filteredHeads.filter((h) => !h.locked).map((h) => h.id),
     [filteredHeads],
   );
+
+  useEffect(() => {
+    if (activeTab !== "shop" && activeTab !== "fetes") return;
+    if (!availableHeadIds.length) return;
+    if (availableHeadIds.includes(headType)) return;
+    setHeadType(availableHeadIds[0]);
+  }, [activeTab, availableHeadIds, headType]);
 
   const selectedHeadMeta = useMemo(
     () => headOptions.find((h) => h.id === headType) ?? null,
@@ -753,15 +778,17 @@ export default function ShopScreen() {
     : undefined;
   const selectedEyeMeta = EYE_OPTIONS.find((option) => option.id === eyeStyle) ?? EYE_OPTIONS[0];
   const selectedMouthMeta = MOUTH_OPTIONS.find((option) => option.id === mouthStyle) ?? MOUTH_OPTIONS[0];
-  const previewLabel = activeTab === "shop"
+  const previewLabel = activeTab === "shop" || activeTab === "fetes"
     ? (selectedHeadMeta?.label ?? "Classique")
     : activeTab === "flags"
       ? (selectedFlag ? translateFlag(selectedFlag, flagLang) : null)
       : activeTab === "eyes"
         ? selectedEyeMeta.label
         : selectedMouthMeta.label;
-  const showCycleArrows = activeTab === "shop" || activeTab === "flags";
-  const cycleDisabled = activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0;
+  const showCycleArrows = activeTab === "shop" || activeTab === "fetes" || activeTab === "flags";
+  const cycleDisabled = activeTab === "shop" || activeTab === "fetes"
+    ? availableHeadIds.length === 0
+    : filteredFlags.length === 0;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -876,14 +903,14 @@ export default function ShopScreen() {
             mouthStyle={mouthStyle}
             bodyStyle={bodyStyle}
             flagSource={selectedFlagSource}
-            bodyTextureSource={activeTab === "shop" ? selectedHeadBodySource : undefined}
-            headPreview={activeTab === "shop" ? selectedHeadPreview : undefined}
-          />
+            bodyTextureSource={activeTab === "shop" || activeTab === "fetes" ? selectedHeadBodySource : undefined}
+            headPreview={activeTab === "shop" || activeTab === "fetes" ? selectedHeadPreview : undefined}
+            />
           {previewLabel ? <Text style={styles.previewCostumeName}>{previewLabel}</Text> : null}
           {showCycleArrows ? (
             <>
               <Pressable
-                onPress={() => activeTab === "shop" ? cycleHead(-1) : cycleFlag(-1)}
+                onPress={() => activeTab === "shop" || activeTab === "fetes" ? cycleHead(-1) : cycleFlag(-1)}
                 style={[
                   styles.costumeArrowBtn,
                   styles.costumeArrowBtnLeft,
@@ -894,7 +921,7 @@ export default function ShopScreen() {
                 <Text style={styles.costumeArrowText}>‹</Text>
               </Pressable>
               <Pressable
-                onPress={() => activeTab === "shop" ? cycleHead(1) : cycleFlag(1)}
+                onPress={() => activeTab === "shop" || activeTab === "fetes" ? cycleHead(1) : cycleFlag(1)}
                 style={[
                   styles.costumeArrowBtn,
                   styles.costumeArrowBtnRight,
@@ -909,52 +936,42 @@ export default function ShopScreen() {
         </View>
       </View>
 
-      {activeTab === "shop" && (
+      {(activeTab === "shop" || activeTab === "fetes") && (
         <>
-          <Text style={styles.sectionTitle}>{t("shopHead")}</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.sm }}>
-            <View style={{ flexDirection: "row", gap: 8 }}>
-              {GAME_EVENTS.filter(e => (eventGems[e.id] || 0) > 0).map(e => (
-                <View key={e.id} style={styles.gemsBar}>
-                  {e.currencyImage ? (
-                    <Image source={{ uri: e.currencyImage }} style={{ width: 22, height: 22 }} resizeMode="contain" />
-                  ) : (
-                    <Text style={styles.gemsText}>{e.emoji}</Text>
-                  )}
-                  <Text style={styles.gemsText}>{eventGems[e.id] || 0}</Text>
+          <Text style={styles.sectionTitle}>{activeTab === "fetes" ? "Fêtes" : t("shopHead")}</Text>
+          {activeTab === "fetes" ? (
+            <>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.sm }}>
+                <View style={{ flexDirection: "row", gap: 8 }}>
+                  {GAME_EVENTS.filter(e => (eventGems[e.id] || 0) > 0).map(e => (
+                    <View key={e.id} style={styles.gemsBar}>
+                      {e.currencyImage ? (
+                        <Image source={{ uri: e.currencyImage }} style={{ width: 22, height: 22 }} resizeMode="contain" />
+                      ) : (
+                        <Text style={styles.gemsText}>{e.emoji}</Text>
+                      )}
+                      <Text style={styles.gemsText}>{eventGems[e.id] || 0}</Text>
+                    </View>
+                  ))}
                 </View>
-              ))}
-            </View>
-          </ScrollView>
-          {!!selectedHeadMeta?.locked && (
-            <Pressable
-              onPress={() => {
-                if (selectedHeadMeta.unlockKey && selectedHeadMeta.eventId) {
-                  handleUnlockEvent(selectedHeadMeta.eventId, selectedHeadMeta.unlockKey);
-                }
-              }}
-              style={styles.lockedCostumeCard}
-            >
-              <Text style={styles.lockedCostumeText}>
-                {selectedHeadMeta.currencyImage ? `30 ${selectedHeadMeta.label}` : `${selectedHeadMeta.eventEmoji || "💎"} 30 ${selectedHeadMeta.label}`}
-              </Text>
-            </Pressable>
-          )}
+              </ScrollView>
+              {!!selectedHeadMeta?.locked && (
+                <Pressable
+                  onPress={() => {
+                    if (selectedHeadMeta.unlockKey && selectedHeadMeta.eventId) {
+                      handleUnlockEvent(selectedHeadMeta.eventId, selectedHeadMeta.unlockKey);
+                    }
+                  }}
+                  style={styles.lockedCostumeCard}
+                >
+                  <Text style={styles.lockedCostumeText}>
+                    {selectedHeadMeta.currencyImage ? `30 ${selectedHeadMeta.label}` : `${selectedHeadMeta.eventEmoji || "💎"} 30 ${selectedHeadMeta.label}`}
+                  </Text>
+                </Pressable>
+              )}
+            </>
+          ) : null}
 
-          <Text style={styles.sectionTitle}>{t("shopBodyStyle")}</Text>
-          <View style={styles.toggleRow}>
-            {(["circles", "tube"] as const).map((s) => (
-              <Pressable
-                key={s}
-                onPress={() => setBodyStyle(s)}
-                style={[styles.toggleBtn, bodyStyle === s && styles.toggleBtnActive]}
-              >
-                <Text style={[styles.toggleText, bodyStyle === s && styles.toggleTextActive]}>
-                  {s === "circles" ? t("shopCircles") : t("shopTube")}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
         </>
       )}
 
