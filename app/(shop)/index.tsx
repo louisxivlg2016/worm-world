@@ -659,7 +659,7 @@ export default function ShopScreen() {
   const [headType, setHeadType] = useState<string>(() => playerSkin?.headType ?? "default");
   const [eyeStyle, setEyeStyle] = useState<EyeOption["id"]>(() => (playerSkin?.eyeStyle as EyeOption["id"]) ?? "classic");
   const [mouthStyle, setMouthStyle] = useState<MouthOption["id"]>(() => (playerSkin?.mouthStyle as MouthOption["id"]) ?? "smile");
-  const bodyStyle: "tube" = "tube";
+  const bodyStyle: "circles" | "tube" = "circles";
   const [selectedFlag, setSelectedFlag] = useState<string | null>(() => (playerSkin?.isFlag && playerSkin?.flagName) ? playerSkin.flagName : null);
   const [activeTab, setActiveTab] = useState<ShopTab>("shop");
 

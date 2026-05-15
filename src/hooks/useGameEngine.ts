@@ -2009,7 +2009,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   const isTube = worm.skin.bodyStyle === 'tube'
   const isFlag = worm.skin.isFlag === true
 
-  if (isTube || isFlag) {
+  if (isTube) {
     // Build screen-space points (skip every other for perf on long worms)
     const step = segments.length > 200 ? 2 : 1
     const pts: { x: number; y: number }[] = []
@@ -2202,7 +2202,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   }
 
   for (let i = segments.length - 1; i >= 0; i--) {
-    if (isTube || isFlag) break // already drawn above
+    if (isTube) break // already drawn above
     const seg = segments[i]
     const p = worldToScreen(seg.x, seg.y, camera, w, h)
     if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
