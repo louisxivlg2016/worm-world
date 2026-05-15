@@ -505,6 +505,13 @@ function ShopWormPreview({
                 height: circleHeadSize,
                 zIndex: 50,
               },
+              showsTubeBody && !isFlagPreview && !hasHeadCostume && {
+                left: 20,
+                top: tubeTop + (tubeHeight - circleHeadSize) / 2,
+                width: circleHeadSize,
+                height: circleHeadSize,
+                zIndex: 50,
+              },
             ]}
           >
             {hasHeadCostume ? (
