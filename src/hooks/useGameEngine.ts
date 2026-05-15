@@ -141,35 +141,6 @@ function drawDefaultHeadFace(
   drawFaceDetails(ctx, hp, headR, colors[0], eyeBlink, eyeStyle, mouthStyle)
 }
 
-function drawStripedHeadFace(
-  ctx: CanvasRenderingContext2D,
-  hp: { x: number; y: number },
-  headR: number,
-  colors: string[],
-  angle: number,
-  eyeBlink: number,
-  eyeStyle: EyeStyle = 'classic',
-  mouthStyle: MouthStyle = 'smile',
-) {
-  ctx.save()
-  ctx.beginPath()
-  ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
-  ctx.clip()
-  ctx.translate(hp.x, hp.y)
-  ctx.rotate(angle)
-  const R = headR
-  const stripeCount = colors.length
-  for (let s = 0; s < stripeCount; s++) {
-    const y1 = -R + (s / stripeCount) * R * 2
-    const y2 = -R + ((s + 1) / stripeCount) * R * 2
-    ctx.fillStyle = colors[s]
-    ctx.fillRect(-R * 1.2, y1, R * 2.4, y2 - y1)
-  }
-  ctx.restore()
-
-  drawFaceDetails(ctx, hp, headR, colors[0], eyeBlink, eyeStyle, mouthStyle)
-}
-
 function drawFaceDetails(
   ctx: CanvasRenderingContext2D,
   hp: { x: number; y: number },
@@ -2339,8 +2310,6 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   } else {
     if (worm.skin.isFlag && bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0) {
       drawTexturedHeadFace(ctx, hp, headR, bodyTexImg, angle, worm.eyeBlink, eyeStyle, mouthStyle)
-    } else if (isTube && colors.length > 1) {
-      drawStripedHeadFace(ctx, hp, headR, colors, angle, worm.eyeBlink, eyeStyle, mouthStyle)
     } else {
       // Default eyes — always upright (fixed position, no rotation)
       drawDefaultHeadFace(ctx, hp, headR, colors, worm.eyeBlink, eyeStyle, mouthStyle)
