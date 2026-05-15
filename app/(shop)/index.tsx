@@ -159,6 +159,7 @@ function ShopWormPreview({
   bodyTextureSource?: any;
   headPreview?: string;
 }) {
+  const { t: previewT } = useTranslation();
   const hasHeadCostume = !!headPreview;
   const isFlagPreview = !!flagSource;
   const segmentSource = flagSource || bodyTextureSource;
