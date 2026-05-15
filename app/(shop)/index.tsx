@@ -109,10 +109,11 @@ const FLAG_TEXTURE_SCALES: Record<string, number> = {
 };
 
 type ShopTab = "shop" | "flags";
+type ShopSectionTab = "costumes" | "eyes" | "mouths";
 
-const SHOP_TAB_LABELS: Record<ShopTab, string> = {
-  shop: "Boutique",
-  flags: "Drapeaux",
+const SHOP_TAB_LABEL_KEYS: Record<ShopTab, string> = {
+  shop: "shopTab",
+  flags: "flagsTab",
 };
 
 const SHOP_TAB_ORDER: ShopTab[] = ["shop", "flags"];
@@ -318,7 +319,7 @@ function ShopWormPreview({
 
   return (
     <View style={styles.previewCard}>
-      <Text style={styles.previewTitle}>Aperçu du ver</Text>
+      <Text style={styles.previewTitle}>{previewT("wormPreview")}</Text>
       <View style={styles.previewStage}>
         {flagPreviewUri ? (
           <Image source={{ uri: flagPreviewUri }} style={styles.previewCanvasImage} resizeMode="contain" />
@@ -580,6 +581,7 @@ export default function ShopScreen() {
   const [bodyStyle, setBodyStyle] = useState<"circles" | "tube">(() => playerSkin?.bodyStyle ?? "circles");
   const [selectedFlag, setSelectedFlag] = useState<string | null>(() => (playerSkin?.isFlag && playerSkin?.flagName) ? playerSkin.flagName : null);
   const [activeTab, setActiveTab] = useState<ShopTab>("shop");
+  const [shopSectionTab, setShopSectionTab] = useState<ShopSectionTab>("costumes");
 
   const [, setUnlockTick] = useState(0);
 
@@ -681,6 +683,19 @@ export default function ShopScreen() {
   const selectedHeadBodySource = (selectedHeadMeta?.bodyTexture || selectedHeadMeta?.preview)
     ? { uri: selectedHeadMeta.bodyTexture ?? selectedHeadMeta.preview! }
     : undefined;
+  const selectedEyeMeta = EYE_OPTIONS.find((option) => option.id === eyeStyle) ?? EYE_OPTIONS[0];
+  const selectedMouthMeta = MOUTH_OPTIONS.find((option) => option.id === mouthStyle) ?? MOUTH_OPTIONS[0];
+  const previewLabel = activeTab === "shop"
+    ? shopSectionTab === "eyes"
+      ? selectedEyeMeta.label
+      : shopSectionTab === "mouths"
+        ? selectedMouthMeta.label
+        : (selectedHeadMeta?.label ?? "Classique")
+    : selectedFlag
+      ? translateFlag(selectedFlag, flagLang)
+      : null;
+  const showCycleArrows = activeTab === "flags" || shopSectionTab === "costumes";
+  const cycleDisabled = activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0;
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -703,7 +718,7 @@ export default function ShopScreen() {
                 style={[styles.flagTab, isActive && styles.flagTabActive]}
               >
                 <Text style={[styles.flagTabText, isActive && styles.flagTabTextActive]}>
-                  {SHOP_TAB_LABELS[tab]}
+                  {t(SHOP_TAB_LABEL_KEYS[tab])}
                 </Text>
               </Pressable>
             );
@@ -752,122 +767,152 @@ export default function ShopScreen() {
             bodyTextureSource={activeTab === "shop" ? selectedHeadBodySource : undefined}
             headPreview={activeTab === "shop" ? selectedHeadPreview : undefined}
           />
-          {activeTab === "shop" ? (
-            <Text style={styles.previewCostumeName}>{selectedHeadMeta?.label ?? "Classique"}</Text>
-          ) : selectedFlag ? (
-            <Text style={styles.previewCostumeName}>{translateFlag(selectedFlag, flagLang)}</Text>
+          {previewLabel ? <Text style={styles.previewCostumeName}>{previewLabel}</Text> : null}
+          {showCycleArrows ? (
+            <>
+              <Pressable
+                onPress={() => activeTab === "shop" ? cycleHead(-1) : cycleFlag(-1)}
+                style={[
+                  styles.costumeArrowBtn,
+                  styles.costumeArrowBtnLeft,
+                  cycleDisabled && styles.costumeArrowBtnDisabled,
+                ]}
+                disabled={cycleDisabled}
+              >
+                <Text style={styles.costumeArrowText}>‹</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => activeTab === "shop" ? cycleHead(1) : cycleFlag(1)}
+                style={[
+                  styles.costumeArrowBtn,
+                  styles.costumeArrowBtnRight,
+                  cycleDisabled && styles.costumeArrowBtnDisabled,
+                ]}
+                disabled={cycleDisabled}
+              >
+                <Text style={styles.costumeArrowText}>›</Text>
+              </Pressable>
+            </>
           ) : null}
-          <Pressable
-            onPress={() => activeTab === "shop" ? cycleHead(-1) : cycleFlag(-1)}
-            style={[
-              styles.costumeArrowBtn,
-              styles.costumeArrowBtnLeft,
-              (activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0) && styles.costumeArrowBtnDisabled,
-            ]}
-            disabled={activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0}
-          >
-            <Text style={styles.costumeArrowText}>‹</Text>
-          </Pressable>
-          <Pressable
-            onPress={() => activeTab === "shop" ? cycleHead(1) : cycleFlag(1)}
-            style={[
-              styles.costumeArrowBtn,
-              styles.costumeArrowBtnRight,
-              (activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0) && styles.costumeArrowBtnDisabled,
-            ]}
-            disabled={activeTab === "shop" ? availableHeadIds.length === 0 : filteredFlags.length === 0}
-          >
-            <Text style={styles.costumeArrowText}>›</Text>
-          </Pressable>
         </View>
       </View>
 
       {activeTab === "shop" && (<>
-      {/* Head / Costume Selector */}
-      <Text style={styles.sectionTitle}>{t("shopHead")}</Text>
-      {/* Per-event currency balances */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.sm }}>
-        <View style={{ flexDirection: "row", gap: 8 }}>
-          {GAME_EVENTS.filter(e => (eventGems[e.id] || 0) > 0).map(e => (
-            <View key={e.id} style={styles.gemsBar}>
-              {e.currencyImage ? (
-                <Image source={{ uri: e.currencyImage }} style={{ width: 22, height: 22 }} resizeMode="contain" />
-              ) : (
-                <Text style={styles.gemsText}>{e.emoji}</Text>
-              )}
-              <Text style={styles.gemsText}>{eventGems[e.id] || 0}</Text>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
-      {!!selectedHeadMeta?.locked && (
+      <View style={styles.shopSectionTabs}>
         <Pressable
-          onPress={() => {
-            if (selectedHeadMeta.unlockKey && selectedHeadMeta.eventId) {
-              handleUnlockEvent(selectedHeadMeta.eventId, selectedHeadMeta.unlockKey);
-            }
-          }}
-          style={styles.lockedCostumeCard}
+          onPress={() => setShopSectionTab("costumes")}
+          style={[styles.shopSectionTab, shopSectionTab === "costumes" && styles.shopSectionTabActive]}
         >
-          <Text style={styles.lockedCostumeText}>
-            {selectedHeadMeta.currencyImage ? `30 ${selectedHeadMeta.label}` : `${selectedHeadMeta.eventEmoji || "💎"} 30 ${selectedHeadMeta.label}`}
-          </Text>
+          <Text style={[styles.shopSectionTabText, shopSectionTab === "costumes" && styles.shopSectionTabTextActive]}>Costumes</Text>
         </Pressable>
-      )}
-
-      {/* Body Style Toggle */}
-      <Text style={styles.sectionTitle}>{t("shopBodyStyle")}</Text>
-      <View style={styles.toggleRow}>
-        {(["circles", "tube"] as const).map((s) => (
-          <Pressable
-            key={s}
-            onPress={() => setBodyStyle(s)}
-            style={[styles.toggleBtn, bodyStyle === s && styles.toggleBtnActive]}
-          >
-            <Text style={[styles.toggleText, bodyStyle === s && styles.toggleTextActive]}>
-              {s === "circles" ? t("shopCircles") : t("shopTube")}
-            </Text>
-          </Pressable>
-        ))}
+        <Pressable
+          onPress={() => setShopSectionTab("eyes")}
+          style={[styles.shopSectionTab, shopSectionTab === "eyes" && styles.shopSectionTabActive]}
+        >
+          <Text style={[styles.shopSectionTabText, shopSectionTab === "eyes" && styles.shopSectionTabTextActive]}>Yeux</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => setShopSectionTab("mouths")}
+          style={[styles.shopSectionTab, shopSectionTab === "mouths" && styles.shopSectionTabActive]}
+        >
+          <Text style={[styles.shopSectionTabText, shopSectionTab === "mouths" && styles.shopSectionTabTextActive]}>Bouches</Text>
+        </Pressable>
       </View>
 
-      <Text style={styles.sectionTitle}>Yeux</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionRow}>
-        {EYE_OPTIONS.map((option) => (
-          <Pressable
-            key={option.id}
-            onPress={() => setEyeStyle(option.id)}
-            style={[
-              styles.faceOption,
-              eyeStyle === option.id && styles.faceOptionSelected,
-            ]}
-          >
-            <Text style={styles.facePreview}>{option.preview}</Text>
-            <Text style={[styles.faceLabel, eyeStyle === option.id && styles.faceLabelSelected]}>
-              {option.label}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
+      {shopSectionTab === "costumes" ? (
+        <>
+          <Text style={styles.sectionTitle}>{t("shopHead")}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.sm }}>
+            <View style={{ flexDirection: "row", gap: 8 }}>
+              {GAME_EVENTS.filter(e => (eventGems[e.id] || 0) > 0).map(e => (
+                <View key={e.id} style={styles.gemsBar}>
+                  {e.currencyImage ? (
+                    <Image source={{ uri: e.currencyImage }} style={{ width: 22, height: 22 }} resizeMode="contain" />
+                  ) : (
+                    <Text style={styles.gemsText}>{e.emoji}</Text>
+                  )}
+                  <Text style={styles.gemsText}>{eventGems[e.id] || 0}</Text>
+                </View>
+              ))}
+            </View>
+          </ScrollView>
+          {!!selectedHeadMeta?.locked && (
+            <Pressable
+              onPress={() => {
+                if (selectedHeadMeta.unlockKey && selectedHeadMeta.eventId) {
+                  handleUnlockEvent(selectedHeadMeta.eventId, selectedHeadMeta.unlockKey);
+                }
+              }}
+              style={styles.lockedCostumeCard}
+            >
+              <Text style={styles.lockedCostumeText}>
+                {selectedHeadMeta.currencyImage ? `30 ${selectedHeadMeta.label}` : `${selectedHeadMeta.eventEmoji || "💎"} 30 ${selectedHeadMeta.label}`}
+              </Text>
+            </Pressable>
+          )}
 
-      <Text style={styles.sectionTitle}>Bouche</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionRow}>
-        {MOUTH_OPTIONS.map((option) => (
-          <Pressable
-            key={option.id}
-            onPress={() => setMouthStyle(option.id)}
-            style={[
-              styles.faceOption,
-              mouthStyle === option.id && styles.faceOptionSelected,
-            ]}
-          >
-            <Text style={styles.facePreview}>{option.preview}</Text>
-            <Text style={[styles.faceLabel, mouthStyle === option.id && styles.faceLabelSelected]}>
-              {option.label}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
+          <Text style={styles.sectionTitle}>{t("shopBodyStyle")}</Text>
+          <View style={styles.toggleRow}>
+            {(["circles", "tube"] as const).map((s) => (
+              <Pressable
+                key={s}
+                onPress={() => setBodyStyle(s)}
+                style={[styles.toggleBtn, bodyStyle === s && styles.toggleBtnActive]}
+              >
+                <Text style={[styles.toggleText, bodyStyle === s && styles.toggleTextActive]}>
+                  {s === "circles" ? t("shopCircles") : t("shopTube")}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </>
+      ) : null}
+
+      {shopSectionTab === "eyes" ? (
+        <>
+          <Text style={styles.sectionTitle}>Yeux</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionRow}>
+            {EYE_OPTIONS.map((option) => (
+              <Pressable
+                key={option.id}
+                onPress={() => setEyeStyle(option.id)}
+                style={[
+                  styles.faceOption,
+                  eyeStyle === option.id && styles.faceOptionSelected,
+                ]}
+              >
+                <Text style={styles.facePreview}>{option.preview}</Text>
+                <Text style={[styles.faceLabel, eyeStyle === option.id && styles.faceLabelSelected]}>
+                  {option.label}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </>
+      ) : null}
+
+      {shopSectionTab === "mouths" ? (
+        <>
+          <Text style={styles.sectionTitle}>Bouches</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.optionRow}>
+            {MOUTH_OPTIONS.map((option) => (
+              <Pressable
+                key={option.id}
+                onPress={() => setMouthStyle(option.id)}
+                style={[
+                  styles.faceOption,
+                  mouthStyle === option.id && styles.faceOptionSelected,
+                ]}
+              >
+                <Text style={styles.facePreview}>{option.preview}</Text>
+                <Text style={[styles.faceLabel, mouthStyle === option.id && styles.faceLabelSelected]}>
+                  {option.label}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </>
+      ) : null}
       </>)}
 
       {/* Apply Button */}
@@ -1436,6 +1481,35 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   flagTabTextActive: {
+    color: colors.gold,
+  },
+  shopSectionTabs: {
+    flexDirection: "row",
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  shopSectionTab: {
+    flex: 1,
+    minHeight: 44,
+    borderRadius: 14,
+    borderCurve: "continuous",
+    backgroundColor: "rgba(255,255,255,0.07)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.10)",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: spacing.sm,
+  },
+  shopSectionTabActive: {
+    backgroundColor: "rgba(246,196,83,0.18)",
+    borderColor: colors.gold,
+  },
+  shopSectionTabText: {
+    color: colors.textSecondary,
+    fontSize: 14,
+    fontWeight: "800",
+  },
+  shopSectionTabTextActive: {
     color: colors.gold,
   },
   applyBtn: {
