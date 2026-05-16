@@ -119,6 +119,7 @@ const SHOP_TAB_LABELS: Record<ShopTab, string> = {
 };
 
 const SHOP_TAB_ORDER: ShopTab[] = ["shop", "fetes", "flags", "eyes", "mouths"];
+const DEFAULT_FACE_HEAD_TYPES = new Set<string>(["july4th2"]);
 
 type HeadOption = {
   id: string;
@@ -779,7 +780,9 @@ export default function ShopScreen() {
     : {};
 
   const selectedFlagSource = selectedFlag ? FLAG_IMAGES[selectedFlag] : undefined;
-  const selectedHeadPreview = selectedHeadMeta?.preview;
+  const selectedHeadPreview = selectedHeadMeta && !DEFAULT_FACE_HEAD_TYPES.has(selectedHeadMeta.id)
+    ? selectedHeadMeta.preview
+    : undefined;
   const selectedHeadBodySource = (selectedHeadMeta?.bodyTexture || selectedHeadMeta?.preview)
     ? { uri: selectedHeadMeta.bodyTexture ?? selectedHeadMeta.preview! }
     : undefined;
