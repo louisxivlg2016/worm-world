@@ -783,6 +783,11 @@ export default function ShopScreen() {
   const selectedHeadBodySource = (selectedHeadMeta?.bodyTexture || selectedHeadMeta?.preview)
     ? { uri: selectedHeadMeta.bodyTexture ?? selectedHeadMeta.preview! }
     : undefined;
+  const selectedEvent = useMemo(
+    () => (selectedHeadMeta?.eventId ? GAME_EVENTS.find((event) => event.id === selectedHeadMeta.eventId) ?? null : null),
+    [selectedHeadMeta],
+  );
+  const selectedEventBalance = selectedEvent ? (eventGems[selectedEvent.id] || 0) : 0;
   const selectedEyeMeta = EYE_OPTIONS.find((option) => option.id === eyeStyle) ?? EYE_OPTIONS[0];
   const selectedMouthMeta = MOUTH_OPTIONS.find((option) => option.id === mouthStyle) ?? MOUTH_OPTIONS[0];
   const previewLabel = activeTab === "shop" || activeTab === "fetes"
@@ -948,16 +953,62 @@ export default function ShopScreen() {
           <Text style={styles.sectionTitle}>{activeTab === "fetes" ? "Fêtes" : t("shopHead")}</Text>
           {activeTab === "fetes" ? (
             <>
+              {selectedEvent ? (
+                <View style={[styles.eventFeatureCard, { borderColor: selectedEvent.borderColor }]}>
+                  <View style={[styles.eventFeatureGlow, { backgroundColor: selectedEvent.borderColor }]} />
+                  <View style={styles.eventFeatureHeader}>
+                    <View style={styles.eventFeatureTitleWrap}>
+                      <Text style={styles.eventFeatureEmoji}>{selectedEvent.emoji}</Text>
+                      <View style={styles.eventFeatureTextWrap}>
+                        <Text style={styles.eventFeatureTitle}>{selectedEvent.label}</Text>
+                        <Text style={styles.eventFeatureSubtitle}>
+                          Costume sélectionné: {selectedHeadMeta?.label ?? "Aucun"}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={styles.eventFeatureBadge}>
+                      <Text style={styles.eventFeatureBadgeText}>
+                        {selectedHeadMeta?.locked ? "À débloquer" : "Débloqué"}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.eventFeatureMetaRow}>
+                    <View style={styles.eventFeatureCurrencyCard}>
+                      {selectedEvent.currencyImage ? (
+                        <Image source={{ uri: selectedEvent.currencyImage }} style={styles.eventFeatureCurrencyIcon} resizeMode="contain" />
+                      ) : (
+                        <Text style={styles.eventFeatureCurrencyEmoji}>{selectedEvent.emoji}</Text>
+                      )}
+                      <View>
+                        <Text style={styles.eventFeatureMetaLabel}>Solde événement</Text>
+                        <Text style={styles.eventFeatureMetaValue}>{selectedEventBalance}</Text>
+                      </View>
+                    </View>
+                    <View style={styles.eventFeatureUnlockCard}>
+                      <Text style={styles.eventFeatureMetaLabel}>Déblocage</Text>
+                      <Text style={styles.eventFeatureMetaValue}>30</Text>
+                    </View>
+                  </View>
+                </View>
+              ) : null}
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.sm }}>
                 <View style={{ flexDirection: "row", gap: 8 }}>
                   {GAME_EVENTS.filter(e => (eventGems[e.id] || 0) > 0).map(e => (
-                    <View key={e.id} style={styles.gemsBar}>
+                    <View
+                      key={e.id}
+                      style={[
+                        styles.gemsBar,
+                        selectedEvent?.id === e.id && styles.gemsBarActive,
+                        { borderColor: selectedEvent?.id === e.id ? e.borderColor : "rgba(147,197,253,0.3)" },
+                      ]}
+                    >
                       {e.currencyImage ? (
                         <Image source={{ uri: e.currencyImage }} style={{ width: 22, height: 22 }} resizeMode="contain" />
                       ) : (
                         <Text style={styles.gemsText}>{e.emoji}</Text>
                       )}
                       <Text style={styles.gemsText}>{eventGems[e.id] || 0}</Text>
+                      <Text style={styles.gemsMiniLabel}>{e.label}</Text>
                     </View>
                   ))}
                 </View>
@@ -969,10 +1020,17 @@ export default function ShopScreen() {
                       handleUnlockEvent(selectedHeadMeta.eventId, selectedHeadMeta.unlockKey);
                     }
                   }}
-                  style={styles.lockedCostumeCard}
+                  style={[styles.lockedCostumeCard, selectedEvent && { borderColor: selectedEvent.borderColor }]}
                 >
-                  <Text style={styles.lockedCostumeText}>
-                    {selectedHeadMeta.currencyImage ? `30 ${selectedHeadMeta.label}` : `${selectedHeadMeta.eventEmoji || "💎"} 30 ${selectedHeadMeta.label}`}
+                  <View style={styles.lockedCostumeHeader}>
+                    <Text style={styles.lockedCostumePill}>Débloquer</Text>
+                    <Text style={styles.lockedCostumeCost}>
+                      {selectedHeadMeta.currencyImage ? "30" : `${selectedHeadMeta.eventEmoji || "💎"} 30`}
+                    </Text>
+                  </View>
+                  <Text style={styles.lockedCostumeTitle}>{selectedHeadMeta.label}</Text>
+                  <Text style={styles.lockedCostumeSubtitle}>
+                    Utilise la monnaie de l’événement pour débloquer ce costume de fête.
                   </Text>
                 </Pressable>
               )}
@@ -1357,11 +1415,131 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
     borderWidth: 1, borderColor: "rgba(147,197,253,0.3)",
   },
+  gemsBarActive: {
+    backgroundColor: "rgba(255,255,255,0.16)",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.18)",
+  },
   gemsText: {
     color: "#60a5fa", fontSize: 18, fontWeight: "800",
   },
+  gemsMiniLabel: {
+    color: "rgba(255,255,255,0.72)",
+    fontSize: 12,
+    fontWeight: "700",
+  },
   gemsHint: {
     color: colors.textSecondary, fontSize: 12,
+  },
+  eventFeatureCard: {
+    position: "relative",
+    overflow: "hidden",
+    borderRadius: 22,
+    borderCurve: "continuous",
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    backgroundColor: "rgba(20,34,28,0.92)",
+    borderWidth: 1,
+    boxShadow: "0 14px 30px rgba(0,0,0,0.22)",
+  },
+  eventFeatureGlow: {
+    position: "absolute",
+    right: -34,
+    top: -34,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    opacity: 0.16,
+  },
+  eventFeatureHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  eventFeatureTitleWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    flex: 1,
+  },
+  eventFeatureEmoji: {
+    fontSize: 28,
+  },
+  eventFeatureTextWrap: {
+    flex: 1,
+  },
+  eventFeatureTitle: {
+    color: colors.text,
+    fontSize: 20,
+    fontWeight: "900",
+  },
+  eventFeatureSubtitle: {
+    color: "rgba(255,255,255,0.72)",
+    fontSize: 13,
+    fontWeight: "600",
+    marginTop: 2,
+  },
+  eventFeatureBadge: {
+    backgroundColor: "rgba(255,255,255,0.10)",
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.12)",
+  },
+  eventFeatureBadgeText: {
+    color: colors.gold,
+    fontSize: 11,
+    fontWeight: "900",
+    textTransform: "uppercase",
+  },
+  eventFeatureMetaRow: {
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  eventFeatureCurrencyCard: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.sm,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderRadius: 18,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.10)",
+  },
+  eventFeatureUnlockCard: {
+    minWidth: 100,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    borderRadius: 18,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.10)",
+  },
+  eventFeatureCurrencyIcon: {
+    width: 34,
+    height: 34,
+  },
+  eventFeatureCurrencyEmoji: {
+    fontSize: 26,
+  },
+  eventFeatureMetaLabel: {
+    color: "rgba(255,255,255,0.62)",
+    fontSize: 11,
+    fontWeight: "700",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+  },
+  eventFeatureMetaValue: {
+    color: colors.text,
+    fontSize: 20,
+    fontWeight: "900",
+    marginTop: 2,
   },
   costumeArrowBtn: {
     width: 40,
@@ -1403,8 +1581,38 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.14)",
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
     marginBottom: spacing.sm,
+    boxShadow: "0 10px 22px rgba(0,0,0,0.16)",
+  },
+  lockedCostumeHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  lockedCostumePill: {
+    color: colors.gold,
+    fontSize: 11,
+    fontWeight: "900",
+    textTransform: "uppercase",
+    letterSpacing: 0.4,
+  },
+  lockedCostumeCost: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: "900",
+  },
+  lockedCostumeTitle: {
+    color: colors.text,
+    fontSize: 16,
+    fontWeight: "800",
+  },
+  lockedCostumeSubtitle: {
+    color: "rgba(255,255,255,0.68)",
+    fontSize: 12,
+    fontWeight: "600",
+    marginTop: 4,
   },
   lockedCostumeText: {
     color: colors.text,
