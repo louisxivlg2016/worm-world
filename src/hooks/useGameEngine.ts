@@ -143,6 +143,57 @@ function drawDefaultHeadFace(
   drawFaceDetails(ctx, hp, headR, colors[0], eyeBlink, eyeStyle, mouthStyle)
 }
 
+function drawJuly4th2HeadFace(
+  ctx: CanvasRenderingContext2D,
+  hp: { x: number; y: number },
+  headR: number,
+  eyeBlink: number,
+  eyeStyle: EyeStyle = 'classic',
+  mouthStyle: MouthStyle = 'smile',
+) {
+  ctx.save()
+  ctx.beginPath()
+  ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
+  ctx.clip()
+
+  ctx.beginPath()
+  ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
+  ctx.fillStyle = '#3c3b6e'
+  ctx.fill()
+
+  const stripeTop = hp.y - headR * 0.98
+  const stripeHeight = headR * 0.22
+  for (let i = 0; i < 6; i++) {
+    ctx.fillStyle = i % 2 === 0 ? '#ffffff' : '#c63d4f'
+    ctx.fillRect(hp.x - headR, stripeTop + i * stripeHeight, headR * 2, stripeHeight)
+  }
+
+  ctx.fillStyle = '#27468d'
+  ctx.fillRect(hp.x - headR * 0.98, stripeTop, headR * 1.26, headR * 0.72)
+
+  ctx.fillStyle = 'rgba(255,255,255,0.18)'
+  ctx.beginPath()
+  ctx.arc(hp.x - headR * 0.24, hp.y - headR * 0.28, headR * 0.42, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.fillStyle = '#ffffff'
+  ctx.font = `${Math.max(10, headR * 0.34)}px sans-serif`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  const stars = [
+    { x: -0.54, y: -0.68 },
+    { x: -0.24, y: -0.52 },
+    { x: 0.02, y: -0.68 },
+  ]
+  for (const star of stars) {
+    ctx.fillText('★', hp.x + headR * star.x, hp.y + headR * star.y)
+  }
+
+  ctx.restore()
+
+  drawFaceDetails(ctx, hp, headR, '#3c3b6e', eyeBlink, eyeStyle, mouthStyle)
+}
+
 function drawFaceDetails(
   ctx: CanvasRenderingContext2D,
   hp: { x: number; y: number },
@@ -2310,7 +2361,9 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
       ctx.drawImage(headImg, hp.x - imgW / 2, hp.y - imgH * imageTopOffset, imgW, imgH)
     }
   } else {
-    if (worm.skin.isFlag && bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0) {
+    if (headType === 'july4th2') {
+      drawJuly4th2HeadFace(ctx, hp, headR, worm.eyeBlink, eyeStyle, mouthStyle)
+    } else if (worm.skin.isFlag && bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0) {
       drawTexturedHeadFace(ctx, hp, headR, bodyTexImg, angle, worm.eyeBlink, eyeStyle, mouthStyle)
     } else {
       // Default eyes — always upright (fixed position, no rotation)

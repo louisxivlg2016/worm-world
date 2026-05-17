@@ -233,6 +233,71 @@ function drawPreviewFaceDetails(
   ctx.stroke();
 }
 
+function PreviewJuly4th2Head({
+  eyeStyle,
+  mouthStyle,
+}: {
+  eyeStyle: EyeOption["id"];
+  mouthStyle: MouthOption["id"];
+}) {
+  const renderEye = (side: "left" | "right") => {
+    const closed = eyeStyle === "happy" || (eyeStyle === "wink" && side === "right");
+    if (closed) {
+      return <View style={[styles.previewEyeClosed, eyeStyle === "happy" && styles.previewEyeHappy]} />;
+    }
+    return (
+      <View style={styles.previewEye}>
+        <View style={styles.previewPupil} />
+      </View>
+    );
+  };
+
+  const mouthNode = mouthStyle === "none"
+    ? null
+    : mouthStyle === "surprised"
+      ? <View style={styles.previewMouthSurprised} />
+      : (
+        <View
+          style={[
+            styles.previewMouth,
+            mouthStyle === "grin" && styles.previewMouthGrin,
+            mouthStyle === "angry" && styles.previewMouthAngry,
+          ]}
+        />
+      );
+
+  return (
+    <View style={styles.previewJulyHeadBubble}>
+      <View style={styles.previewJulyHeadBase} />
+      <View style={styles.previewJulyStripeWrap}>
+        {Array.from({ length: 6 }).map((_, index) => (
+          <View
+            key={`preview-july-stripe-${index}`}
+            style={[
+              styles.previewJulyStripe,
+              { backgroundColor: index % 2 === 0 ? "#ffffff" : "#c63d4f" },
+            ]}
+          />
+        ))}
+      </View>
+      <View style={styles.previewJulyBluePatch} />
+      <View style={styles.previewJulyGlow} />
+      <View style={styles.previewJulyStarsRow}>
+        <Text style={styles.previewJulyStar}>★</Text>
+        <Text style={styles.previewJulyStar}>★</Text>
+        <Text style={styles.previewJulyStar}>★</Text>
+      </View>
+      <View style={styles.previewFaceWrap}>
+        <View style={styles.previewEyesRow}>
+          {renderEye("left")}
+          {renderEye("right")}
+        </View>
+        {mouthNode}
+      </View>
+    </View>
+  );
+}
+
 function ShopWormPreview({
   colors: palette,
   eyeStyle,
@@ -241,6 +306,7 @@ function ShopWormPreview({
   flagSource,
   bodyTextureSource,
   headPreview,
+  headType,
 }: {
   colors: string[];
   eyeStyle: EyeOption["id"];
@@ -249,11 +315,13 @@ function ShopWormPreview({
   flagSource?: any;
   bodyTextureSource?: any;
   headPreview?: string;
+  headType?: string;
 }) {
   const { t: previewT } = useTranslation();
   const hasHeadCostume = !!headPreview;
   const isFlagPreview = !!flagSource;
   const segmentSource = flagSource || bodyTextureSource;
+  const isJuly4thUncleSam = headType === "july4th2";
   const [flagPreviewUri, setFlagPreviewUri] = useState<string>("");
   const showsTubeBody = bodyStyle === "tube" || isFlagPreview;
   const flagTextureScale = isFlagPreview && segmentSource ? (FLAG_TEXTURE_SCALES[segmentSource] ?? DEFAULT_FLAG_TEXTURE_SCALE) : 1;
@@ -521,6 +589,8 @@ function ShopWormPreview({
                 style={[styles.previewHeadImage, styles.previewHeadCostume]}
                 resizeMode="contain"
               />
+            ) : isJuly4thUncleSam ? (
+              <PreviewJuly4th2Head eyeStyle={eyeStyle} mouthStyle={mouthStyle} />
             ) : (
               <View
                 style={[
@@ -920,7 +990,8 @@ export default function ShopScreen() {
             flagSource={selectedFlagSource}
             bodyTextureSource={activeTab === "shop" || activeTab === "fetes" ? selectedHeadBodySource : undefined}
             headPreview={activeTab === "shop" || activeTab === "fetes" ? selectedHeadPreview : undefined}
-            />
+            headType={activeTab === "shop" || activeTab === "fetes" ? selectedHeadMeta?.id : undefined}
+          />
           {previewLabel ? <Text style={styles.previewCostumeName}>{previewLabel}</Text> : null}
           {showCycleArrows ? (
             <>
@@ -1239,6 +1310,60 @@ const styles = StyleSheet.create({
   previewFlagHeadBubble: {
     borderWidth: 0,
     boxShadow: "0 4px 10px rgba(0,0,0,0.14)",
+  },
+  previewJulyHeadBubble: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 5px 10px rgba(0,0,0,0.22)",
+    backgroundColor: "#3c3b6e",
+  },
+  previewJulyHeadBase: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#3c3b6e",
+  },
+  previewJulyStripeWrap: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    height: 32,
+  },
+  previewJulyStripe: {
+    flex: 1,
+  },
+  previewJulyBluePatch: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    width: 46,
+    height: 40,
+    backgroundColor: "#27468d",
+  },
+  previewJulyGlow: {
+    position: "absolute",
+    left: 12,
+    top: 14,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "rgba(255,255,255,0.14)",
+  },
+  previewJulyStarsRow: {
+    position: "absolute",
+    left: 5,
+    top: 5,
+    width: 40,
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  previewJulyStar: {
+    color: "#fff",
+    fontSize: 9,
+    fontWeight: "900",
   },
   previewHeadBubbleFill: {
     position: "absolute",
