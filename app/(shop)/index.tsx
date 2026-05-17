@@ -119,7 +119,7 @@ const SHOP_TAB_LABELS: Record<ShopTab, string> = {
 };
 
 const SHOP_TAB_ORDER: ShopTab[] = ["shop", "fetes", "flags", "eyes", "mouths"];
-const DEFAULT_FACE_HEAD_TYPES = new Set<string>(["july4th2"]);
+const DEFAULT_FACE_HEAD_TYPES = new Set<string>();
 
 type HeadOption = {
   id: string;

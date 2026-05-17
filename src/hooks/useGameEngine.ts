@@ -23,7 +23,7 @@ const IS_DOM = typeof Image !== 'undefined'
 // ============================================
 const headImageCache = new Map<string, HTMLImageElement>()
 const accessoryHeadCache = new Map<string, boolean>()
-const DEFAULT_FACE_HEAD_TYPES = new Set<string>(['july4th2'])
+const DEFAULT_FACE_HEAD_TYPES = new Set<string>()
 
 function loadHeadImage(src: string): HTMLImageElement | null {
   if (!IS_DOM) return null
