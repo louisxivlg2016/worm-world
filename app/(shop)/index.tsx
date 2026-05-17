@@ -287,6 +287,10 @@ function PreviewJuly4th2Head({
         <Text style={styles.previewJulyStar}>★</Text>
         <Text style={styles.previewJulyStar}>★</Text>
       </View>
+      <View style={styles.previewJulyBrowsRow}>
+        <View style={[styles.previewJulyBrow, styles.previewJulyBrowLeft]} />
+        <View style={[styles.previewJulyBrow, styles.previewJulyBrowRight]} />
+      </View>
       <View style={styles.previewFaceWrap}>
         <View style={styles.previewEyesRow}>
           {renderEye("left")}
@@ -294,6 +298,7 @@ function PreviewJuly4th2Head({
         </View>
         {mouthNode}
       </View>
+      <View style={styles.previewJulyBeard} />
     </View>
   );
 }
@@ -1364,6 +1369,36 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 9,
     fontWeight: "900",
+  },
+  previewJulyBrowsRow: {
+    position: "absolute",
+    top: 32,
+    width: 44,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  previewJulyBrow: {
+    width: 16,
+    height: 4,
+    borderRadius: 999,
+    backgroundColor: "#f7f3ea",
+  },
+  previewJulyBrowLeft: {
+    transform: [{ rotate: "-14deg" }],
+  },
+  previewJulyBrowRight: {
+    transform: [{ rotate: "14deg" }],
+  },
+  previewJulyBeard: {
+    position: "absolute",
+    bottom: 10,
+    width: 18,
+    height: 12,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    backgroundColor: "#f7f3ea",
   },
   previewHeadBubbleFill: {
     position: "absolute",

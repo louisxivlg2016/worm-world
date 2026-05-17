@@ -192,6 +192,23 @@ function drawJuly4th2HeadFace(
   ctx.restore()
 
   drawFaceDetails(ctx, hp, headR, '#3c3b6e', eyeBlink, eyeStyle, mouthStyle)
+
+  ctx.strokeStyle = '#f7f3ea'
+  ctx.lineWidth = Math.max(2, headR * 0.1)
+  ctx.lineCap = 'round'
+  ctx.beginPath()
+  ctx.moveTo(hp.x - headR * 0.56, hp.y - headR * 0.18)
+  ctx.quadraticCurveTo(hp.x - headR * 0.34, hp.y - headR * 0.32, hp.x - headR * 0.1, hp.y - headR * 0.2)
+  ctx.moveTo(hp.x + headR * 0.1, hp.y - headR * 0.2)
+  ctx.quadraticCurveTo(hp.x + headR * 0.34, hp.y - headR * 0.32, hp.x + headR * 0.56, hp.y - headR * 0.18)
+  ctx.stroke()
+
+  ctx.fillStyle = '#f7f3ea'
+  ctx.beginPath()
+  ctx.moveTo(hp.x - headR * 0.18, hp.y + headR * 0.54)
+  ctx.quadraticCurveTo(hp.x, hp.y + headR * 0.82, hp.x + headR * 0.18, hp.y + headR * 0.54)
+  ctx.quadraticCurveTo(hp.x, hp.y + headR * 0.68, hp.x - headR * 0.18, hp.y + headR * 0.54)
+  ctx.fill()
 }
 
 function drawFaceDetails(
