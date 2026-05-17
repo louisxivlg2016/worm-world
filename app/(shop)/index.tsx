@@ -724,7 +724,13 @@ export default function ShopScreen() {
   const contentMaxWidth = 600;
   const previewRowWidth = width - spacing.md * 2;
 
-  const { totalCoins: coins, eventGems, unlockEventCostumeForEvent, playerSkin } = useGameState();
+  const {
+    totalCoins: coins,
+    eventGems,
+    unlockEventCostumeForEvent,
+    playerSkin,
+    wonEventUnlockKey,
+  } = useGameState();
 
   const [flagSearch, setFlagSearch] = useState("");
   const [headSearch, setHeadSearch] = useState("");
@@ -741,7 +747,7 @@ export default function ShopScreen() {
 
   const [, setUnlockTick] = useState(0);
 
-  const headOptions = useMemo(() => getHeadOptions(), [eventGems]);
+  const headOptions = useMemo(() => getHeadOptions(), [eventGems, wonEventUnlockKey]);
 
   const handleUnlockEvent = useCallback((eventId: string, unlockKey: string) => {
     const EVENT_COSTUME_COST = 30;
@@ -774,6 +780,14 @@ export default function ShopScreen() {
   const eventHeadOptions = useMemo(
     () => headOptions.filter((option) => isEventHeadOption(option)),
     [headOptions],
+  );
+
+  const visibleFetesEvents = useMemo(
+    () => GAME_EVENTS.filter((event) => {
+      if ((eventGems[event.id] || 0) > 0) return true;
+      return headOptions.some((option) => option.eventId === event.id && !option.locked);
+    }),
+    [eventGems, headOptions],
   );
 
   const filteredHeads = useMemo(
@@ -1072,7 +1086,7 @@ export default function ShopScreen() {
               ) : null}
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.sm }}>
                 <View style={{ flexDirection: "row", gap: 8 }}>
-                  {GAME_EVENTS.filter(e => (eventGems[e.id] || 0) > 0).map(e => (
+                  {visibleFetesEvents.map(e => (
                     <View
                       key={e.id}
                       style={[

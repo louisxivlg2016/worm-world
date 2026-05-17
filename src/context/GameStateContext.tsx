@@ -190,6 +190,7 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
         return next;
       });
     }
+    getStorage().setItem(unlockKey, "true");
     setWonEventUnlockKey(unlockKey);
     setIsPlaying(false);
   }, [gameMode]);
