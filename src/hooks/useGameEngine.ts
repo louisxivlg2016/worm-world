@@ -326,6 +326,62 @@ function drawTexturedHeadFace(
   drawFaceDetails(ctx, hp, headR, 'rgba(255,255,255,0.12)', eyeBlink, eyeStyle, mouthStyle)
 }
 
+function drawCostumeHeadImage(
+  ctx: CanvasRenderingContext2D,
+  hp: { x: number; y: number },
+  headR: number,
+  headImg: HTMLImageElement,
+  isAccessory: boolean,
+) {
+  let imageTopOffset = 0.75
+  if (isAccessory) imageTopOffset = 0.48
+
+  const aspect = headImg.naturalHeight / headImg.naturalWidth
+  const imgW = headR * 5
+  const imgH = imgW * aspect
+  const imgX = hp.x - imgW / 2
+  const imgY = hp.y - imgH * imageTopOffset
+
+  if (!isAccessory) {
+    ctx.save()
+    const glow = ctx.createRadialGradient(
+      hp.x - headR * 0.2, hp.y - headR * 0.35, headR * 0.2,
+      hp.x, hp.y, headR * 2.2,
+    )
+    glow.addColorStop(0, 'rgba(255,255,255,0.20)')
+    glow.addColorStop(0.45, 'rgba(255,255,255,0.06)')
+    glow.addColorStop(1, 'rgba(0,0,0,0)')
+    ctx.fillStyle = glow
+    ctx.beginPath()
+    ctx.arc(hp.x, hp.y, headR * 1.7, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.restore()
+  }
+
+  ctx.save()
+  ctx.shadowColor = 'rgba(0,0,0,0.28)'
+  ctx.shadowBlur = headR * 0.7
+  ctx.shadowOffsetY = headR * 0.22
+  ctx.drawImage(headImg, imgX, imgY, imgW, imgH)
+  ctx.restore()
+
+  if (!isAccessory) {
+    ctx.save()
+    ctx.beginPath()
+    ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
+    ctx.clip()
+    const gloss = ctx.createLinearGradient(hp.x, hp.y - headR, hp.x, hp.y + headR)
+    gloss.addColorStop(0, 'rgba(255,255,255,0.16)')
+    gloss.addColorStop(0.42, 'rgba(255,255,255,0.04)')
+    gloss.addColorStop(1, 'rgba(0,0,0,0.14)')
+    ctx.fillStyle = gloss
+    ctx.beginPath()
+    ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.restore()
+  }
+}
+
 function drawContainedTextureInCircle(
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
@@ -2303,19 +2359,24 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
       ctx.drawImage(bodyTexImg, -drawW / 2, -drawH / 2, drawW, drawH)
       ctx.restore()
 
-      if (isFlag) {
+      {
         ctx.save()
         const gloss = ctx.createRadialGradient(
           p.x - bigR * 0.35, p.y - bigR * 0.45, 0,
           p.x, p.y, bigR * 1.15,
         )
-        gloss.addColorStop(0, 'rgba(255,255,255,0.12)')
-        gloss.addColorStop(0.55, 'rgba(255,255,255,0.03)')
-        gloss.addColorStop(1, 'rgba(0,0,0,0.10)')
+        gloss.addColorStop(0, isFlag ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.17)')
+        gloss.addColorStop(0.55, isFlag ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.05)')
+        gloss.addColorStop(1, isFlag ? 'rgba(0,0,0,0.10)' : 'rgba(0,0,0,0.16)')
         ctx.fillStyle = gloss
         ctx.beginPath()
         ctx.arc(p.x, p.y, bigR, 0, Math.PI * 2)
         ctx.fill()
+        if (!isFlag) {
+          ctx.strokeStyle = 'rgba(255,255,255,0.08)'
+          ctx.lineWidth = Math.max(1, bigR * 0.08)
+          ctx.stroke()
+        }
         ctx.restore()
       }
     } else {
@@ -2364,18 +2425,11 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
     const headSrc = HEAD_IMAGES[headType]
     const headImg = headImageCache.get(headSrc)
     if (headImg) {
-      let imageTopOffset = 0.75
-      if (isAccessoryHeadImage(headSrc, headImg)) {
+      const isAccessory = isAccessoryHeadImage(headSrc, headImg)
+      if (isAccessory) {
         drawDefaultHeadFace(ctx, hp, headR, colors, worm.eyeBlink, eyeStyle, mouthStyle)
-        // Accessory-only heads should sit on the worm face instead of floating above it.
-        imageTopOffset = 0.48
       }
-      // Always upright — no rotation
-      const aspect = headImg.naturalHeight / headImg.naturalWidth
-      const imgW = headR * 5
-      const imgH = imgW * aspect
-      // Full heads sit higher; accessory hats sit lower so they attach to the worm head.
-      ctx.drawImage(headImg, hp.x - imgW / 2, hp.y - imgH * imageTopOffset, imgW, imgH)
+      drawCostumeHeadImage(ctx, hp, headR, headImg, isAccessory)
     }
   } else {
     if (headType === 'july4th2') {

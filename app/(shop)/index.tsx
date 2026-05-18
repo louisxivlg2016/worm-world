@@ -589,11 +589,15 @@ function ShopWormPreview({
             ]}
           >
             {hasHeadCostume ? (
-              <Image
-                source={{ uri: headPreview }}
-                style={[styles.previewHeadImage, styles.previewHeadCostume]}
-                resizeMode="contain"
-              />
+              <View style={styles.previewHeadCostumeWrap}>
+                <View style={styles.previewHeadCostumeGlow} />
+                <View style={styles.previewHeadCostumePlate} />
+                <Image
+                  source={{ uri: headPreview }}
+                  style={[styles.previewHeadImage, styles.previewHeadCostume]}
+                  resizeMode="contain"
+                />
+              </View>
             ) : isJuly4thUncleSam ? (
               <PreviewJuly4th2Head eyeStyle={eyeStyle} mouthStyle={mouthStyle} />
             ) : (
@@ -1506,6 +1510,29 @@ const styles = StyleSheet.create({
     width: "126%",
     height: "126%",
     transform: [{ translateX: -10 }, { translateY: 4 }],
+  },
+  previewHeadCostumeWrap: {
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  previewHeadCostumeGlow: {
+    position: "absolute",
+    width: "92%",
+    height: "92%",
+    borderRadius: 999,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    boxShadow: "0 10px 22px rgba(0,0,0,0.18)",
+  },
+  previewHeadCostumePlate: {
+    position: "absolute",
+    width: "82%",
+    height: "82%",
+    borderRadius: 999,
+    backgroundColor: "rgba(255,255,255,0.06)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.08)",
   },
   previewEyesRow: {
     flexDirection: "row",
