@@ -323,6 +323,23 @@ function drawTexturedHeadFace(
   ctx.drawImage(img, -drawR * 1.25, -drawR, drawR * 2.5, drawR * 2)
   ctx.restore()
 
+  ctx.save()
+  ctx.beginPath()
+  ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
+  ctx.clip()
+  const gloss = ctx.createRadialGradient(
+    hp.x - headR * 0.35, hp.y - headR * 0.45, headR * 0.12,
+    hp.x, hp.y, headR * 1.15,
+  )
+  gloss.addColorStop(0, 'rgba(255,255,255,0.20)')
+  gloss.addColorStop(0.5, 'rgba(255,255,255,0.05)')
+  gloss.addColorStop(1, 'rgba(0,0,0,0.12)')
+  ctx.fillStyle = gloss
+  ctx.beginPath()
+  ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.restore()
+
   drawFaceDetails(ctx, hp, headR, 'rgba(255,255,255,0.12)', eyeBlink, eyeStyle, mouthStyle)
 }
 
@@ -2210,8 +2227,15 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
         ctx.closePath()
       }
 
-      // === 1) Dark outline (drawn first, thicker) ===
-      if (!isFlag) {
+      // === 1) Outline / body shadow ===
+      if (isFlag) {
+        ctx.save()
+        ctx.translate(0, R * 0.38)
+        traceTubePath()
+        ctx.fillStyle = 'rgba(0,0,0,0.16)'
+        ctx.fill()
+        ctx.restore()
+      } else {
         ctx.save()
         ctx.lineJoin = 'round'
         ctx.lineCap = 'round'
@@ -2289,6 +2313,20 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
 
       ctx.restore()
 
+      if (isFlag) {
+        ctx.save()
+        ctx.lineJoin = 'round'
+        ctx.lineCap = 'round'
+        ctx.lineWidth = Math.max(1.5, R * 0.11)
+        traceTubePath()
+        ctx.strokeStyle = 'rgba(255,255,255,0.10)'
+        ctx.stroke()
+        ctx.lineWidth = Math.max(1, R * 0.06)
+        ctx.strokeStyle = 'rgba(0,0,0,0.14)'
+        ctx.stroke()
+        ctx.restore()
+      }
+
       if (isFlag && bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0 && flagLengths && flagRepeatScreenWidth > 0) {
         const tail = pts[pts.length - 1]
         const prevTail = pts[Math.max(0, pts.length - 2)]
@@ -2306,6 +2344,12 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
         ctx.translate(tail.x, tail.y)
         ctx.rotate(tailAngle)
         drawRepeatedTextureSlice(ctx, bodyTexImg!, tailSrcStart, tailSrcSpan, -tailDrawW / 2, -tailDrawH / 2, tailDrawW, tailDrawH)
+        const tailGloss = ctx.createRadialGradient(-tailDrawW * 0.12, -tailDrawH * 0.2, 0, 0, 0, tailDrawW * 0.75)
+        tailGloss.addColorStop(0, 'rgba(255,255,255,0.12)')
+        tailGloss.addColorStop(0.6, 'rgba(255,255,255,0.03)')
+        tailGloss.addColorStop(1, 'rgba(0,0,0,0.10)')
+        ctx.fillStyle = tailGloss
+        ctx.fillRect(-tailDrawW / 2, -tailDrawH / 2, tailDrawW, tailDrawH)
         ctx.restore()
       }
 

@@ -418,6 +418,20 @@ function ShopWormPreview({
       const tail = segments[segCount - 1];
       const hp = { x: head.x, y: head.y };
 
+      // Body shadow
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(head.x, head.y - R);
+      ctx.lineTo(tail.x, tail.y - R);
+      ctx.arc(tail.x, tail.y, R, -Math.PI / 2, Math.PI / 2);
+      ctx.lineTo(head.x, head.y + R);
+      ctx.arc(head.x, head.y, R, Math.PI / 2, -Math.PI / 2);
+      ctx.closePath();
+      ctx.translate(0, R * 0.36);
+      ctx.fillStyle = "rgba(0,0,0,0.16)";
+      ctx.fill();
+      ctx.restore();
+
       // Body — long horizontal pill clipped to flag-texture repeat
       ctx.save();
       ctx.beginPath();
@@ -443,6 +457,22 @@ function ShopWormPreview({
       ctx.fillRect(head.x - R, head.y - R, (tail.x - head.x) + R * 2, R * 2);
       ctx.restore();
 
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(head.x, head.y - R);
+      ctx.lineTo(tail.x, tail.y - R);
+      ctx.arc(tail.x, tail.y, R, -Math.PI / 2, Math.PI / 2);
+      ctx.lineTo(head.x, head.y + R);
+      ctx.arc(head.x, head.y, R, Math.PI / 2, -Math.PI / 2);
+      ctx.closePath();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = "rgba(255,255,255,0.10)";
+      ctx.stroke();
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = "rgba(0,0,0,0.14)";
+      ctx.stroke();
+      ctx.restore();
+
       // Head — same code as in-game drawTexturedHeadFace
       ctx.save();
       ctx.beginPath();
@@ -451,6 +481,23 @@ function ShopWormPreview({
       ctx.translate(hp.x, hp.y);
       const drawR = R * 1.9;
       ctx.drawImage(img, -drawR * 1.25, -drawR, drawR * 2.5, drawR * 2);
+      ctx.restore();
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(hp.x, hp.y, R * 0.98, 0, Math.PI * 2);
+      ctx.clip();
+      const headGloss = ctx.createRadialGradient(
+        hp.x - R * 0.35, hp.y - R * 0.45, R * 0.12,
+        hp.x, hp.y, R * 1.15,
+      );
+      headGloss.addColorStop(0, "rgba(255,255,255,0.20)");
+      headGloss.addColorStop(0.5, "rgba(255,255,255,0.05)");
+      headGloss.addColorStop(1, "rgba(0,0,0,0.12)");
+      ctx.fillStyle = headGloss;
+      ctx.beginPath();
+      ctx.arc(hp.x, hp.y, R * 0.98, 0, Math.PI * 2);
+      ctx.fill();
       ctx.restore();
 
       drawPreviewFaceDetails(ctx, hp, R, eyeStyle, mouthStyle);
