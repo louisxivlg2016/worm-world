@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1000" viewBox="0 0 1900 1000">
+  <rect width="1900" height="1000" fill="#ffffff"/>
+  <rect y="0" width="1900" height="76.9231" fill="#b22234"/>
+  <rect y="153.8462" width="1900" height="76.9231" fill="#b22234"/>
+  <rect y="307.6923" width="1900" height="76.9231" fill="#b22234"/>
+  <rect y="461.5385" width="1900" height="76.9231" fill="#b22234"/>
+  <rect y="615.3846" width="1900" height="76.9231" fill="#b22234"/>
+  <rect y="769.2308" width="1900" height="76.9231" fill="#b22234"/>
+  <rect y="923.0769" width="1900" height="76.9231" fill="#b22234"/>
+  <rect width="760" height="538.4615" fill="#3c3b6e"/>
+  <defs>
+    <polygon id="star" points="0,-24 5.64,-7.73 22.83,-7.42 9.13,2.95 13.86,19.42 0,9.6 -13.86,19.42 -9.13,2.95 -22.83,-7.42 -5.64,-7.73" fill="#ffffff"/>
+  </defs>
+  <g transform="translate(63,53.8462)">
+    <use href="#star" x="0" y="0"/>
+    <use href="#star" x="114" y="0"/>
+    <use href="#star" x="228" y="0"/>
+    <use href="#star" x="342" y="0"/>
+    <use href="#star" x="456" y="0"/>
+    <use href="#star" x="570" y="0"/>
+
+    <use href="#star" x="57" y="53.8462"/>
+    <use href="#star" x="171" y="53.8462"/>
+    <use href="#star" x="285" y="53.8462"/>
+    <use href="#star" x="399" y="53.8462"/>
+    <use href="#star" x="513" y="53.8462"/>
+
+    <use href="#star" x="0" y="107.6923"/>
+    <use href="#star" x="114" y="107.6923"/>
+    <use href="#star" x="228" y="107.6923"/>
+    <use href="#star" x="342" y="107.6923"/>
+    <use href="#star" x="456" y="107.6923"/>
+    <use href="#star" x="570" y="107.6923"/>
+
+    <use href="#star" x="57" y="161.5385"/>
+    <use href="#star" x="171" y="161.5385"/>
+    <use href="#star" x="285" y="161.5385"/>
+    <use href="#star" x="399" y="161.5385"/>
+    <use href="#star" x="513" y="161.5385"/>
+
+    <use href="#star" x="0" y="215.3846"/>
+    <use href="#star" x="114" y="215.3846"/>
+    <use href="#star" x="228" y="215.3846"/>
+    <use href="#star" x="342" y="215.3846"/>
+    <use href="#star" x="456" y="215.3846"/>
+    <use href="#star" x="570" y="215.3846"/>
+
+    <use href="#star" x="57" y="269.2308"/>
+    <use href="#star" x="171" y="269.2308"/>
+    <use href="#star" x="285" y="269.2308"/>
+    <use href="#star" x="399" y="269.2308"/>
+    <use href="#star" x="513" y="269.2308"/>
+
+    <use href="#star" x="0" y="323.0769"/>
+    <use href="#star" x="114" y="323.0769"/>
+    <use href="#star" x="228" y="323.0769"/>
+    <use href="#star" x="342" y="323.0769"/>
+    <use href="#star" x="456" y="323.0769"/>
+    <use href="#star" x="570" y="323.0769"/>
+
+    <use href="#star" x="57" y="376.9231"/>
+    <use href="#star" x="171" y="376.9231"/>
+    <use href="#star" x="285" y="376.9231"/>
+    <use href="#star" x="399" y="376.9231"/>
+    <use href="#star" x="513" y="376.9231"/>
+
+    <use href="#star" x="0" y="430.7692"/>
+    <use href="#star" x="114" y="430.7692"/>
+    <use href="#star" x="228" y="430.7692"/>
+    <use href="#star" x="342" y="430.7692"/>
+    <use href="#star" x="456" y="430.7692"/>
+    <use href="#star" x="570" y="430.7692"/>
+  </g>
+</svg>
