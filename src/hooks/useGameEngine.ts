@@ -23,7 +23,20 @@ const IS_DOM = typeof Image !== 'undefined'
 // ============================================
 const headImageCache = new Map<string, HTMLImageElement>()
 const accessoryHeadCache = new Map<string, boolean>()
-const DEFAULT_FACE_HEAD_TYPES = new Set<string>()
+const DEFAULT_FACE_HEAD_TYPES = new Set<string>([
+  'bastille_flag',
+  'hispanidad_flag',
+  'einheit_flag',
+  'repubblica_flag',
+  'portugal_flag',
+  'russia_flag',
+  'china_flag',
+  'india_flag',
+  'cumhuriyet_flag',
+  'koningsdag_flag',
+  'japan_flag',
+  'korea_flag',
+])
 
 function loadHeadImage(src: string): HTMLImageElement | null {
   if (!IS_DOM) return null
@@ -2478,7 +2491,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   } else {
     if (headType === 'july4th2') {
       drawJuly4th2HeadFace(ctx, hp, headR, worm.eyeBlink, eyeStyle, mouthStyle)
-    } else if (worm.skin.isFlag && bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0) {
+    } else if ((worm.skin.isFlag || DEFAULT_FACE_HEAD_TYPES.has(headType)) && bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0) {
       drawTexturedHeadFace(ctx, hp, headR, bodyTexImg, angle, worm.eyeBlink, eyeStyle, mouthStyle)
     } else {
       // Default eyes — always upright (fixed position, no rotation)

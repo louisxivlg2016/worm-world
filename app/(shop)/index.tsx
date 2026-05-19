@@ -119,7 +119,20 @@ const SHOP_TAB_LABELS: Record<ShopTab, string> = {
 };
 
 const SHOP_TAB_ORDER: ShopTab[] = ["shop", "fetes", "flags", "eyes", "mouths"];
-const DEFAULT_FACE_HEAD_TYPES = new Set<string>();
+const DEFAULT_FACE_HEAD_TYPES = new Set<string>([
+  "bastille_flag",
+  "hispanidad_flag",
+  "einheit_flag",
+  "repubblica_flag",
+  "portugal_flag",
+  "russia_flag",
+  "china_flag",
+  "india_flag",
+  "cumhuriyet_flag",
+  "koningsdag_flag",
+  "japan_flag",
+  "korea_flag",
+]);
 
 type HeadOption = {
   id: string;
