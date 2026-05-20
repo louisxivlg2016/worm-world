@@ -469,7 +469,7 @@ export const GAME_EVENTS: GameEvent[] = [
     costumes: [
       { id: 'santa', label: 'Père Noël', preview: '/heads/santa.png', bodyTexture: '/heads/santa-body.png' },
       { id: 'santa2', label: 'Lutin', preview: '/heads/santa2.png', bodyTexture: '/heads/santa2-body.png' },
-      { id: 'santa3', label: 'Bonhomme', preview: '/heads/santa3.png', bodyTexture: '/heads/santa3-body.png' },
+      { id: 'santa3', label: 'Bonhomme de neige', preview: '/heads/santa3.png', bodyTexture: '/heads/santa3-body.png' },
       { id: 'santa4', label: 'Maître Noël', preview: '/heads/santa4.png', bodyTexture: '/heads/santa4-body.png' },
     ],
     unlockKey: 'santaUnlocked',

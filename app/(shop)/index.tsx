@@ -132,6 +132,9 @@ const DEFAULT_FACE_HEAD_TYPES = new Set<string>([
   "koningsdag_flag",
   "japan_flag",
   "korea_flag",
+  "santa",
+  "santa2",
+  "santa3",
 ]);
 
 type HeadOption = {
@@ -316,6 +319,106 @@ function PreviewJuly4th2Head({
   );
 }
 
+function PreviewSantaHead({
+  eyeStyle,
+  mouthStyle,
+}: {
+  eyeStyle: EyeOption["id"];
+  mouthStyle: MouthOption["id"];
+}) {
+  const renderEye = (side: "left" | "right") => {
+    const closed = eyeStyle === "happy" || (eyeStyle === "wink" && side === "right");
+    if (closed) return <View style={[styles.previewEyeClosed, eyeStyle === "happy" && styles.previewEyeHappy]} />;
+    return <View style={styles.previewEye}><View style={styles.previewPupil} /></View>;
+  };
+  const mouthNode = mouthStyle === "none" ? null : mouthStyle === "surprised" ? <View style={styles.previewMouthSurprised} /> : (
+    <View style={[styles.previewMouth, mouthStyle === "grin" && styles.previewMouthGrin, mouthStyle === "angry" && styles.previewMouthAngry]} />
+  );
+  return (
+    <View style={styles.previewHolidayHeadBubble}>
+      <View style={styles.previewSantaBase} />
+      <View style={styles.previewSantaFace} />
+      <View style={styles.previewSantaBeard} />
+      <View style={styles.previewSantaHat} />
+      <View style={styles.previewSantaTrim} />
+      <View style={styles.previewSantaPom} />
+      <View style={[styles.previewFaceWrap, styles.previewHolidayFaceWrap]}>
+        <View style={styles.previewEyesRow}>
+          {renderEye("left")}
+          {renderEye("right")}
+        </View>
+        {mouthNode}
+      </View>
+    </View>
+  );
+}
+
+function PreviewElfHead({
+  eyeStyle,
+  mouthStyle,
+}: {
+  eyeStyle: EyeOption["id"];
+  mouthStyle: MouthOption["id"];
+}) {
+  const renderEye = (side: "left" | "right") => {
+    const closed = eyeStyle === "happy" || (eyeStyle === "wink" && side === "right");
+    if (closed) return <View style={[styles.previewEyeClosed, eyeStyle === "happy" && styles.previewEyeHappy]} />;
+    return <View style={styles.previewEye}><View style={styles.previewPupil} /></View>;
+  };
+  const mouthNode = mouthStyle === "none" ? null : mouthStyle === "surprised" ? <View style={styles.previewMouthSurprised} /> : (
+    <View style={[styles.previewMouth, mouthStyle === "grin" && styles.previewMouthGrin, mouthStyle === "angry" && styles.previewMouthAngry]} />
+  );
+  return (
+    <View style={styles.previewHolidayHeadBubble}>
+      <View style={styles.previewElfBase} />
+      <View style={styles.previewElfFace} />
+      <View style={[styles.previewElfEar, styles.previewElfEarLeft]} />
+      <View style={[styles.previewElfEar, styles.previewElfEarRight]} />
+      <View style={styles.previewElfHat} />
+      <View style={styles.previewElfBell} />
+      <View style={[styles.previewFaceWrap, styles.previewHolidayFaceWrap]}>
+        <View style={styles.previewEyesRow}>
+          {renderEye("left")}
+          {renderEye("right")}
+        </View>
+        {mouthNode}
+      </View>
+    </View>
+  );
+}
+
+function PreviewSnowmanHead({
+  eyeStyle,
+  mouthStyle,
+}: {
+  eyeStyle: EyeOption["id"];
+  mouthStyle: MouthOption["id"];
+}) {
+  const renderEye = (side: "left" | "right") => {
+    const closed = eyeStyle === "happy" || (eyeStyle === "wink" && side === "right");
+    if (closed) return <View style={[styles.previewEyeClosed, eyeStyle === "happy" && styles.previewEyeHappy]} />;
+    return <View style={styles.previewEye}><View style={styles.previewPupil} /></View>;
+  };
+  const mouthNode = mouthStyle === "none" ? null : mouthStyle === "surprised" ? <View style={styles.previewMouthSurprised} /> : (
+    <View style={[styles.previewMouth, mouthStyle === "grin" && styles.previewMouthGrin, mouthStyle === "angry" && styles.previewMouthAngry]} />
+  );
+  return (
+    <View style={styles.previewHolidayHeadBubble}>
+      <View style={styles.previewSnowmanBase} />
+      <View style={styles.previewSnowmanHatBrim} />
+      <View style={styles.previewSnowmanHatTop} />
+      <View style={styles.previewSnowmanNose} />
+      <View style={[styles.previewFaceWrap, styles.previewHolidayFaceWrap]}>
+        <View style={styles.previewEyesRow}>
+          {renderEye("left")}
+          {renderEye("right")}
+        </View>
+        {mouthNode}
+      </View>
+    </View>
+  );
+}
+
 function ShopWormPreview({
   colors: palette,
   eyeStyle,
@@ -340,6 +443,9 @@ function ShopWormPreview({
   const isFlagPreview = !!flagSource;
   const segmentSource = flagSource || bodyTextureSource;
   const isJuly4thUncleSam = headType === "july4th2";
+  const isSantaHead = headType === "santa";
+  const isElfHead = headType === "santa2";
+  const isSnowmanHead = headType === "santa3";
   const [flagPreviewUri, setFlagPreviewUri] = useState<string>("");
   const showsTubeBody = bodyStyle === "tube" || isFlagPreview;
   const flagTextureScale = isFlagPreview && segmentSource ? (FLAG_TEXTURE_SCALES[segmentSource] ?? DEFAULT_FLAG_TEXTURE_SCALE) : 1;
@@ -648,7 +754,13 @@ function ShopWormPreview({
               },
             ]}
           >
-            {hasHeadCostume ? (
+            {isSantaHead ? (
+              <PreviewSantaHead eyeStyle={eyeStyle} mouthStyle={mouthStyle} />
+            ) : isElfHead ? (
+              <PreviewElfHead eyeStyle={eyeStyle} mouthStyle={mouthStyle} />
+            ) : isSnowmanHead ? (
+              <PreviewSnowmanHead eyeStyle={eyeStyle} mouthStyle={mouthStyle} />
+            ) : hasHeadCostume ? (
               <View style={styles.previewHeadCostumeWrap}>
                 <View style={styles.previewHeadCostumeGlow} />
                 <View style={styles.previewHeadCostumePlate} />
@@ -1403,6 +1515,157 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     boxShadow: "0 5px 10px rgba(0,0,0,0.22)",
     backgroundColor: "#3c3b6e",
+  },
+  previewHolidayHeadBubble: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 5px 10px rgba(0,0,0,0.22)",
+  },
+  previewHolidayFaceWrap: {
+    zIndex: 4,
+  },
+  previewSantaBase: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#d23a3a",
+  },
+  previewSantaFace: {
+    position: "absolute",
+    top: 18,
+    width: 56,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: "#f6dcc5",
+    zIndex: 1,
+  },
+  previewSantaBeard: {
+    position: "absolute",
+    bottom: 8,
+    width: 42,
+    height: 24,
+    borderRadius: 16,
+    backgroundColor: "#fff",
+    zIndex: 2,
+  },
+  previewSantaHat: {
+    position: "absolute",
+    top: 4,
+    left: 8,
+    width: 68,
+    height: 30,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 26,
+    borderBottomRightRadius: 18,
+    backgroundColor: "#d92f2f",
+    transform: [{ rotate: "-10deg" }],
+    zIndex: 2,
+  },
+  previewSantaTrim: {
+    position: "absolute",
+    top: 23,
+    width: 66,
+    height: 10,
+    borderRadius: 999,
+    backgroundColor: "#fff",
+    zIndex: 3,
+  },
+  previewSantaPom: {
+    position: "absolute",
+    right: 7,
+    top: 6,
+    width: 13,
+    height: 13,
+    borderRadius: 999,
+    backgroundColor: "#fff",
+    zIndex: 3,
+  },
+  previewElfBase: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#27a156",
+  },
+  previewElfFace: {
+    position: "absolute",
+    top: 20,
+    width: 54,
+    height: 46,
+    borderRadius: 24,
+    backgroundColor: "#f3d7be",
+    zIndex: 1,
+  },
+  previewElfEar: {
+    position: "absolute",
+    top: 34,
+    width: 18,
+    height: 18,
+    backgroundColor: "#f3d7be",
+    zIndex: 0,
+  },
+  previewElfEarLeft: {
+    left: 8,
+    transform: [{ rotate: "-38deg" }],
+  },
+  previewElfEarRight: {
+    right: 8,
+    transform: [{ rotate: "38deg" }],
+  },
+  previewElfHat: {
+    position: "absolute",
+    top: 5,
+    left: 9,
+    width: 70,
+    height: 28,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 26,
+    borderBottomRightRadius: 16,
+    backgroundColor: "#cf3434",
+    transform: [{ rotate: "-12deg" }],
+    zIndex: 2,
+  },
+  previewElfBell: {
+    position: "absolute",
+    right: 10,
+    top: 20,
+    width: 10,
+    height: 10,
+    borderRadius: 999,
+    backgroundColor: "#f4cf57",
+    zIndex: 3,
+  },
+  previewSnowmanBase: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#eef4fb",
+  },
+  previewSnowmanHatBrim: {
+    position: "absolute",
+    top: 12,
+    width: 40,
+    height: 7,
+    borderRadius: 999,
+    backgroundColor: "#171717",
+    zIndex: 3,
+  },
+  previewSnowmanHatTop: {
+    position: "absolute",
+    top: 2,
+    width: 24,
+    height: 16,
+    borderTopLeftRadius: 5,
+    borderTopRightRadius: 5,
+    backgroundColor: "#171717",
+    zIndex: 3,
+  },
+  previewSnowmanNose: {
+    position: "absolute",
+    top: 46,
+    left: 47,
+    width: 18,
+    height: 8,
+    backgroundColor: "#ff8a1d",
+    transform: [{ rotate: "10deg" }],
+    zIndex: 5,
   },
   previewJulyHeadBase: {
     ...StyleSheet.absoluteFillObject,

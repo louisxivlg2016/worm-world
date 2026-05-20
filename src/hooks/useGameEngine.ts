@@ -36,6 +36,9 @@ const DEFAULT_FACE_HEAD_TYPES = new Set<string>([
   'koningsdag_flag',
   'japan_flag',
   'korea_flag',
+  'santa',
+  'santa2',
+  'santa3',
 ])
 
 function loadHeadImage(src: string): HTMLImageElement | null {
@@ -222,6 +225,147 @@ function drawJuly4th2HeadFace(
   ctx.quadraticCurveTo(hp.x, hp.y + headR * 0.82, hp.x + headR * 0.18, hp.y + headR * 0.54)
   ctx.quadraticCurveTo(hp.x, hp.y + headR * 0.68, hp.x - headR * 0.18, hp.y + headR * 0.54)
   ctx.fill()
+}
+
+function drawSantaHeadFace(
+  ctx: CanvasRenderingContext2D,
+  hp: { x: number; y: number },
+  headR: number,
+  eyeBlink: number,
+  eyeStyle: EyeStyle = 'classic',
+  mouthStyle: MouthStyle = 'smile',
+) {
+  ctx.save()
+  ctx.beginPath()
+  ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
+  ctx.clip()
+
+  const base = ctx.createLinearGradient(hp.x, hp.y - headR, hp.x, hp.y + headR)
+  base.addColorStop(0, '#ff6b6b')
+  base.addColorStop(1, '#cb2f2f')
+  ctx.fillStyle = base
+  ctx.beginPath()
+  ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.fillStyle = '#f6dcc5'
+  ctx.beginPath()
+  ctx.arc(hp.x, hp.y + headR * 0.08, headR * 0.68, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.fillStyle = '#ffffff'
+  ctx.beginPath()
+  ctx.arc(hp.x, hp.y + headR * 0.54, headR * 0.34, 0, Math.PI * 2)
+  ctx.arc(hp.x - headR * 0.28, hp.y + headR * 0.4, headR * 0.22, 0, Math.PI * 2)
+  ctx.arc(hp.x + headR * 0.28, hp.y + headR * 0.4, headR * 0.22, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.fillStyle = '#d92f2f'
+  ctx.beginPath()
+  ctx.moveTo(hp.x - headR * 0.78, hp.y - headR * 0.06)
+  ctx.quadraticCurveTo(hp.x - headR * 0.18, hp.y - headR * 1.14, hp.x + headR * 0.68, hp.y - headR * 0.72)
+  ctx.lineTo(hp.x + headR * 0.18, hp.y)
+  ctx.closePath()
+  ctx.fill()
+
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(hp.x - headR * 0.78, hp.y - headR * 0.16, headR * 1.46, headR * 0.22)
+  ctx.beginPath()
+  ctx.arc(hp.x + headR * 0.82, hp.y - headR * 0.76, headR * 0.17, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.restore()
+
+  drawFaceDetails(ctx, { x: hp.x, y: hp.y + headR * 0.02 }, headR * 0.84, '#f6dcc5', eyeBlink, eyeStyle, mouthStyle)
+}
+
+function drawElfHeadFace(
+  ctx: CanvasRenderingContext2D,
+  hp: { x: number; y: number },
+  headR: number,
+  eyeBlink: number,
+  eyeStyle: EyeStyle = 'classic',
+  mouthStyle: MouthStyle = 'smile',
+) {
+  ctx.save()
+  ctx.beginPath()
+  ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
+  ctx.clip()
+
+  const base = ctx.createLinearGradient(hp.x, hp.y - headR, hp.x, hp.y + headR)
+  base.addColorStop(0, '#55da81')
+  base.addColorStop(1, '#1a994d')
+  ctx.fillStyle = base
+  ctx.beginPath()
+  ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.fillStyle = '#f3d7be'
+  ctx.beginPath()
+  ctx.arc(hp.x, hp.y + headR * 0.08, headR * 0.66, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.beginPath()
+  ctx.moveTo(hp.x - headR * 0.72, hp.y - headR * 0.02)
+  ctx.lineTo(hp.x - headR * 1.02, hp.y + headR * 0.2)
+  ctx.lineTo(hp.x - headR * 0.74, hp.y + headR * 0.28)
+  ctx.closePath()
+  ctx.fill()
+  ctx.beginPath()
+  ctx.moveTo(hp.x + headR * 0.72, hp.y - headR * 0.02)
+  ctx.lineTo(hp.x + headR * 1.02, hp.y + headR * 0.2)
+  ctx.lineTo(hp.x + headR * 0.74, hp.y + headR * 0.28)
+  ctx.closePath()
+  ctx.fill()
+
+  ctx.fillStyle = '#ce3434'
+  ctx.beginPath()
+  ctx.moveTo(hp.x - headR * 0.76, hp.y - headR * 0.02)
+  ctx.quadraticCurveTo(hp.x - headR * 0.18, hp.y - headR * 1.12, hp.x + headR * 0.76, hp.y - headR * 0.22)
+  ctx.lineTo(hp.x + headR * 0.16, hp.y + headR * 0.02)
+  ctx.closePath()
+  ctx.fill()
+
+  ctx.fillStyle = '#f4cf57'
+  ctx.beginPath()
+  ctx.arc(hp.x + headR * 0.72, hp.y - headR * 0.22, headR * 0.11, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.restore()
+
+  drawFaceDetails(ctx, { x: hp.x, y: hp.y + headR * 0.04 }, headR * 0.82, '#f3d7be', eyeBlink, eyeStyle, mouthStyle)
+}
+
+function drawSnowmanHeadFace(
+  ctx: CanvasRenderingContext2D,
+  hp: { x: number; y: number },
+  headR: number,
+  eyeBlink: number,
+  eyeStyle: EyeStyle = 'classic',
+  mouthStyle: MouthStyle = 'smile',
+) {
+  const base = ctx.createRadialGradient(
+    hp.x - headR * 0.28, hp.y - headR * 0.34, headR * 0.14,
+    hp.x, hp.y, headR,
+  )
+  base.addColorStop(0, '#ffffff')
+  base.addColorStop(1, '#dfe8f2')
+  ctx.fillStyle = base
+  ctx.beginPath()
+  ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
+  ctx.fill()
+
+  drawFaceDetails(ctx, hp, headR * 0.84, '#eef4fb', eyeBlink, eyeStyle, mouthStyle)
+
+  ctx.fillStyle = '#ff8a1d'
+  ctx.beginPath()
+  ctx.moveTo(hp.x + headR * 0.02, hp.y + headR * 0.12)
+  ctx.lineTo(hp.x + headR * 0.42, hp.y + headR * 0.18)
+  ctx.lineTo(hp.x + headR * 0.04, hp.y + headR * 0.26)
+  ctx.closePath()
+  ctx.fill()
+
+  ctx.fillStyle = '#171717'
+  ctx.fillRect(hp.x - headR * 0.34, hp.y - headR * 0.92, headR * 0.68, headR * 0.18)
+  ctx.fillRect(hp.x - headR * 0.2, hp.y - headR * 1.16, headR * 0.4, headR * 0.26)
 }
 
 function drawFaceDetails(
@@ -2491,6 +2635,12 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   } else {
     if (headType === 'july4th2') {
       drawJuly4th2HeadFace(ctx, hp, headR, worm.eyeBlink, eyeStyle, mouthStyle)
+    } else if (headType === 'santa') {
+      drawSantaHeadFace(ctx, hp, headR, worm.eyeBlink, eyeStyle, mouthStyle)
+    } else if (headType === 'santa2') {
+      drawElfHeadFace(ctx, hp, headR, worm.eyeBlink, eyeStyle, mouthStyle)
+    } else if (headType === 'santa3') {
+      drawSnowmanHeadFace(ctx, hp, headR, worm.eyeBlink, eyeStyle, mouthStyle)
     } else if ((worm.skin.isFlag || DEFAULT_FACE_HEAD_TYPES.has(headType)) && bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0) {
       drawTexturedHeadFace(ctx, hp, headR, bodyTexImg, angle, worm.eyeBlink, eyeStyle, mouthStyle)
     } else {
