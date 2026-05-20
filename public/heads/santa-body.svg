@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="128" viewBox="0 0 512 128">
+  <defs>
+    <linearGradient id="coat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f34f4f"/>
+      <stop offset="55%" stop-color="#d82f2f"/>
+      <stop offset="100%" stop-color="#a91d1d"/>
+    </linearGradient>
+    <linearGradient id="fur" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#e9eef2"/>
+    </linearGradient>
+    <radialGradient id="shine" cx="35%" cy="18%" r="80%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.32)"/>
+      <stop offset="45%" stop-color="rgba(255,255,255,0.08)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </radialGradient>
+    <pattern id="buttons" width="96" height="128" patternUnits="userSpaceOnUse">
+      <circle cx="48" cy="64" r="10" fill="#f3d36b" stroke="#c79a22" stroke-width="3"/>
+      <circle cx="48" cy="64" r="3" fill="#fff4bf"/>
+    </pattern>
+  </defs>
+
+  <rect width="512" height="128" rx="64" fill="url(#coat)"/>
+  <rect x="0" y="8" width="512" height="18" rx="9" fill="url(#fur)" opacity="0.98"/>
+  <rect x="0" y="102" width="512" height="18" rx="9" fill="url(#fur)" opacity="0.96"/>
+  <rect x="0" y="0" width="512" height="128" rx="64" fill="url(#buttons)" opacity="0.9"/>
+  <ellipse cx="256" cy="20" rx="230" ry="18" fill="#ffffff" opacity="0.14"/>
+  <rect width="512" height="128" rx="64" fill="url(#shine)"/>
+  <rect x="0.5" y="0.5" width="511" height="127" rx="63.5" fill="none" stroke="rgba(255,255,255,0.16)"/>
+</svg>

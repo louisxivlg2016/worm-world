@@ -248,9 +248,15 @@ function drawSantaHeadFace(
   ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
   ctx.fill()
 
-  ctx.fillStyle = '#f6dcc5'
+  ctx.fillStyle = '#f4d3b8'
   ctx.beginPath()
   ctx.arc(hp.x, hp.y + headR * 0.08, headR * 0.68, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.fillStyle = 'rgba(235,145,145,0.45)'
+  ctx.beginPath()
+  ctx.arc(hp.x - headR * 0.32, hp.y + headR * 0.18, headR * 0.12, 0, Math.PI * 2)
+  ctx.arc(hp.x + headR * 0.32, hp.y + headR * 0.18, headR * 0.12, 0, Math.PI * 2)
   ctx.fill()
 
   ctx.fillStyle = '#ffffff'
@@ -258,6 +264,12 @@ function drawSantaHeadFace(
   ctx.arc(hp.x, hp.y + headR * 0.54, headR * 0.34, 0, Math.PI * 2)
   ctx.arc(hp.x - headR * 0.28, hp.y + headR * 0.4, headR * 0.22, 0, Math.PI * 2)
   ctx.arc(hp.x + headR * 0.28, hp.y + headR * 0.4, headR * 0.22, 0, Math.PI * 2)
+  ctx.fill()
+
+  ctx.fillStyle = '#ffffff'
+  ctx.beginPath()
+  ctx.ellipse(hp.x - headR * 0.16, hp.y + headR * 0.3, headR * 0.16, headR * 0.11, Math.PI * 0.15, 0, Math.PI * 2)
+  ctx.ellipse(hp.x + headR * 0.16, hp.y + headR * 0.3, headR * 0.16, headR * 0.11, -Math.PI * 0.15, 0, Math.PI * 2)
   ctx.fill()
 
   ctx.fillStyle = '#d92f2f'
@@ -275,7 +287,7 @@ function drawSantaHeadFace(
   ctx.fill()
   ctx.restore()
 
-  drawFaceDetails(ctx, { x: hp.x, y: hp.y + headR * 0.02 }, headR * 0.84, '#f6dcc5', eyeBlink, eyeStyle, mouthStyle)
+  drawFaceDetails(ctx, { x: hp.x, y: hp.y + headR * 0.02 }, headR * 0.82, '#f4d3b8', eyeBlink, eyeStyle, mouthStyle)
 }
 
 function drawElfHeadFace(
@@ -2900,7 +2912,7 @@ export function useGameEngine(
     { headType: 'king' },
     { headType: 'dragon', bodyTexture: '/heads/dragon-body.png' },
     { headType: 'stpatrick', bodyTexture: '/heads/stpatrick-body.png' },
-    { headType: 'santa', bodyTexture: '/heads/santa-body.png' },
+    { headType: 'santa', bodyTexture: '/heads/santa-body.svg' },
     { headType: 'cat' as any, bodyTexture: '/heads/cat-body.png' },
     { headType: 'dog' as any, bodyTexture: '/heads/dog-body.png' },
     { headType: 'panda' as any, bodyTexture: '/heads/panda-body.png' },
