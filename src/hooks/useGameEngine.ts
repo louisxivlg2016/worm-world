@@ -2632,9 +2632,9 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   // Head features
   const head = segments[0]
   const hp = worldToScreen(head.x, head.y, camera, w, h)
-  const headType = worm.skin.headType ?? 'default'
-  const headScale = headType === 'santa' ? 1.28 : 1
-  const headR = radius * camera.zoom * headScale
+  const skinHeadType = worm.skin.headType ?? 'default'
+  const headType = skinHeadType
+  const headR = radius * camera.zoom * (skinHeadType === 'santa' ? 1.28 : 1)
   const angle = worm.angle
   const eyeStyle = worm.skin.eyeStyle ?? 'classic'
   const mouthStyle = worm.skin.mouthStyle ?? 'smile'
