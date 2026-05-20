@@ -448,7 +448,6 @@ function ShopWormPreview({
   const isFlagPreview = !!flagSource;
   const segmentSource = flagSource || bodyTextureSource;
   const isJuly4thUncleSam = headType === "july4th2";
-  const isSantaHead = headType === "santa";
   const isElfHead = headType === "santa2";
   const isSnowmanHead = headType === "santa3";
   const [flagPreviewUri, setFlagPreviewUri] = useState<string>("");
@@ -467,7 +466,7 @@ function ShopWormPreview({
   const flagTailSize = Math.round(tubeRadius * 2.04);
   const flagTailTop = tubeTop + (tubeHeight - flagTailSize) / 2;
   const previewRadius = 68;
-  const circleHeadSize = isSantaHead ? previewRadius * 2.45 : previewRadius * 2;
+  const circleHeadSize = headType === "santa" ? previewRadius * 2.45 : previewRadius * 2;
   const circleSegmentSize = previewRadius * 2;
   const circleSegmentStep = Math.max(8, Math.round(previewRadius * 0.38));
   const circleBodyTop = 150;
@@ -759,13 +758,7 @@ function ShopWormPreview({
               },
             ]}
           >
-            {isSantaHead ? (
-              <PreviewSantaHead eyeStyle={eyeStyle} mouthStyle={mouthStyle} />
-            ) : isElfHead ? (
-              <PreviewElfHead eyeStyle={eyeStyle} mouthStyle={mouthStyle} />
-            ) : isSnowmanHead ? (
-              <PreviewSnowmanHead eyeStyle={eyeStyle} mouthStyle={mouthStyle} />
-            ) : hasHeadCostume ? (
+            {hasHeadCostume ? (
               <View style={styles.previewHeadCostumeWrap}>
                 <View style={styles.previewHeadCostumeGlow} />
                 <View style={styles.previewHeadCostumePlate} />
@@ -775,6 +768,10 @@ function ShopWormPreview({
                   resizeMode="contain"
                 />
               </View>
+            ) : isElfHead ? (
+              <PreviewElfHead eyeStyle={eyeStyle} mouthStyle={mouthStyle} />
+            ) : isSnowmanHead ? (
+              <PreviewSnowmanHead eyeStyle={eyeStyle} mouthStyle={mouthStyle} />
             ) : isJuly4thUncleSam ? (
               <PreviewJuly4th2Head eyeStyle={eyeStyle} mouthStyle={mouthStyle} />
             ) : (

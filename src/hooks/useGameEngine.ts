@@ -36,7 +36,6 @@ const DEFAULT_FACE_HEAD_TYPES = new Set<string>([
   'koningsdag_flag',
   'japan_flag',
   'korea_flag',
-  'santa',
   'santa2',
   'santa3',
 ])
