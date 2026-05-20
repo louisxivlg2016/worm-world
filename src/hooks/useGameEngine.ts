@@ -2922,7 +2922,13 @@ export function useGameEngine(
     let skin: WormSkin = { ...baseSkin }
     const activeEvent = getEventByMode(s.gameMode)
     if (activeEvent && activeEvent.costumes.length > 0) {
-      const randCostume = activeEvent.costumes[Math.floor(Math.random() * activeEvent.costumes.length)]
+      const weightedCostumes = activeEvent.id === 'noel'
+        ? activeEvent.costumes.flatMap((costume) => {
+            if (costume.id === 'santa' || costume.id === 'santa4') return [costume, costume, costume]
+            return [costume]
+          })
+        : activeEvent.costumes
+      const randCostume = weightedCostumes[Math.floor(Math.random() * weightedCostumes.length)]
       skin = { colors: [...activeEvent.aiColors], eye: '#fff' }
       skin.headType = randCostume.id as any
       skin.bodyTexture = randCostume.bodyTexture
