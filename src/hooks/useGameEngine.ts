@@ -2632,9 +2632,10 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   // Head features
   const head = segments[0]
   const hp = worldToScreen(head.x, head.y, camera, w, h)
-  const headR = radius * camera.zoom
-  const angle = worm.angle
   const headType = worm.skin.headType ?? 'default'
+  const headScale = headType === 'santa' ? 1.28 : 1
+  const headR = radius * camera.zoom * headScale
+  const angle = worm.angle
   const eyeStyle = worm.skin.eyeStyle ?? 'classic'
   const mouthStyle = worm.skin.mouthStyle ?? 'smile'
 
@@ -2680,7 +2681,11 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   }
 
   // Name tag — push higher for queen head (crown is tall)
-  const nameOffset = headType !== 'default' ? radius + 40 : radius + 18
+  const nameOffset = headType === 'santa'
+    ? radius + 54
+    : headType !== 'default'
+      ? radius + 40
+      : radius + 18
   const np = worldToScreen(head.x, head.y - nameOffset, camera, w, h)
   ctx.font = `${Math.round(13 * camera.zoom)}px Fredoka`
   ctx.textAlign = 'center'

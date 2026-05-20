@@ -462,7 +462,7 @@ function ShopWormPreview({
   const flagTailSize = Math.round(tubeRadius * 2.04);
   const flagTailTop = tubeTop + (tubeHeight - flagTailSize) / 2;
   const previewRadius = 68;
-  const circleHeadSize = previewRadius * 2;
+  const circleHeadSize = isSantaHead ? previewRadius * 2.45 : previewRadius * 2;
   const circleSegmentSize = previewRadius * 2;
   const circleSegmentStep = Math.max(8, Math.round(previewRadius * 0.38));
   const circleBodyTop = 150;
