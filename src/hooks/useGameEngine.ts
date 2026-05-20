@@ -241,8 +241,8 @@ function drawSantaHeadFace(
   ctx.clip()
 
   const base = ctx.createLinearGradient(hp.x, hp.y - headR, hp.x, hp.y + headR)
-  base.addColorStop(0, '#ff6b6b')
-  base.addColorStop(1, '#cb2f2f')
+  base.addColorStop(0, '#ff5f5f')
+  base.addColorStop(1, '#c92020')
   ctx.fillStyle = base
   ctx.beginPath()
   ctx.arc(hp.x, hp.y, headR * 0.98, 0, Math.PI * 2)
@@ -250,49 +250,51 @@ function drawSantaHeadFace(
 
   ctx.fillStyle = '#f2cfb3'
   ctx.beginPath()
-  ctx.arc(hp.x, hp.y + headR * 0.02, headR * 0.62, 0, Math.PI * 2)
+  ctx.arc(hp.x, hp.y - headR * 0.02, headR * 0.5, 0, Math.PI * 2)
   ctx.fill()
 
   ctx.fillStyle = 'rgba(235,145,145,0.45)'
   ctx.beginPath()
-  ctx.arc(hp.x - headR * 0.28, hp.y + headR * 0.16, headR * 0.1, 0, Math.PI * 2)
-  ctx.arc(hp.x + headR * 0.28, hp.y + headR * 0.16, headR * 0.1, 0, Math.PI * 2)
+  ctx.arc(hp.x - headR * 0.22, hp.y + headR * 0.04, headR * 0.08, 0, Math.PI * 2)
+  ctx.arc(hp.x + headR * 0.22, hp.y + headR * 0.04, headR * 0.08, 0, Math.PI * 2)
   ctx.fill()
 
   ctx.fillStyle = '#ffffff'
   ctx.beginPath()
-  ctx.arc(hp.x, hp.y + headR * 0.62, headR * 0.36, 0, Math.PI * 2)
-  ctx.arc(hp.x - headR * 0.34, hp.y + headR * 0.46, headR * 0.24, 0, Math.PI * 2)
-  ctx.arc(hp.x + headR * 0.34, hp.y + headR * 0.46, headR * 0.24, 0, Math.PI * 2)
+  ctx.arc(hp.x, hp.y + headR * 0.58, headR * 0.44, 0, Math.PI * 2)
+  ctx.arc(hp.x - headR * 0.38, hp.y + headR * 0.38, headR * 0.26, 0, Math.PI * 2)
+  ctx.arc(hp.x + headR * 0.38, hp.y + headR * 0.38, headR * 0.26, 0, Math.PI * 2)
   ctx.fill()
 
   ctx.fillStyle = '#ffffff'
   ctx.beginPath()
-  ctx.ellipse(hp.x - headR * 0.17, hp.y + headR * 0.28, headR * 0.19, headR * 0.12, Math.PI * 0.12, 0, Math.PI * 2)
-  ctx.ellipse(hp.x + headR * 0.17, hp.y + headR * 0.28, headR * 0.19, headR * 0.12, -Math.PI * 0.12, 0, Math.PI * 2)
+  ctx.ellipse(hp.x - headR * 0.2, hp.y + headR * 0.22, headR * 0.24, headR * 0.1, Math.PI * 0.12, 0, Math.PI * 2)
+  ctx.ellipse(hp.x + headR * 0.2, hp.y + headR * 0.22, headR * 0.24, headR * 0.1, -Math.PI * 0.12, 0, Math.PI * 2)
   ctx.fill()
 
   ctx.fillStyle = '#e7b596'
   ctx.beginPath()
-  ctx.arc(hp.x, hp.y + headR * 0.22, headR * 0.08, 0, Math.PI * 2)
+  ctx.arc(hp.x, hp.y + headR * 0.14, headR * 0.07, 0, Math.PI * 2)
   ctx.fill()
 
   ctx.fillStyle = '#d92f2f'
   ctx.beginPath()
-  ctx.moveTo(hp.x - headR * 0.88, hp.y - headR * 0.08)
-  ctx.quadraticCurveTo(hp.x - headR * 0.22, hp.y - headR * 1.18, hp.x + headR * 0.78, hp.y - headR * 0.8)
-  ctx.lineTo(hp.x + headR * 0.2, hp.y - headR * 0.02)
+  ctx.moveTo(hp.x - headR * 0.96, hp.y - headR * 0.12)
+  ctx.quadraticCurveTo(hp.x - headR * 0.26, hp.y - headR * 1.08, hp.x + headR * 0.82, hp.y - headR * 0.74)
+  ctx.lineTo(hp.x + headR * 0.12, hp.y - headR * 0.04)
   ctx.closePath()
   ctx.fill()
 
   ctx.fillStyle = '#ffffff'
-  ctx.fillRect(hp.x - headR * 0.86, hp.y - headR * 0.18, headR * 1.6, headR * 0.24)
   ctx.beginPath()
-  ctx.arc(hp.x + headR * 0.92, hp.y - headR * 0.78, headR * 0.18, 0, Math.PI * 2)
+  ctx.roundRect(hp.x - headR * 0.9, hp.y - headR * 0.22, headR * 1.72, headR * 0.24, headR * 0.12)
+  ctx.fill()
+  ctx.beginPath()
+  ctx.arc(hp.x + headR * 0.9, hp.y - headR * 0.76, headR * 0.2, 0, Math.PI * 2)
   ctx.fill()
   ctx.restore()
 
-  drawFaceDetails(ctx, { x: hp.x, y: hp.y - headR * 0.02 }, headR * 0.72, '#f2cfb3', eyeBlink, eyeStyle, mouthStyle)
+  drawFaceDetails(ctx, { x: hp.x, y: hp.y - headR * 0.03 }, headR * 0.58, '#f2cfb3', eyeBlink, eyeStyle, mouthStyle)
 }
 
 function drawElfHeadFace(
