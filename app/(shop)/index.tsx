@@ -922,6 +922,12 @@ export default function ShopScreen() {
   const bodyStyle: "circles" | "tube" = "circles";
   const [selectedFlag, setSelectedFlag] = useState<string | null>(() => (playerSkin?.isFlag && playerSkin?.flagName) ? playerSkin.flagName : null);
   const [activeTab, setActiveTab] = useState<ShopTab>("shop");
+  const [selectedFeteEventId, setSelectedFeteEventId] = useState<string | null>(() => {
+    const initialHead = playerSkin?.headType;
+    if (!initialHead) return null;
+    const event = GAME_EVENTS.find((candidate) => candidate.costumes.some((costume) => costume.id === initialHead));
+    return event?.id ?? null;
+  });
 
   const [, setUnlockTick] = useState(0);
 
@@ -968,9 +974,22 @@ export default function ShopScreen() {
     [eventGems, headOptions],
   );
 
+  useEffect(() => {
+    if (!visibleFetesEvents.length) {
+      setSelectedFeteEventId(null);
+      return;
+    }
+    if (selectedFeteEventId && visibleFetesEvents.some((event) => event.id === selectedFeteEventId)) return;
+    setSelectedFeteEventId(visibleFetesEvents[0].id);
+  }, [selectedFeteEventId, visibleFetesEvents]);
+
   const filteredHeads = useMemo(
-    () => (activeTab === "fetes" ? eventHeadOptions : baseHeadOptions),
-    [activeTab, baseHeadOptions, eventHeadOptions],
+    () => (
+      activeTab === "fetes"
+        ? eventHeadOptions.filter((option) => option.eventId === selectedFeteEventId)
+        : baseHeadOptions
+    ),
+    [activeTab, baseHeadOptions, eventHeadOptions, selectedFeteEventId],
   );
 
   const availableHeadIds = useMemo(
@@ -1053,10 +1072,12 @@ export default function ShopScreen() {
   const selectedHeadBodySource = (selectedHeadMeta?.bodyTexture || selectedHeadMeta?.preview)
     ? { uri: selectedHeadMeta.bodyTexture ?? selectedHeadMeta.preview! }
     : undefined;
-  const selectedEvent = useMemo(
-    () => (selectedHeadMeta?.eventId ? GAME_EVENTS.find((event) => event.id === selectedHeadMeta.eventId) ?? null : null),
-    [selectedHeadMeta],
-  );
+  const selectedEvent = useMemo(() => {
+    if (activeTab === "fetes" && selectedFeteEventId) {
+      return GAME_EVENTS.find((event) => event.id === selectedFeteEventId) ?? null;
+    }
+    return selectedHeadMeta?.eventId ? GAME_EVENTS.find((event) => event.id === selectedHeadMeta.eventId) ?? null : null;
+  }, [activeTab, selectedFeteEventId, selectedHeadMeta]);
   const selectedEventBalance = selectedEvent ? (eventGems[selectedEvent.id] || 0) : 0;
   const selectedEyeMeta = EYE_OPTIONS.find((option) => option.id === eyeStyle) ?? EYE_OPTIONS[0];
   const selectedMouthMeta = MOUTH_OPTIONS.find((option) => option.id === mouthStyle) ?? MOUTH_OPTIONS[0];
@@ -1265,8 +1286,13 @@ export default function ShopScreen() {
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.sm }}>
                 <View style={{ flexDirection: "row", gap: 8 }}>
                   {visibleFetesEvents.map(e => (
-                    <View
+                    <Pressable
                       key={e.id}
+                      onPress={() => {
+                        setSelectedFeteEventId(e.id);
+                        const firstHeadForEvent = headOptions.find((option) => option.eventId === e.id);
+                        if (firstHeadForEvent) setHeadType(firstHeadForEvent.id);
+                      }}
                       style={[
                         styles.gemsBar,
                         selectedEvent?.id === e.id && styles.gemsBarActive,
@@ -1280,7 +1306,7 @@ export default function ShopScreen() {
                       )}
                       <Text style={styles.gemsText}>{eventGems[e.id] || 0}</Text>
                       <Text style={styles.gemsMiniLabel}>{e.label}</Text>
-                    </View>
+                    </Pressable>
                   ))}
                 </View>
               </ScrollView>
