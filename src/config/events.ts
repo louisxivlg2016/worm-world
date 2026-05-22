@@ -494,6 +494,7 @@ export const GAME_EVENTS: GameEvent[] = [
       { id: 'reveillon', label: 'Champagne', preview: '/heads/reveillon.png', bodyTexture: '/heads/reveillon-body.png' },
       { id: 'reveillon2', label: 'Feu d\'artifice', preview: '/heads/reveillon2.png', bodyTexture: '/heads/reveillon2-body.png' },
       { id: 'reveillon3', label: 'Maître Champagne', preview: '/heads/reveillon3.png', bodyTexture: '/heads/reveillon3-body.png' },
+      { id: 'reveillon4', label: 'Minuit Royal', preview: '/heads/newyear4.png', bodyTexture: '/heads/newyear4-body.png' },
     ],
     unlockKey: 'reveillonUnlocked',
     bgImage: '/reveillon-bg.png',
