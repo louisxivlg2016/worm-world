@@ -45,9 +45,9 @@ export const GAME_EVENTS: GameEvent[] = [
     emoji: '🎆',
     currencyImage: '/newyear-coin.png',
     costumes: [
-      { id: 'newyear', label: 'Chapeau Haut', preview: '/heads/newyear.png', bodyTexture: '/heads/newyear-body.png' },
-      { id: 'newyear2', label: 'Chapeau Fête', preview: '/heads/newyear2.png', bodyTexture: '/heads/newyear2-body.png' },
-      { id: 'newyear3', label: 'Horloge', preview: '/heads/newyear3.png', bodyTexture: '/heads/newyear3-body.png' },
+      { id: 'newyear', label: 'Reine des Feux', preview: '/heads/newyear.png', bodyTexture: '/heads/newyear-body.png' },
+      { id: 'newyear2', label: 'Tour Champagne', preview: '/heads/newyear2.png', bodyTexture: '/heads/newyear2-body.png' },
+      { id: 'newyear3', label: 'Compte à Rebours', preview: '/heads/newyear3.png', bodyTexture: '/heads/newyear3-body.png' },
       { id: 'newyear4', label: 'Maître Or', preview: '/heads/newyear4.png', bodyTexture: '/heads/newyear4-body.png' },
     ],
     unlockKey: 'newyearUnlocked',
