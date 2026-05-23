@@ -116,9 +116,9 @@ export const GAME_EVENTS: GameEvent[] = [
     emoji: '🎭',
     currencyImage: '/carnival-coin.png',
     costumes: [
-      { id: 'carnival', label: 'Masque', preview: '/heads/carnival.png', bodyTexture: '/heads/carnival-body.png' },
-      { id: 'carnival2', label: 'Clown', preview: '/heads/carnival2.png', bodyTexture: '/heads/carnival2-body.png' },
-      { id: 'carnival3', label: 'Confetti', preview: '/heads/carnival3.png', bodyTexture: '/heads/carnival3-body.png' },
+      { id: 'carnival', label: 'Masque', preview: '/heads/carnival.svg', bodyTexture: '/heads/carnival-body.png' },
+      { id: 'carnival2', label: 'Clown', preview: '/heads/carnival2.svg', bodyTexture: '/heads/carnival2-body.png' },
+      { id: 'carnival3', label: 'Bouffon', preview: '/heads/carnival3.svg', bodyTexture: '/heads/carnival3-body.png' },
       { id: 'carnival4', label: 'Arlequin Royal', preview: '/heads/carnival4.png', bodyTexture: '/heads/carnival4-body.png' },
     ],
     unlockKey: 'carnivalUnlocked',
