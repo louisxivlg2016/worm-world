@@ -17,6 +17,7 @@
   </defs>
   <g filter="url(#shadow7)">
     <circle cx="256" cy="282" r="145" fill="url(#face7)"/>
+    <ellipse cx="256" cy="256" rx="114" ry="120" fill="#ffffff" opacity=".16"/>
     <circle cx="256" cy="136" r="63" fill="url(#disco)"/>
     <path d="M214 96h84l-42-34z" fill="#fff"/>
     <path d="M193 133h126M209 103l94 66M303 103l-94 66M256 73v126" stroke="#ffffffaa" stroke-width="7"/>
@@ -24,6 +25,7 @@
     <circle cx="362" cy="170" r="9" fill="#6ef5ff"/>
     <circle cx="119" cy="194" r="8" fill="#ffd74d"/>
     <circle cx="395" cy="196" r="8" fill="#8aff93"/>
+    <path d="M146 120l8 8m223-2l-8 9m-248 55l13 5m266 1l-12 6" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".75"/>
     <ellipse cx="200" cy="280" rx="55" ry="71" fill="#fff"/>
     <ellipse cx="312" cy="280" rx="55" ry="71" fill="#fff"/>
     <circle cx="200" cy="280" r="31" fill="#191622"/>
@@ -31,9 +33,13 @@
     <circle cx="212" cy="267" r="9" fill="#fff"/>
     <circle cx="324" cy="267" r="9" fill="#fff"/>
     <path d="M170 233c10-15 25-23 40-23m52 0c15 0 30 8 40 23" fill="none" stroke="#5c5f86" stroke-width="10" stroke-linecap="round"/>
+    <path d="M170 244c10-10 25-15 40-15m52 0c15 0 30 5 40 15" fill="none" stroke="#ffffffc8" stroke-width="4" stroke-linecap="round"/>
     <circle cx="182" cy="314" r="15" fill="#ff9fcb" opacity=".8"/>
     <circle cx="330" cy="314" r="15" fill="#ff9fcb" opacity=".8"/>
     <path d="M207 347c14 18 84 18 98 0" fill="none" stroke="#7b3d5b" stroke-width="12" stroke-linecap="round"/>
     <path d="M228 352c10 8 46 8 56 0" fill="none" stroke="#ffd2e4" stroke-width="7" stroke-linecap="round"/>
+    <path d="M146 338c18 18 34 28 56 33m108-33c22 15 38 25 56 33" fill="none" stroke="#9ea3db" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="138" cy="344" r="10" fill="#ff72bb"/>
+    <circle cx="374" cy="344" r="10" fill="#6fe9ff"/>
   </g>
 </svg>

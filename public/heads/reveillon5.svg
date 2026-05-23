@@ -14,6 +14,7 @@
   </defs>
   <g filter="url(#shadow5)">
     <circle cx="256" cy="280" r="146" fill="url(#face5)"/>
+    <ellipse cx="256" cy="244" rx="98" ry="112" fill="#fff7df" opacity=".22"/>
     <path d="M171 162c17-55 48-91 85-91s68 36 85 91c-23-10-54-16-85-16s-62 6-85 16z" fill="#fff9eb"/>
     <path d="M188 101h136l-18 44H206z" fill="#e7bf50"/>
     <path d="M205 101h102l-11 18h-80z" fill="#fff7da"/>
@@ -22,11 +23,18 @@
     <circle cx="316" cy="158" r="10" fill="#ffe07a"/>
     <circle cx="256" cy="91" r="19" fill="#fff3cb"/>
     <path d="M256 114c0 0-28 14-40 41 31-10 55-14 80 0-12-27-40-41-40-41z" fill="#ffebad" opacity=".7"/>
+    <path d="M190 126c18-20 40-33 66-39m66 39c-18-20-40-33-66-39" fill="none" stroke="#fff6d2" stroke-width="8" stroke-linecap="round"/>
     <g fill="#fff2b8" opacity=".85">
       <circle cx="160" cy="120" r="9"/>
       <circle cx="352" cy="132" r="7"/>
       <circle cx="126" cy="170" r="6"/>
       <circle cx="382" cy="171" r="8"/>
+    </g>
+    <g fill="#fff6d0" opacity=".95">
+      <circle cx="118" cy="214" r="5"/>
+      <circle cx="142" cy="231" r="4"/>
+      <circle cx="392" cy="223" r="5"/>
+      <circle cx="368" cy="239" r="4"/>
     </g>
     <ellipse cx="200" cy="272" rx="56" ry="72" fill="#fff"/>
     <ellipse cx="312" cy="272" rx="56" ry="72" fill="#fff"/>
@@ -35,9 +43,13 @@
     <circle cx="212" cy="259" r="9" fill="#fff"/>
     <circle cx="324" cy="259" r="9" fill="#fff"/>
     <path d="M172 226c9-14 24-22 39-22m54 0c15 0 30 8 39 22" fill="none" stroke="#846027" stroke-width="10" stroke-linecap="round"/>
+    <path d="M166 236c8-12 24-19 41-19m48 0c17 0 33 7 41 19" fill="none" stroke="#fff1cb" stroke-width="4" stroke-linecap="round" opacity=".8"/>
     <path d="M208 343c14 16 82 16 96 0" fill="none" stroke="#7a5230" stroke-width="12" stroke-linecap="round"/>
     <path d="M231 347c8 7 34 7 42 0" fill="none" stroke="#fff3cc" stroke-width="7" stroke-linecap="round"/>
     <circle cx="182" cy="309" r="15" fill="#f6dc95" opacity=".85"/>
     <circle cx="330" cy="309" r="15" fill="#f6dc95" opacity=".85"/>
+    <path d="M142 334c18 20 30 30 44 34m184-34c-18 20-30 30-44 34" fill="none" stroke="#f4d58a" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="146" cy="339" r="12" fill="#ffe5a6"/>
+    <circle cx="366" cy="339" r="12" fill="#ffe5a6"/>
   </g>
 </svg>
