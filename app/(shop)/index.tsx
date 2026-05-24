@@ -1097,7 +1097,7 @@ export default function ShopScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.bgOrbA} />
       <View style={styles.bgOrbB} />
-      <View style={desktopContainerStyle}>
+      <View style={[{ flex: 1 }, desktopContainerStyle]}>
       {/* Coin Balance */}
       <View style={styles.coinBar}>
         <Text style={styles.coinText}>{"\u{1FA99}"} {coins}</Text>
@@ -1339,6 +1339,7 @@ export default function ShopScreen() {
 
 
       {/* Apply Button */}
+      <View style={{ flex: 1 }} />
       <View style={{ marginTop: spacing.lg, alignItems: "center", gap: 6 }}>
         {computePrice() > 0 && (
           <Text style={{ color: "#ffd700", fontSize: 14, fontWeight: "800" }}>
@@ -1366,6 +1367,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.md,
+    flexGrow: 1,
   },
   bgOrbA: {
     position: "absolute",
