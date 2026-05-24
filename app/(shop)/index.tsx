@@ -1870,6 +1870,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: spacing.md,
     alignItems: "center",
+    zIndex: 60,
   },
   previewSegment: {
     position: "absolute",
