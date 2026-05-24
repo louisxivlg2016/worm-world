@@ -165,6 +165,9 @@ export const GAME_EVENTS: GameEvent[] = [
     costumes: [
       { id: 'stpatrick', label: 'Leprechaun', preview: '/heads/stpatrick.png', bodyTexture: '/heads/stpatrick-body.png' },
       { id: 'stpatrick2', label: 'Gentleman Vert', preview: '/heads/stpatrick2.png', bodyTexture: '/heads/stpatrick2-body.png' },
+      { id: 'stpatrick3', label: 'Reine Trèfle', preview: '/heads/stpatrick3.png', bodyTexture: '/heads/stpatrick-body.png' },
+      { id: 'stpatrick4', label: 'Lord Chanceux', preview: '/heads/stpatrick4.png', bodyTexture: '/heads/stpatrick2-body.png' },
+      { id: 'stpatrick5', label: "Pot d'Or", preview: '/heads/stpatrick5.png', bodyTexture: '/heads/stpatrick-body.png' },
     ],
     unlockKey: 'stpatrickUnlocked',
     bgImage: '/stpatrick-clover.png',
