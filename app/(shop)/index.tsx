@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback, useEffect, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
   View,
@@ -433,6 +433,7 @@ function ShopWormPreview({
   bodyTextureSource,
   headPreview,
   headType,
+  footer,
 }: {
   colors: string[];
   eyeStyle: EyeOption["id"];
@@ -442,6 +443,7 @@ function ShopWormPreview({
   bodyTextureSource?: any;
   headPreview?: string;
   headType?: string;
+  footer?: ReactNode;
 }) {
   const { t: previewT } = useTranslation();
   const hasHeadCostume = !!headPreview;
@@ -812,6 +814,7 @@ function ShopWormPreview({
             )}
           </View>
         ) : null}
+        {footer ? <View style={styles.previewFooter}>{footer}</View> : null}
       </View>
     </View>
   );
@@ -1097,7 +1100,7 @@ export default function ShopScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.bgOrbA} />
       <View style={styles.bgOrbB} />
-      <View style={[{ flex: 1 }, desktopContainerStyle]}>
+      <View style={desktopContainerStyle}>
       {/* Coin Balance */}
       <View style={styles.coinBar}>
         <Text style={styles.coinText}>{"\u{1FA99}"} {coins}</Text>
@@ -1209,6 +1212,21 @@ export default function ShopScreen() {
             bodyTextureSource={activeTab === "shop" || activeTab === "fetes" ? selectedHeadBodySource : undefined}
             headPreview={activeTab === "shop" || activeTab === "fetes" ? selectedHeadPreview : undefined}
             headType={activeTab === "shop" || activeTab === "fetes" ? selectedHeadMeta?.id : undefined}
+            footer={
+              <View style={{ alignItems: "center", gap: 6 }}>
+                {computePrice() > 0 && (
+                  <Text style={{ color: "#ffd700", fontSize: 14, fontWeight: "800" }}>
+                    💰 {computePrice()} 🪙
+                  </Text>
+                )}
+                <Pressable
+                  onPress={handleApply}
+                  style={computePrice() > coins && styles.applyBtnDisabled}
+                >
+                  <Image source={require("../../assets/buy-btn.png")} style={{ width: 140, height: 50 }} resizeMode="contain" />
+                </Pressable>
+              </View>
+            }
           />
           {previewLabel ? <Text style={styles.previewCostumeName}>{previewLabel}</Text> : null}
           {showCycleArrows ? (
@@ -1338,22 +1356,6 @@ export default function ShopScreen() {
       )}
 
 
-      {/* Apply Button */}
-      <View style={{ flex: 1 }} />
-      <View style={{ marginTop: spacing.lg, alignItems: "center", gap: 6 }}>
-        {computePrice() > 0 && (
-          <Text style={{ color: "#ffd700", fontSize: 14, fontWeight: "800" }}>
-            💰 {computePrice()} 🪙
-          </Text>
-        )}
-        <Pressable
-          onPress={handleApply}
-          style={computePrice() > coins && styles.applyBtnDisabled}
-        >
-          <Image source={require("../../assets/buy-btn.png")} style={{ width: 140, height: 50 }} resizeMode="contain" />
-        </Pressable>
-      </View>
-
       <View style={{ height: spacing.xxl }} />
       </View>
     </ScrollView>
@@ -1367,7 +1369,6 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: spacing.md,
-    flexGrow: 1,
   },
   bgOrbA: {
     position: "absolute",
@@ -1862,6 +1863,13 @@ const styles = StyleSheet.create({
     fontWeight: "800",
     textAlign: "center",
     marginTop: spacing.sm,
+  },
+  previewFooter: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: spacing.md,
+    alignItems: "center",
   },
   previewSegment: {
     position: "absolute",
