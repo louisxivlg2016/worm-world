@@ -93,7 +93,7 @@ export const GAME_EVENTS: GameEvent[] = [
     emoji: '🏮',
     currencyImage: '/cny-coin.png',
     costumes: [
-      { id: 'cny', label: 'Lanterne', preview: '/heads/cny.png', bodyTexture: '/heads/cny-body.png' },
+      { id: 'cny', label: 'Lanterne', preview: '/heads/cny.svg', bodyTexture: '/heads/cny-body.png' },
       { id: 'cny2', label: 'Dragon', preview: '/heads/cny2.png', bodyTexture: '/heads/cny2-body.png' },
       { id: 'cny3', label: 'Empereur Festif', preview: '/heads/cny3.png', bodyTexture: '/heads/cny3-body.png' },
     ],
