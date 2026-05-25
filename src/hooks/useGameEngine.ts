@@ -42,9 +42,12 @@ function loadHeadImage(src: string): HTMLImageElement | null {
   if (!IS_DOM) return null
   if (headImageCache.has(src)) return headImageCache.get(src)!
   const img = new Image()
+  img.decoding = 'async'
+  try { (img as HTMLImageElement & { fetchPriority?: string }).fetchPriority = 'high' } catch {}
+  headImageCache.set(src, img)
   img.src = src
   img.onload = () => { headImageCache.set(src, img) }
-  return null
+  return img
 }
 
 function isAccessoryHeadImage(src: string, img: HTMLImageElement): boolean {
@@ -107,9 +110,12 @@ function loadBodyTexture(src: string): HTMLImageElement | null {
   if (!IS_DOM) return null
   if (bodyTextureCache.has(src)) return bodyTextureCache.get(src)!
   const img = new Image()
+  img.decoding = 'async'
+  try { (img as HTMLImageElement & { fetchPriority?: string }).fetchPriority = 'high' } catch {}
+  bodyTextureCache.set(src, img)
   img.src = src
   img.onload = () => { bodyTextureCache.set(src, img) }
-  return null
+  return img
 }
 
 const BODY_TEXTURES: Record<string, string> = {
