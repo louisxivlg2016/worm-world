@@ -1830,18 +1830,28 @@ function drawBackground(ctx: CanvasRenderingContext2D, camera: Camera, w: number
 // Food image cache — preload all cartoon food images
 const foodImgCache = new Map<string, HTMLImageElement>()
 
+function preloadOneFoodImage(src: string) {
+  if (foodImgCache.has(src)) return
+  const img = new Image()
+  img.decoding = 'async'
+  img.onload = () => { foodImgCache.set(src, img) }
+  img.src = src
+}
+
 function preloadFoodImages() {
   if (!IS_DOM) return
-  const packPaths = Object.values(FOOD_PACK_IMAGES).flat()
-  const allPaths = [...new Set([...FOOD_IMAGES, ...SPECIAL_FOOD_IMAGES, ...packPaths])]
-  for (const src of allPaths) {
-    if (foodImgCache.has(src)) continue
-    const img = new Image()
-    img.src = src
-    img.onload = () => { foodImgCache.set(src, img) }
+  // Load the images actually in use first (active pack + defaults + special),
+  // then lazily load the other packs so they don't slow down the active set.
+  const activePack = currentFoodPack ? (FOOD_PACK_IMAGES[currentFoodPack] ?? []) : []
+  const priority = [...new Set([...activePack, ...FOOD_IMAGES, ...SPECIAL_FOOD_IMAGES])]
+  for (const src of priority) preloadOneFoodImage(src)
+  const rest = Object.values(FOOD_PACK_IMAGES).flat().filter((s) => !priority.includes(s))
+  if (rest.length) {
+    const loadRest = () => { for (const src of rest) preloadOneFoodImage(src) }
+    if (typeof requestIdleCallback !== 'undefined') requestIdleCallback(loadRest, { timeout: 3000 })
+    else setTimeout(loadRest, 1500)
   }
 }
-preloadFoodImages()
 
 // Food style setting — read from storage
 let currentFoodStyle: 'images' | 'circles' | 'emojis' = 'images'
@@ -1856,6 +1866,7 @@ function loadFoodStyle() {
   } catch { currentFoodStyle = 'images'; currentFoodPack = null }
 }
 loadFoodStyle()
+preloadFoodImages()
 
 // Circle food colors
 const CIRCLE_COLORS = ['#ff3366','#00ccff','#7cff00','#ff6b35','#ffd700','#cc33ff','#ff69b4','#00ff88','#ff4444','#44bbff']
@@ -2136,6 +2147,15 @@ function drawFood(ctx: CanvasRenderingContext2D, foods: Food[], camera: Camera, 
       const img = foodImgCache.get(f.img)!
       if (decayAlpha < 1) ctx.globalAlpha = decayAlpha
       ctx.drawImage(img, p.x - size / 2, p.y - size / 2, size, size)
+      if (decayAlpha < 1) ctx.globalAlpha = 1
+    } else if (f.img) {
+      // Image not loaded yet — draw a colored circle so food shows up instantly
+      if (decayAlpha < 1) ctx.globalAlpha = decayAlpha
+      const colorIdx = Math.abs(Math.round(f.x * 7 + f.y * 3)) % CIRCLE_COLORS.length
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, size * 0.45, 0, Math.PI * 2)
+      ctx.fillStyle = CIRCLE_COLORS[colorIdx]
+      ctx.fill()
       if (decayAlpha < 1) ctx.globalAlpha = 1
     }
   }
@@ -2675,13 +2695,16 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   if (headType !== 'default' && HEAD_IMAGES[headType]) {
     // Custom head image — draw as the worm's actual head, big and clear
     const headSrc = HEAD_IMAGES[headType]
-    const headImg = headImageCache.get(headSrc)
-    if (headImg) {
+    const headImg = headImageCache.get(headSrc) ?? loadHeadImage(headSrc)
+    if (headImg && headImg.complete && headImg.naturalWidth > 0) {
       const isAccessory = isAccessoryHeadImage(headSrc, headImg)
       if (isAccessory) {
         drawDefaultHeadFace(ctx, hp, headR, colors, worm.eyeBlink, eyeStyle, mouthStyle)
       }
       drawCostumeHeadImage(ctx, hp, headR, headImg, isAccessory)
+    } else {
+      // Costume image still loading — show default face so the head isn't blank
+      drawDefaultHeadFace(ctx, hp, headR, colors, worm.eyeBlink, eyeStyle, mouthStyle)
     }
   } else {
     if (headType === 'july4th2') {
