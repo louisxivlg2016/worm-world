@@ -1084,13 +1084,6 @@ export default function ShopScreen() {
   const selectedEventBalance = selectedEvent ? (eventGems[selectedEvent.id] || 0) : 0;
   const selectedEyeMeta = EYE_OPTIONS.find((option) => option.id === eyeStyle) ?? EYE_OPTIONS[0];
   const selectedMouthMeta = MOUTH_OPTIONS.find((option) => option.id === mouthStyle) ?? MOUTH_OPTIONS[0];
-  const previewLabel = activeTab === "shop" || activeTab === "fetes"
-    ? (selectedHeadMeta?.label ?? "Classique")
-    : activeTab === "flags"
-      ? (selectedFlag ? translateFlag(selectedFlag, flagLang) : null)
-      : activeTab === "eyes"
-        ? selectedEyeMeta.label
-        : selectedMouthMeta.label;
   const showCycleArrows = activeTab === "shop" || activeTab === "fetes" || activeTab === "flags";
   const cycleDisabled = activeTab === "shop" || activeTab === "fetes"
     ? availableHeadIds.length === 0
@@ -1228,7 +1221,6 @@ export default function ShopScreen() {
               </View>
             }
           />
-          {previewLabel ? <Text style={styles.previewCostumeName}>{previewLabel}</Text> : null}
           {showCycleArrows ? (
             <>
               <Pressable
@@ -1260,7 +1252,7 @@ export default function ShopScreen() {
 
       {(activeTab === "shop" || activeTab === "fetes") && (
         <>
-          <Text style={styles.sectionTitle}>{activeTab === "fetes" ? "Fêtes" : t("shopHead")}</Text>
+          {activeTab === "fetes" ? <Text style={styles.sectionTitle}>Fêtes</Text> : null}
           {activeTab === "fetes" ? (
             <>
               {selectedEvent ? (
