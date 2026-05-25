@@ -879,15 +879,15 @@ function worldToScreen(wx: number, wy: number, camera: Camera, canvasW: number, 
 function findFoodHotspot(x: number, y: number, range: number, foods: Food[]) {
   let count = 0, totalX = 0, totalY = 0, totalValue = 0
   for (const f of foods) {
-    if (f.fromDeath) continue // AI ignores death food
     const dx = x - f.x, dy = y - f.y
     const d = Math.sqrt(dx * dx + dy * dy)
     if (d < range) {
-      count++
+      const weight = f.fromDeath ? 4 : 1
+      count += weight
       totalX += f.x
       totalY += f.y
       totalValue += f.value
-      if (f.fromDeath) { count += 3; totalValue += 10 }
+      if (f.fromDeath) totalValue += 18
     }
   }
   if (count < 8) return null
@@ -973,8 +973,6 @@ function updateWorm(worm: Worm, dt: number, foods: Food[], coins: Coin[], partic
   const attractRange = headR + 35 + eff.magnetRange
   const nearby = foodGrid ? foodGrid.query(head.x, head.y, attractRange) : foods
   for (const f of nearby) {
-    // AI worms ignore death food — only player can eat it
-    if (f.fromDeath && !worm.isPlayer) continue
     const dx = head.x - f.x, dy = head.y - f.y
     const dist = Math.sqrt(dx * dx + dy * dy)
     if (dist < attractRange && dist > 0.001) {
@@ -1284,20 +1282,51 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
   // --- DEATH FOOD RUSH — AI eats nearby death food ---
   if (worm.aiTimer <= 0) {
     let bestDeathFood: Food | null = null
-    let bestDeathDist = 300
+    let bestDeathDist = Infinity
+    let bestDeathScore = -Infinity
+    let shouldBoostForDeathFood = false
+    const deathSearchRange = Math.min(420 + worm.aiGreed * 180 + worm.aiSkill * 120, 760)
     for (const f of foods) {
       if (!f.fromDeath) continue
       const dx = head.x - f.x, dy = head.y - f.y
       const d = Math.sqrt(dx * dx + dy * dy)
-      if (d < bestDeathDist) {
+      if (d > deathSearchRange) continue
+
+      let score = f.value * 70 - d * 0.85 + 180
+      let contested = false
+
+      for (const other of others) {
+        const oh = other.segments[0]
+        const odx = oh.x - f.x, ody = oh.y - f.y
+        const otherDist = Math.sqrt(odx * odx + ody * ody)
+        if (otherDist > 180) continue
+
+        contested = true
+        score += other.isPlayer ? 240 : 120
+
+        if (otherDist < d + 40) {
+          score += other.isPlayer ? 180 : 90
+        }
+
+        if (otherDist < 90) {
+          score += other.isPlayer ? 140 : 70
+        }
+      }
+
+      if (d < 90) score += 120
+      if (f.special) score += 60
+
+      if (score > bestDeathScore) {
+        bestDeathScore = score
         bestDeathDist = d
         bestDeathFood = f
+        shouldBoostForDeathFood = contested || d > 90
       }
     }
-    if (bestDeathFood) {
+    if (bestDeathFood && bestDeathScore > 0) {
       worm.targetAngle = Math.atan2(bestDeathFood.y - head.y, bestDeathFood.x - head.x)
-      worm.boosting = bestDeathDist > 50 && worm.boostEnergy > 20
-      worm.aiTimer = 8 + Math.floor(Math.random() * 6)
+      worm.boosting = shouldBoostForDeathFood && worm.boostEnergy > 15
+      worm.aiTimer = 5 + Math.floor(Math.random() * 4)
       return
     }
   }
@@ -1541,14 +1570,13 @@ function updateAI(worm: Worm, allWorms: Worm[], foods: Food[], foodGrid?: Spatia
       if (d > searchRange) continue
       let score = f.value * 15 - d
       if (f.special) score += 80
-      if (f.fromDeath) continue // AI ignores death food
+      if (f.fromDeath) score += 220 + f.value * 45
       if (score > bestScore) { bestScore = score; bestFood = f }
     }
 
     if (bestFood) {
       worm.targetAngle = Math.atan2(bestFood.y - head.y, bestFood.x - head.x)
-      // Only boost toward special food, not death food from across the map
-      if (bestFood.special && worm.aiGreed > 0.4 && worm.boostEnergy > 30) {
+      if ((bestFood.special || bestFood.fromDeath) && worm.aiGreed > 0.35 && worm.boostEnergy > 24) {
         worm.boosting = true
         worm.aiDistracted = 12
       }
