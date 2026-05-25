@@ -635,11 +635,10 @@ function drawRepeatedTextureSlice(
   }
 }
 
-// Preload all (only in browser)
-if (typeof Image !== 'undefined') {
-  Object.values(HEAD_IMAGES).forEach(src => loadHeadImage(src))
-  Object.values(BODY_TEXTURES).forEach(src => loadBodyTexture(src))
-}
+// NOTE: costume heads/bodies total ~80MB. Preloading them all here blocked the
+// network for several seconds at startup. Instead they load on demand
+// (loadHeadImage/loadBodyTexture, with a default-face fallback while loading);
+// the player's own costume is preloaded in startGame so it shows within ~1s.
 
 // ============================================
 // SPATIAL GRID - O(1) food lookup instead of O(n)
@@ -3059,8 +3058,11 @@ export function useGameEngine(
     s.player = createWorm(px, py, playerSkin, playerName, true)
     s.player.invincible = 180 // 3 seconds of spawn protection
 
-    // Preload body texture if the skin has one
+    // Preload the player's own costume (head + body) so it shows within the first second
     if (playerSkin.bodyTexture) loadBodyTexture(playerSkin.bodyTexture)
+    if (playerSkin.headType && playerSkin.headType !== 'default' && HEAD_IMAGES[playerSkin.headType]) {
+      loadHeadImage(HEAD_IMAGES[playerSkin.headType])
+    }
 
     // Set gameMode BEFORE spawning AI (affects their size/score)
     s.gameMode = gameMode ?? 'ffa'
