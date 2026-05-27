@@ -10,12 +10,18 @@
   </defs>
   <g filter="url(#iceshadow)">
     <circle cx="256" cy="284" r="150" fill="url(#ice)"/>
+    <circle cx="256" cy="284" r="136" fill="none" stroke="#ffc9e7" stroke-width="8" opacity=".4"/>
     <path d="M136 198c18-54 61-94 120-94 60 0 104 38 120 92-35 15-83 22-120 22-39 0-88-7-120-20z" fill="#fff4cb"/>
     <path d="M170 121c13-31 39-59 86-74 47 15 73 43 86 74-24 3-48 9-86 9-37 0-61-6-86-9z" fill="#9de4ff"/>
     <path d="M191 93c10-20 29-40 65-54 36 14 55 34 65 54-20 8-47 14-65 14-18 0-45-6-65-14z" fill="#ffcf4a"/>
+    <path d="M181 118c22 8 49 12 75 12 31 0 52-3 75-12" fill="none" stroke="#fff7df" stroke-width="7" stroke-linecap="round" opacity=".65"/>
     <g fill="#fff" opacity=".9">
       <circle cx="148" cy="168" r="12"/><circle cx="363" cy="170" r="10"/><circle cx="334" cy="133" r="9"/>
       <circle cx="180" cy="145" r="8"/><circle cx="273" cy="88" r="7"/><circle cx="226" cy="76" r="7"/>
+    </g>
+    <g fill="#ffd87c" opacity=".95">
+      <circle cx="160" cy="119" r="8"/><circle cx="352" cy="119" r="8"/><circle cx="256" cy="69" r="9"/>
+      <circle cx="160" cy="119" r="3" fill="#fff"/><circle cx="352" cy="119" r="3" fill="#fff"/><circle cx="256" cy="69" r="3" fill="#fff"/>
     </g>
     <g>
       <circle cx="198" cy="286" r="46" fill="#fff"/>
@@ -27,9 +33,14 @@
     </g>
     <path d="M176 229c18-18 50-18 68 0" fill="none" stroke="#7e2758" stroke-width="12" stroke-linecap="round"/>
     <path d="M283 229c18-18 50-18 68 0" fill="none" stroke="#7e2758" stroke-width="12" stroke-linecap="round"/>
+    <path d="M170 245c19-9 44-11 67-3" fill="none" stroke="#a23c72" stroke-width="5" stroke-linecap="round" opacity=".35"/>
+    <path d="M279 243c18-7 42-7 64 1" fill="none" stroke="#a23c72" stroke-width="5" stroke-linecap="round" opacity=".35"/>
     <circle cx="208" cy="344" r="18" fill="#ffc0df" opacity=".55"/>
     <circle cx="304" cy="344" r="18" fill="#ffc0df" opacity=".55"/>
     <path d="M205 392c19 19 83 19 102 0" fill="#84204d"/>
     <path d="M220 391c12 11 61 11 72 0 0 21-18 37-36 37s-36-16-36-37z" fill="#ff8dbf"/>
+    <g fill="#fff5d3" opacity=".8">
+      <circle cx="192" cy="175" r="5"/><circle cx="320" cy="175" r="5"/>
+    </g>
   </g>
 </svg>

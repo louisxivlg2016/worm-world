@@ -12,6 +12,10 @@
       <stop offset="0%" stop-color="#3c7f1d"/>
       <stop offset="100%" stop-color="#79b845"/>
     </linearGradient>
+    <linearGradient id="gold" x1="0" x2="1">
+      <stop offset="0%" stop-color="#fff0b7"/>
+      <stop offset="100%" stop-color="#d89f1e"/>
+    </linearGradient>
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
       <feDropShadow dx="0" dy="14" stdDeviation="12" flood-color="#76101f" flood-opacity=".35"/>
     </filter>
@@ -21,6 +25,17 @@
     <path d="M126 192c18-66 77-118 143-118 61 0 117 38 145 98-18 23-44 39-71 41-52 4-102 0-217-21z" fill="url(#cap)"/>
     <path d="M95 209c40-25 118-24 188-14 65 10 109 9 150-8 8 30-5 64-38 81-20 10-71 18-141 18-103 0-154-24-159-77z" fill="#d71e35"/>
     <path d="M121 211c36 13 84 22 133 22 47 0 109-6 159-22" fill="none" stroke="#ffd78b" stroke-width="10" stroke-linecap="round" opacity=".9"/>
+    <path d="M112 238c45 21 110 31 144 31 57 0 116-10 160-31" fill="none" stroke="#9f1122" stroke-width="8" stroke-linecap="round" opacity=".45"/>
+    <g opacity=".9">
+      <circle cx="120" cy="218" r="10" fill="url(#gold)"/>
+      <circle cx="155" cy="226" r="9" fill="url(#gold)"/>
+      <circle cx="392" cy="217" r="10" fill="url(#gold)"/>
+      <circle cx="355" cy="226" r="9" fill="url(#gold)"/>
+      <circle cx="120" cy="218" r="4" fill="#fff8de"/>
+      <circle cx="155" cy="226" r="3" fill="#fff8de"/>
+      <circle cx="392" cy="217" r="4" fill="#fff8de"/>
+      <circle cx="355" cy="226" r="3" fill="#fff8de"/>
+    </g>
     <g transform="translate(123 124)">
       <ellipse cx="48" cy="48" rx="50" ry="48" fill="#fff4f0"/>
       <ellipse cx="48" cy="48" rx="38" ry="36" fill="#ffebeb"/>
@@ -40,6 +55,15 @@
         <circle cx="48" cy="62" r="18"/>
       </g>
       <circle cx="48" cy="47" r="8" fill="#ffd644"/>
+      <circle cx="48" cy="47" r="15" fill="none" stroke="url(#gold)" stroke-width="5"/>
+      <g fill="#ffe48d">
+        <circle cx="8" cy="56" r="6"/>
+        <circle cx="88" cy="56" r="6"/>
+      </g>
+    </g>
+    <g>
+      <path d="M146 182c34-25 67-35 110-35 42 0 81 11 110 35" fill="none" stroke="#fff4db" stroke-width="12" stroke-linecap="round" opacity=".45"/>
+      <path d="M150 185c32-22 66-31 106-31 39 0 77 10 106 31" fill="none" stroke="#9c1020" stroke-width="6" stroke-dasharray="1 14" stroke-linecap="round" opacity=".4"/>
     </g>
     <g>
       <circle cx="198" cy="274" r="46" fill="#fff"/>
@@ -51,9 +75,15 @@
     </g>
     <path d="M182 221c22-18 47-18 67 0" fill="none" stroke="#4f1117" stroke-width="12" stroke-linecap="round"/>
     <path d="M283 221c22-18 47-18 67 0" fill="none" stroke="#4f1117" stroke-width="12" stroke-linecap="round"/>
+    <path d="M168 245c18-10 40-13 60-6" fill="none" stroke="#8a0f1d" stroke-width="5" stroke-linecap="round" opacity=".45"/>
+    <path d="M284 239c17-8 40-9 60 0" fill="none" stroke="#8a0f1d" stroke-width="5" stroke-linecap="round" opacity=".45"/>
     <circle cx="208" cy="334" r="20" fill="#ff8ca0" opacity=".55"/>
     <circle cx="304" cy="334" r="20" fill="#ff8ca0" opacity=".55"/>
     <path d="M206 385c18 22 80 22 100 0" fill="#70111b"/>
     <path d="M221 384c13 10 58 10 70 0 0 24-20 40-35 40s-35-16-35-40z" fill="#ff697f"/>
+    <g fill="#ffd78b" opacity=".9">
+      <circle cx="181" cy="362" r="5"/>
+      <circle cx="331" cy="362" r="5"/>
+    </g>
   </g>
 </svg>

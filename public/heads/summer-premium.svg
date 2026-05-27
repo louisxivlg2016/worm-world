@@ -16,8 +16,10 @@
       <path d="M127 82l54 41-17 25-30 1z"/>
     </g>
     <circle cx="256" cy="282" r="150" fill="url(#sunskin)"/>
+    <circle cx="256" cy="282" r="134" fill="none" stroke="#ffcf67" stroke-width="10" opacity=".45"/>
     <path d="M130 184c37-43 84-68 126-68s90 27 126 72c-26 10-58 16-126 16-67 0-100-6-126-20z" fill="#f6d390"/>
     <path d="M128 195c36 5 66 9 128 9 62 0 96-4 128-9-8 41-25 58-49 58H177c-27 0-43-17-49-58z" fill="#e6bc79"/>
+    <path d="M141 193c30-21 73-33 115-33 48 0 84 10 114 33" fill="none" stroke="#fff0bf" stroke-width="8" stroke-linecap="round" opacity=".65"/>
     <g>
       <path d="M164 212h184" stroke="#d94d1e" stroke-width="6" stroke-dasharray="3 10" opacity=".45"/>
       <path d="M164 224h184" stroke="#d94d1e" stroke-width="6" stroke-dasharray="3 10" opacity=".45"/>
@@ -31,6 +33,10 @@
       <path d="M169 168c24 16 54 16 78 0" fill="none" stroke="#d94d1e" stroke-width="8" stroke-linecap="round"/>
       <path d="M265 168c24 16 54 16 78 0" fill="none" stroke="#d94d1e" stroke-width="8" stroke-linecap="round"/>
     </g>
+    <g fill="#ffdf80" opacity=".85">
+      <circle cx="122" cy="236" r="8"/><circle cx="390" cy="236" r="8"/>
+      <circle cx="148" cy="261" r="6"/><circle cx="364" cy="261" r="6"/>
+    </g>
     <g>
       <circle cx="198" cy="282" r="46" fill="#fff"/>
       <circle cx="314" cy="282" r="46" fill="#fff"/>
@@ -39,9 +45,14 @@
       <circle cx="208" cy="271" r="8" fill="#fff"/>
       <circle cx="324" cy="271" r="8" fill="#fff"/>
     </g>
+    <path d="M173 243c17-10 42-12 63-4" fill="none" stroke="#d65b29" stroke-width="5" stroke-linecap="round" opacity=".35"/>
+    <path d="M279 239c18-8 43-8 64 1" fill="none" stroke="#d65b29" stroke-width="5" stroke-linecap="round" opacity=".35"/>
     <circle cx="208" cy="340" r="19" fill="#ffb36f" opacity=".5"/>
     <circle cx="304" cy="340" r="19" fill="#ffb36f" opacity=".5"/>
     <path d="M205 390c17 20 84 20 101 0" fill="#7c2900"/>
     <path d="M220 389c12 11 62 11 72 0 0 20-18 37-36 37s-36-17-36-37z" fill="#ff7d5e"/>
+    <g fill="#fff0b1" opacity=".8">
+      <circle cx="246" cy="126" r="5"/><circle cx="266" cy="126" r="5"/>
+    </g>
   </g>
 </svg>
