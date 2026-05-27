@@ -282,8 +282,8 @@ export const GAME_EVENTS: GameEvent[] = [
     emoji: '🌹',
     currencyImage: '/mayday-coin.png',
     costumes: [
-      { id: 'mayday', label: 'Ouvrière Fleurie', preview: '/heads/mayday-premium.svg', bodyTexture: '/heads/mayday-body.png' },
-      { id: 'mayday2', label: 'Couronne du Printemps', preview: '/heads/mayday2-premium.svg', bodyTexture: '/heads/mayday2-body.png' },
+      { id: 'mayday', label: 'Ouvrière Fleurie', preview: '/heads/mayday-premium.svg?v=2', bodyTexture: '/heads/mayday-body.png' },
+      { id: 'mayday2', label: 'Couronne du Printemps', preview: '/heads/mayday2-premium.svg?v=2', bodyTexture: '/heads/mayday2-body.png' },
       { id: 'mayday3', label: 'Héraut des Roses', preview: '/heads/mayday3.png', bodyTexture: '/heads/mayday3-body.png' },
     ],
     unlockKey: 'maydayUnlocked',
@@ -305,9 +305,9 @@ export const GAME_EVENTS: GameEvent[] = [
     emoji: '☀️',
     currencyImage: '/summer-coin.png',
     costumes: [
-      { id: 'summer', label: 'Soleil Plage', preview: '/heads/summer-premium.svg', bodyTexture: '/heads/summer-body.png' },
-      { id: 'summer2', label: 'Sorbet Chic', preview: '/heads/summer2-premium.svg', bodyTexture: '/heads/summer2-body.png' },
-      { id: 'summer3', label: 'Lagune Tiki', preview: '/heads/summer3-premium.svg', bodyTexture: '/heads/summer3-body.png' },
+      { id: 'summer', label: 'Soleil Plage', preview: '/heads/summer-premium.svg?v=2', bodyTexture: '/heads/summer-body.png' },
+      { id: 'summer2', label: 'Sorbet Chic', preview: '/heads/summer2-premium.svg?v=2', bodyTexture: '/heads/summer2-body.png' },
+      { id: 'summer3', label: 'Lagune Tiki', preview: '/heads/summer3-premium.svg?v=2', bodyTexture: '/heads/summer3-body.png' },
       { id: 'summer4', label: 'Capitaine Soleil', preview: '/heads/summer4.png', bodyTexture: '/heads/summer4-body.png' },
     ],
     unlockKey: 'summerUnlocked',
