@@ -424,9 +424,11 @@ export const GAME_EVENTS: GameEvent[] = [
     emoji: '🪔',
     currencyImage: '/diwali-coin.png',
     costumes: [
-      { id: 'diwali', label: 'Diya', preview: '/heads/diwali.png', bodyTexture: '/heads/diwali-body.png' },
-      { id: 'diwali2', label: 'Rangoli', preview: '/heads/diwali2.png', bodyTexture: '/heads/diwali2-body.png' },
+      { id: 'diwali', label: 'Prince Saphir', preview: '/heads/diwali.png', bodyTexture: '/heads/diwali-body.png' },
+      { id: 'diwali2', label: 'Reine Rangoli', preview: '/heads/diwali2.png', bodyTexture: '/heads/diwali2-body.png' },
       { id: 'diwali3', label: 'Rajah Diya', preview: '/heads/diwali3.png', bodyTexture: '/heads/diwali3-body.png' },
+      { id: 'diwali4', label: 'Gardien Lanternes', preview: '/heads/diwali4.png', bodyTexture: '/heads/diwali2-body.png' },
+      { id: 'diwali5', label: 'Diva Paon', preview: '/heads/diwali5.png', bodyTexture: '/heads/diwali-body.png' },
     ],
     unlockKey: 'diwaliUnlocked',
     bgImage: '/diwali-bg.png',
