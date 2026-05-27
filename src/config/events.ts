@@ -140,9 +140,9 @@ export const GAME_EVENTS: GameEvent[] = [
     emoji: '🌈',
     currencyImage: '/holi-coin.png',
     costumes: [
-      { id: 'holi', label: 'Couleurs', preview: '/heads/holi.png', bodyTexture: '/heads/holi-body.png' },
-      { id: 'holi2', label: 'Ballon', preview: '/heads/holi2.png', bodyTexture: '/heads/holi2-body.png' },
-      { id: 'holi3', label: 'Maître Multicolore', preview: '/heads/holi3.png', bodyTexture: '/heads/holi3-body.png' },
+      { id: 'holi', label: 'Couleurs', preview: '/heads/holi-premium.png', bodyTexture: '/heads/holi-body.png' },
+      { id: 'holi2', label: 'Ballon', preview: '/heads/holi2-premium.png', bodyTexture: '/heads/holi2-body.png' },
+      { id: 'holi3', label: 'Maître Multicolore', preview: '/heads/holi3-premium.png', bodyTexture: '/heads/holi3-body.png' },
     ],
     unlockKey: 'holiUnlocked',
     bgImage: '/holi-bg.png',
