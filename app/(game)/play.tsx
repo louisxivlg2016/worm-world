@@ -1,6 +1,7 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
+import { useIsFocused } from "@react-navigation/native";
 import GamePlay from "@/expo/GamePlay";
 import { useGameState } from "@/context/GameStateContext";
 import { getEventByMode } from "@/config/events";
@@ -8,12 +9,18 @@ import type { GameMode } from "@/types/game";
 
 export default function PlayScreen() {
   const router = useRouter();
+  const isFocused = useIsFocused();
   const params = useLocalSearchParams<{ mode?: string }>();
   const { playerName, playerSkin, roomSlug, roomId, gameMode: ctxGameMode, seed, handleDeath, handleEventWin, setIsPlaying } = useGameState();
+  const [screenKey, setScreenKey] = useState(0);
 
   // Use route param if available, otherwise context
   const gameMode = (params.mode as GameMode) || ctxGameMode || "ffa";
   const event = getEventByMode(gameMode);
+
+  useEffect(() => {
+    if (isFocused) setScreenKey((v) => v + 1);
+  }, [isFocused]);
 
   const onDeath = useCallback((score: number, length: number, coins: number, kills: number) => {
     // Play collision sound — try Web Audio first, fall back to HTMLAudio
@@ -69,6 +76,7 @@ export default function PlayScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: "#000" }}>
       <GamePlay
+        key={screenKey}
         playerName={playerName || "Player"}
         playerSkin={JSON.stringify(playerSkin)}
         roomSlug={roomSlug}

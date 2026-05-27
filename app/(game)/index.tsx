@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, TextInput, ScrollView, Pressable, useWindowDimensions, Image } from "react-native";
 import { useRouter } from "expo-router";
+import { useIsFocused } from "@react-navigation/native";
 import { useTranslation } from "react-i18next";
 import { useGameState } from "@/context/GameStateContext";
 import { SKINS } from "@/types/game";
@@ -11,15 +12,21 @@ import { colors, spacing } from "@/expo/theme";
 export default function HomeScreen() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
+  const isFocused = useIsFocused();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 600;
   const { customSkin, playerSkin, startGame, totalCoins } = useGameState();
+  const [screenKey, setScreenKey] = useState(0);
 
   const [name, setName] = useState(() => {
     try { return getStorage().getItem("playerName") ?? ""; } catch { return ""; }
   });
   const [selectedSkin, setSelectedSkin] = useState(0);
   const activeSkin = customSkin ?? playerSkin ?? SKINS[selectedSkin] ?? SKINS[0];
+
+  useEffect(() => {
+    if (isFocused) setScreenKey((v) => v + 1);
+  }, [isFocused]);
 
   const userLang = (i18n.language || "fr").split("-")[0];
   // Show events: universal (no lang) + matching user's language
@@ -43,7 +50,7 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View key={screenKey} style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={{
         position: "absolute",
         top: -120,
