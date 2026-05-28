@@ -282,9 +282,9 @@ export const GAME_EVENTS: GameEvent[] = [
     emoji: '🌹',
     currencyImage: '/mayday-coin.png',
     costumes: [
-      { id: 'mayday', label: 'Ouvrière Fleurie', preview: '/heads/mayday-premium.svg?v=2', bodyTexture: '/heads/mayday-body.png' },
-      { id: 'mayday2', label: 'Couronne du Printemps', preview: '/heads/mayday2-premium.svg?v=2', bodyTexture: '/heads/mayday2-body.png' },
-      { id: 'mayday3', label: 'Héraut des Roses', preview: '/heads/mayday3.png', bodyTexture: '/heads/mayday3-body.png' },
+      { id: 'mayday', label: 'Ouvrière Fleurie', preview: '/heads/mayday.png?v=3', bodyTexture: '/heads/mayday-body.png' },
+      { id: 'mayday2', label: 'Couronne du Printemps', preview: '/heads/mayday2.png?v=3', bodyTexture: '/heads/mayday2-body.png' },
+      { id: 'mayday3', label: 'Héraut des Roses', preview: '/heads/mayday3.png?v=3', bodyTexture: '/heads/mayday3-body.png' },
     ],
     unlockKey: 'maydayUnlocked',
     bgImage: '/mayday-bg.png',
