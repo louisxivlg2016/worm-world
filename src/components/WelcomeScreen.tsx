@@ -27,6 +27,13 @@ export function WelcomeScreen({ customSkin, activeEvents, onPlay, onPlayCoins, o
     onPlay(name.trim() || `Guest${Math.floor(Math.random() * 999)}`, activeSkin)
   }
 
+  const formatEventLabel = (label: string) =>
+    label
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/ı/g, 'i')
+      .toUpperCase()
+
   return (
     <div style={styles.container}>
       <h1 style={styles.title}>{t('title')}</h1>
@@ -56,10 +63,10 @@ export function WelcomeScreen({ customSkin, activeEvents, onPlay, onPlayCoins, o
         ))}
       </div>
       <button style={styles.playBtn} onClick={handlePlay}>
-        {t('soloPlay')}
+        {String(t('soloPlay')).toUpperCase()}
       </button>
       <button style={styles.coinsBtn} onClick={() => onPlayCoins(name.trim() || `Guest${Math.floor(Math.random() * 999)}`, activeSkin)}>
-        {t('coinsMode')}
+        {String(t('coinsMode')).toUpperCase()}
       </button>
       {activeEvents.length > 0 && (
         <div style={styles.eventsScroll}>
@@ -67,22 +74,17 @@ export function WelcomeScreen({ customSkin, activeEvents, onPlay, onPlayCoins, o
             <button
               key={event.id}
               style={{
-                padding: '10px 28px',
-                border: 'none',
-                borderRadius: 50,
-                fontFamily: "'Bungee', cursive",
-                fontSize: 14,
-                color: '#FFFFFF',
+                ...styles.eventChip,
                 background: event.btnGradient,
-                cursor: 'pointer',
                 boxShadow: event.btnShadow,
-                letterSpacing: 1,
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
+                borderColor: event.borderColor || 'rgba(255,255,255,0.18)',
               }}
               onClick={() => onPlayEvent(event.id, name.trim() || `Guest${Math.floor(Math.random() * 999)}`, activeSkin)}
             >
-              {event.emoji} {event.label}
+              <span style={styles.eventChipText}>
+                <span style={styles.eventEmoji}>{event.emoji}</span>
+                {formatEventLabel(event.label)}
+              </span>
             </button>
           ))}
         </div>
@@ -120,7 +122,7 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 100,
-    background: 'radial-gradient(ellipse at center, #1a5c8a 0%, #0e3a5c 60%, #082740 100%)',
+    background: 'radial-gradient(ellipse at center, #24577e 0%, #1c496f 58%, #173f61 100%)',
   },
   title: {
     fontFamily: "'Bungee', cursive",
@@ -203,6 +205,30 @@ const styles: Record<string, React.CSSProperties> = {
     scrollbarWidth: 'thin',
     WebkitOverflowScrolling: 'touch',
   } as React.CSSProperties,
+  eventChip: {
+    padding: '10px 28px',
+    border: 'none',
+    borderRadius: 50,
+    fontFamily: "'Bungee', cursive",
+    fontSize: 14,
+    color: '#FFFFFF',
+    cursor: 'pointer',
+    letterSpacing: 1,
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  eventChipText: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+  },
+  eventEmoji: {
+    fontSize: 18,
+    lineHeight: 1,
+  },
   btnRow: {
     display: 'flex',
     gap: 12,
