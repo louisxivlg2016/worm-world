@@ -353,9 +353,9 @@ export const GAME_EVENTS: GameEvent[] = [
     currencyImage: '/bastille-coin.png',
     lang: 'fr',
     costumes: [
-      { id: 'bastille', label: 'Cocarde', preview: '/heads/bastille.png', bodyTexture: '/heads/bastille-body.png' },
-      { id: 'bastille2', label: 'Béret', preview: '/heads/bastille2.png', bodyTexture: '/heads/bastille2-body.png' },
-      { id: 'bastille3', label: 'Patriote Tricolore', preview: '/heads/bastille3.png', bodyTexture: '/heads/bastille3-body.png' },
+      { id: 'bastille', label: 'Cocarde', preview: '/heads/bastille.png?v=2', bodyTexture: '/heads/bastille-body.png' },
+      { id: 'bastille2', label: 'Béret', preview: '/heads/bastille2.png?v=2', bodyTexture: '/heads/bastille2-body.png' },
+      { id: 'bastille3', label: 'Patriote Tricolore', preview: '/heads/bastille3.png?v=2', bodyTexture: '/heads/bastille3-body.png' },
       { id: 'bastille_flag', label: 'Drapeau Français', preview: '/drapeau/france.png', bodyTexture: '/drapeau/france.png' },
     ],
     unlockKey: 'bastilleUnlocked',
