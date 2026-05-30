@@ -135,6 +135,17 @@ for (const ev of _EVENTS_FOR_HEADS) {
   }
 }
 
+const EVENT_BODY_TEXTURES = new Set(
+  _EVENTS_FOR_HEADS.flatMap((ev) => ev.costumes.map((c) => c.bodyTexture))
+    .filter((src) => src.startsWith('/heads/'))
+)
+
+function isPremiumEventBodyTexture(src?: string | null): boolean {
+  if (!src) return false
+  const normalized = src.split('?')[0]
+  return EVENT_BODY_TEXTURES.has(normalized)
+}
+
 const DEFAULT_FLAG_TEXTURE_SCALE = 1.4
 
 const BODY_TEXTURE_OFFSETS: Record<string, number> = {
@@ -160,6 +171,64 @@ function drawDefaultHeadFace(
   ctx.fill()
 
   drawFaceDetails(ctx, hp, headR, colors[0], eyeBlink, eyeStyle, mouthStyle)
+}
+
+function drawPremiumBodyOverlays(
+  ctx: CanvasRenderingContext2D,
+  pts: { x: number; y: number }[],
+  normals: { nx: number; ny: number }[],
+  R: number,
+  minX: number,
+  minY: number,
+  maxX: number,
+  maxY: number,
+) {
+  const satin = ctx.createLinearGradient(0, minY, 0, maxY)
+  satin.addColorStop(0, 'rgba(255,255,255,0.30)')
+  satin.addColorStop(0.18, 'rgba(255,245,214,0.18)')
+  satin.addColorStop(0.48, 'rgba(255,255,255,0.05)')
+  satin.addColorStop(0.78, 'rgba(32,12,8,0.08)')
+  satin.addColorStop(1, 'rgba(0,0,0,0.22)')
+  ctx.fillStyle = satin
+  ctx.fillRect(minX, minY, maxX - minX, maxY - minY)
+
+  if (pts.length > 1) {
+    ctx.beginPath()
+    const start = pts[0]
+    const startN = normals[0]
+    ctx.moveTo(start.x + startN.nx * (-R * 0.52), start.y + startN.ny * (-R * 0.52))
+    for (let i = 1; i < pts.length; i++) {
+      const p = pts[i]
+      const n = normals[i]
+      ctx.lineTo(p.x + n.nx * (-R * 0.52), p.y + n.ny * (-R * 0.52))
+    }
+    for (let i = pts.length - 1; i >= 0; i--) {
+      const p = pts[i]
+      const n = normals[i]
+      ctx.lineTo(p.x + n.nx * (-R * 0.18), p.y + n.ny * (-R * 0.18))
+    }
+    ctx.closePath()
+    const ribbon = ctx.createLinearGradient(0, minY, 0, maxY)
+    ribbon.addColorStop(0, 'rgba(255,255,255,0.28)')
+    ribbon.addColorStop(1, 'rgba(255,255,255,0)')
+    ctx.fillStyle = ribbon
+    ctx.fill()
+  }
+
+  for (let i = 2; i < pts.length; i += 3) {
+    const p = pts[i]
+    const n = normals[Math.min(i, normals.length - 1)]
+    const jewelX = p.x + n.nx * (-R * 0.14)
+    const jewelY = p.y + n.ny * (-R * 0.14)
+    ctx.beginPath()
+    ctx.arc(jewelX, jewelY, Math.max(1.2, R * 0.07), 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(255,214,120,0.34)'
+    ctx.fill()
+    ctx.beginPath()
+    ctx.arc(jewelX - R * 0.012, jewelY - R * 0.012, Math.max(0.8, R * 0.03), 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(255,255,255,0.52)'
+    ctx.fill()
+  }
 }
 
 function drawJuly4th2HeadFace(
@@ -2478,6 +2547,8 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
       traceTubePath()
       ctx.clip()
 
+      const isPremiumEventBody = isPremiumEventBodyTexture(bodyTexKey)
+
       if (isFlag && bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0) {
         const lengths = [0]
         for (let i = 1; i < pts.length; i++) {
@@ -2535,6 +2606,10 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
           ctx.closePath()
           ctx.fill()
         }
+      }
+
+      if (!isFlag && isPremiumEventBody) {
+        drawPremiumBodyOverlays(ctx, pts, normals, R, minX, minY, maxX, maxY)
       }
 
       ctx.restore()
@@ -2646,6 +2721,12 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
           ctx.strokeStyle = 'rgba(255,255,255,0.08)'
           ctx.lineWidth = Math.max(1, bigR * 0.08)
           ctx.stroke()
+        }
+        if (!isFlag && isPremiumEventBodyTexture(bodyTexKey)) {
+          ctx.beginPath()
+          ctx.arc(p.x, p.y - bigR * 0.12, bigR * 0.14, 0, Math.PI * 2)
+          ctx.fillStyle = 'rgba(255,223,146,0.28)'
+          ctx.fill()
         }
         ctx.restore()
       }

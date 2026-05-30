@@ -101,12 +101,20 @@ const FLAG_SKINS: FlagSkin[] = [
 ];
 
 const DEFAULT_FLAG_TEXTURE_SCALE = 1.4;
+const PREMIUM_EVENT_BODY_TEXTURES = new Set(
+  GAME_EVENTS.flatMap((event) => event.costumes.map((costume) => costume.bodyTexture)).filter((src) => src.startsWith("/heads/"))
+);
 const FLAG_TEXTURE_OFFSETS: Record<string, number> = {
   "/assets/france.png": 0.18,
 };
 const FLAG_TEXTURE_SCALES: Record<string, number> = {
   "/assets/france.png": DEFAULT_FLAG_TEXTURE_SCALE,
 };
+
+function isPremiumEventBodyTextureSource(src?: string | null) {
+  if (!src) return false;
+  return PREMIUM_EVENT_BODY_TEXTURES.has(src.split("?")[0]);
+}
 
 type ShopTab = "shop" | "fetes" | "flags" | "eyes" | "mouths";
 
@@ -454,6 +462,7 @@ function ShopWormPreview({
   const isSnowmanHead = headType === "santa3";
   const [flagPreviewUri, setFlagPreviewUri] = useState<string>("");
   const showsTubeBody = bodyStyle === "tube" || isFlagPreview;
+  const isPremiumEventBodyPreview = !isFlagPreview && isPremiumEventBodyTextureSource(bodyTextureSource?.uri);
   const flagTextureScale = isFlagPreview && segmentSource ? (FLAG_TEXTURE_SCALES[segmentSource] ?? DEFAULT_FLAG_TEXTURE_SCALE) : 1;
   const flagTextureOffset = isFlagPreview && segmentSource ? (FLAG_TEXTURE_OFFSETS[segmentSource] ?? 0) : 0;
   const baseColor = palette[0] || "#9a9a9a";
@@ -486,6 +495,22 @@ function ShopWormPreview({
         <View key={`${color}-${index}`} style={[styles.previewPaletteBand, { backgroundColor: color }]} />
       ))}
     </View>
+  );
+
+  const renderPremiumTubeDecor = () => (
+    <>
+      <View style={styles.previewTubePremiumGlow} />
+      <View style={styles.previewTubePremiumRibbon} />
+      <View style={styles.previewTubePremiumEdgeShade} />
+      <View style={styles.previewTubePremiumJewelsRow}>
+        {Array.from({ length: 18 }, (_, index) => (
+          <View key={`premium-jewel-${index}`} style={styles.previewTubePremiumJewelWrap}>
+            <View style={styles.previewTubePremiumJewel} />
+            <View style={styles.previewTubePremiumJewelCore} />
+          </View>
+        ))}
+      </View>
+    </>
   );
 
   const renderEye = (side: "left" | "right") => {
@@ -697,6 +722,7 @@ function ShopWormPreview({
               ) : renderTubePaletteFill(styles.previewTubeImage)}
               <View style={styles.previewTubeShade} />
               <View style={styles.previewTubeHighlight} />
+              {isPremiumEventBodyPreview ? renderPremiumTubeDecor() : null}
             </View>
           </>
         ) : !flagPreviewUri ? (
@@ -1493,6 +1519,59 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 4,
     backgroundColor: "rgba(255,255,255,0.18)",
+  },
+  previewTubePremiumGlow: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    backgroundColor: "rgba(255,214,128,0.08)",
+  },
+  previewTubePremiumRibbon: {
+    position: "absolute",
+    left: 18,
+    right: 40,
+    top: 14,
+    height: 22,
+    borderRadius: 14,
+    backgroundColor: "rgba(255,255,255,0.10)",
+  },
+  previewTubePremiumEdgeShade: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 28,
+    backgroundColor: "rgba(22,10,5,0.08)",
+  },
+  previewTubePremiumJewelsRow: {
+    position: "absolute",
+    left: 32,
+    right: 32,
+    top: 40,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  previewTubePremiumJewelWrap: {
+    width: 10,
+    height: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  previewTubePremiumJewel: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "rgba(255,220,148,0.30)",
+  },
+  previewTubePremiumJewelCore: {
+    position: "absolute",
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: "rgba(255,255,255,0.65)",
   },
   previewHead: {
     position: "absolute",
