@@ -116,6 +116,37 @@ function isPremiumEventBodyTextureSource(src?: string | null) {
   return PREMIUM_EVENT_BODY_TEXTURES.has(src.split("?")[0]);
 }
 
+type PremiumBodyTheme =
+  | "royal"
+  | "floral"
+  | "lantern"
+  | "festival"
+  | "clover"
+  | "crescent"
+  | "spring"
+  | "worker"
+  | "summer"
+  | "national"
+  | "winter"
+  | "default";
+
+function getPremiumBodyTheme(source?: string | null): PremiumBodyTheme {
+  const normalized = source?.split("?")[0] ?? "";
+  if (!normalized) return "default";
+  if (normalized.includes("newyear") || normalized.includes("reveillon")) return "royal";
+  if (normalized.includes("valentine")) return "floral";
+  if (normalized.includes("cny") || normalized.includes("diwali")) return "lantern";
+  if (normalized.includes("carnival") || normalized.includes("holi") || normalized.includes("muertos")) return "festival";
+  if (normalized.includes("stpatrick")) return "clover";
+  if (normalized.includes("ramadan") || normalized.includes("eid")) return "crescent";
+  if (normalized.includes("easter")) return "spring";
+  if (normalized.includes("mayday")) return "worker";
+  if (normalized.includes("summer")) return "summer";
+  if (normalized.includes("bastille") || normalized.includes("july4th") || normalized.includes("thanksgiving")) return "national";
+  if (normalized.includes("santa")) return "winter";
+  return "default";
+}
+
 type ShopTab = "shop" | "fetes" | "flags" | "eyes" | "mouths";
 
 const SHOP_TAB_LABELS: Record<ShopTab, string> = {
@@ -463,6 +494,7 @@ function ShopWormPreview({
   const [flagPreviewUri, setFlagPreviewUri] = useState<string>("");
   const showsTubeBody = bodyStyle === "tube" || isFlagPreview;
   const isPremiumEventBodyPreview = !isFlagPreview && isPremiumEventBodyTextureSource(bodyTextureSource?.uri);
+  const premiumBodyTheme = getPremiumBodyTheme(bodyTextureSource?.uri);
   const flagTextureScale = isFlagPreview && segmentSource ? (FLAG_TEXTURE_SCALES[segmentSource] ?? DEFAULT_FLAG_TEXTURE_SCALE) : 1;
   const flagTextureOffset = isFlagPreview && segmentSource ? (FLAG_TEXTURE_OFFSETS[segmentSource] ?? 0) : 0;
   const baseColor = palette[0] || "#9a9a9a";
@@ -523,6 +555,54 @@ function ShopWormPreview({
           <View key={`premium-tassel-${index}`} style={styles.previewTubePremiumTassel} />
         ))}
       </View>
+      {premiumBodyTheme === "floral" ? (
+        <View style={styles.previewTubeFloralRow}>
+          {Array.from({ length: 11 }, (_, index) => (
+            <View key={`floral-${index}`} style={styles.previewTubeFlower}>
+              <View style={styles.previewTubeFlowerCore} />
+            </View>
+          ))}
+        </View>
+      ) : null}
+      {premiumBodyTheme === "worker" ? (
+        <View style={styles.previewTubeWorkerBadges}>
+          {Array.from({ length: 9 }, (_, index) => (
+            <View key={`worker-${index}`} style={styles.previewTubeWorkerBadge} />
+          ))}
+        </View>
+      ) : null}
+      {premiumBodyTheme === "summer" || premiumBodyTheme === "festival" ? (
+        <View style={styles.previewTubeFeatherRow}>
+          {Array.from({ length: 12 }, (_, index) => (
+            <View
+              key={`feather-${index}`}
+              style={[
+                styles.previewTubeFeather,
+                premiumBodyTheme === "festival" && styles.previewTubeFeatherFestival,
+              ]}
+            />
+          ))}
+        </View>
+      ) : null}
+      {premiumBodyTheme === "crescent" ? (
+        <View style={styles.previewTubeCrescentRow}>
+          {Array.from({ length: 10 }, (_, index) => (
+            <View key={`crescent-${index}`} style={styles.previewTubeCrescent} />
+          ))}
+        </View>
+      ) : null}
+      {premiumBodyTheme === "clover" ? (
+        <View style={styles.previewTubeCloverRow}>
+          {Array.from({ length: 10 }, (_, index) => (
+            <View key={`clover-${index}`} style={styles.previewTubeClover}>
+              <View style={styles.previewTubeCloverLeafA} />
+              <View style={styles.previewTubeCloverLeafB} />
+              <View style={styles.previewTubeCloverLeafC} />
+              <View style={styles.previewTubeCloverLeafD} />
+            </View>
+          ))}
+        </View>
+      ) : null}
     </>
   );
 
@@ -1630,6 +1710,134 @@ const styles = StyleSheet.create({
     height: 14,
     borderRadius: 2,
     backgroundColor: "rgba(255,215,126,0.34)",
+  },
+  previewTubeFloralRow: {
+    position: "absolute",
+    left: 48,
+    right: 48,
+    top: 38,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  previewTubeFlower: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: "rgba(255,179,210,0.72)",
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0 0 8px rgba(255,130,185,0.22)",
+  },
+  previewTubeFlowerCore: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: "rgba(255,244,178,0.95)",
+  },
+  previewTubeWorkerBadges: {
+    position: "absolute",
+    left: 44,
+    right: 44,
+    top: 37,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  previewTubeWorkerBadge: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: "rgba(246,213,99,0.88)",
+    boxShadow: "0 0 8px rgba(255,224,122,0.25)",
+  },
+  previewTubeFeatherRow: {
+    position: "absolute",
+    left: 40,
+    right: 40,
+    bottom: 12,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+  },
+  previewTubeFeather: {
+    width: 8,
+    height: 22,
+    borderRadius: 6,
+    backgroundColor: "rgba(255,235,162,0.42)",
+    transform: [{ rotate: "18deg" }],
+  },
+  previewTubeFeatherFestival: {
+    backgroundColor: "rgba(198,112,255,0.34)",
+    transform: [{ rotate: "-14deg" }],
+  },
+  previewTubeCrescentRow: {
+    position: "absolute",
+    left: 42,
+    right: 42,
+    top: 41,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  previewTubeCrescent: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: "rgba(255,237,173,0.85)",
+    borderRightColor: "transparent",
+    transform: [{ rotate: "22deg" }],
+  },
+  previewTubeCloverRow: {
+    position: "absolute",
+    left: 44,
+    right: 44,
+    top: 40,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  previewTubeClover: {
+    width: 14,
+    height: 14,
+    position: "relative",
+  },
+  previewTubeCloverLeafA: {
+    position: "absolute",
+    left: 2,
+    top: 0,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "rgba(138,231,168,0.9)",
+  },
+  previewTubeCloverLeafB: {
+    position: "absolute",
+    right: 2,
+    top: 0,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "rgba(138,231,168,0.9)",
+  },
+  previewTubeCloverLeafC: {
+    position: "absolute",
+    left: 2,
+    bottom: 2,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "rgba(138,231,168,0.9)",
+  },
+  previewTubeCloverLeafD: {
+    position: "absolute",
+    right: 2,
+    bottom: 2,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "rgba(138,231,168,0.9)",
   },
   previewHead: {
     position: "absolute",

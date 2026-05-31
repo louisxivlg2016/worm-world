@@ -146,6 +146,39 @@ function isPremiumEventBodyTexture(src?: string | null): boolean {
   return EVENT_BODY_TEXTURES.has(normalized)
 }
 
+type PremiumBodyTheme =
+  | 'royal'
+  | 'floral'
+  | 'lantern'
+  | 'festival'
+  | 'clover'
+  | 'crescent'
+  | 'spring'
+  | 'worker'
+  | 'summer'
+  | 'national'
+  | 'harvest'
+  | 'winter'
+  | 'default'
+
+function getPremiumBodyTheme(src?: string | null): PremiumBodyTheme {
+  const normalized = src?.split('?')[0] ?? ''
+  if (!normalized) return 'default'
+  if (normalized.includes('newyear') || normalized.includes('reveillon')) return 'royal'
+  if (normalized.includes('valentine')) return 'floral'
+  if (normalized.includes('cny') || normalized.includes('diwali')) return 'lantern'
+  if (normalized.includes('carnival') || normalized.includes('holi') || normalized.includes('muertos')) return 'festival'
+  if (normalized.includes('stpatrick')) return 'clover'
+  if (normalized.includes('ramadan') || normalized.includes('eid')) return 'crescent'
+  if (normalized.includes('easter')) return 'spring'
+  if (normalized.includes('mayday')) return 'worker'
+  if (normalized.includes('summer')) return 'summer'
+  if (normalized.includes('bastille') || normalized.includes('july4th') || normalized.includes('thanksgiving')) return 'national'
+  if (normalized.includes('thanksgiving')) return 'harvest'
+  if (normalized.includes('santa')) return 'winter'
+  return 'default'
+}
+
 const DEFAULT_FLAG_TEXTURE_SCALE = 1.4
 
 const BODY_TEXTURE_OFFSETS: Record<string, number> = {
@@ -182,7 +215,9 @@ function drawPremiumBodyOverlays(
   minY: number,
   maxX: number,
   maxY: number,
+  bodyTextureKey?: string | null,
 ) {
+  const theme = getPremiumBodyTheme(bodyTextureKey)
   const satin = ctx.createLinearGradient(0, minY, 0, maxY)
   satin.addColorStop(0, 'rgba(255,255,255,0.30)')
   satin.addColorStop(0.18, 'rgba(255,245,214,0.18)')
@@ -215,6 +250,17 @@ function drawPremiumBodyOverlays(
     ctx.fill()
   }
 
+  const drawGem = (x: number, y: number, size: number, fill = 'rgba(255,239,188,0.92)', core = 'rgba(255,255,255,0.74)') => {
+    ctx.beginPath()
+    ctx.arc(x, y, size, 0, Math.PI * 2)
+    ctx.fillStyle = fill
+    ctx.fill()
+    ctx.beginPath()
+    ctx.arc(x - size * 0.2, y - size * 0.2, size * 0.38, 0, Math.PI * 2)
+    ctx.fillStyle = core
+    ctx.fill()
+  }
+
   for (let i = 1; i < pts.length - 1; i += 2) {
     const p = pts[i]
     const next = pts[Math.min(i + 1, pts.length - 1)]
@@ -237,14 +283,49 @@ function drawPremiumBodyOverlays(
     ctx.fillStyle = 'rgba(120,62,25,0.22)'
     ctx.fillRect(-beltWidth * 0.16, -beltHeight / 2, beltWidth * 0.32, beltHeight)
 
-    ctx.beginPath()
-    ctx.arc(0, 0, Math.max(1.6, R * 0.09), 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(255,239,188,0.92)'
-    ctx.fill()
-    ctx.beginPath()
-    ctx.arc(-R * 0.018, -R * 0.018, Math.max(0.8, R * 0.03), 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(255,255,255,0.74)'
-    ctx.fill()
+    if (theme === 'worker') {
+      ctx.fillStyle = 'rgba(153, 47, 22, 0.38)'
+      ctx.fillRect(-beltWidth * 0.5, -beltHeight * 0.08, beltWidth, beltHeight * 0.16)
+      drawGem(0, 0, Math.max(1.8, R * 0.11), 'rgba(247,220,116,0.95)', 'rgba(255,255,255,0.65)')
+    } else if (theme === 'floral') {
+      drawGem(0, 0, Math.max(1.8, R * 0.1), 'rgba(255,214,226,0.95)', 'rgba(255,255,255,0.8)')
+      for (const side of [-1, 1]) {
+        ctx.beginPath()
+        ctx.arc(side * R * 0.12, 0, Math.max(1, R * 0.05), 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(255,105,180,0.62)'
+        ctx.fill()
+      }
+    } else if (theme === 'clover') {
+      for (const ox of [-0.08, 0.08]) {
+        for (const oy of [-0.08, 0.08]) {
+          ctx.beginPath()
+          ctx.arc(R * ox, R * oy, Math.max(1.1, R * 0.045), 0, Math.PI * 2)
+          ctx.fillStyle = 'rgba(130, 224, 170, 0.9)'
+          ctx.fill()
+        }
+      }
+      ctx.fillStyle = 'rgba(255,255,255,0.55)'
+      ctx.fillRect(-R * 0.01, R * 0.02, R * 0.02, R * 0.12)
+    } else if (theme === 'crescent') {
+      ctx.beginPath()
+      ctx.arc(0, 0, Math.max(2, R * 0.11), Math.PI * 0.15, Math.PI * 1.85)
+      ctx.fillStyle = 'rgba(255,236,168,0.92)'
+      ctx.fill()
+      ctx.beginPath()
+      ctx.arc(R * 0.04, 0, Math.max(1.8, R * 0.09), Math.PI * 0.15, Math.PI * 1.85)
+      ctx.fillStyle = 'rgba(120,62,25,0.40)'
+      ctx.fill()
+    } else if (theme === 'summer') {
+      ctx.beginPath()
+      ctx.moveTo(0, -R * 0.11)
+      ctx.lineTo(R * 0.12, R * 0.09)
+      ctx.lineTo(-R * 0.12, R * 0.09)
+      ctx.closePath()
+      ctx.fillStyle = 'rgba(255,244,200,0.9)'
+      ctx.fill()
+    } else {
+      drawGem(0, 0, Math.max(1.6, R * 0.09))
+    }
     ctx.restore()
   }
 
@@ -253,14 +334,25 @@ function drawPremiumBodyOverlays(
     const n = normals[Math.min(i, normals.length - 1)]
     const jewelX = p.x + n.nx * (-R * 0.14)
     const jewelY = p.y + n.ny * (-R * 0.14)
-    ctx.beginPath()
-    ctx.arc(jewelX, jewelY, Math.max(1.2, R * 0.07), 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(255,214,120,0.34)'
-    ctx.fill()
-    ctx.beginPath()
-    ctx.arc(jewelX - R * 0.012, jewelY - R * 0.012, Math.max(0.8, R * 0.03), 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(255,255,255,0.52)'
-    ctx.fill()
+    if (theme === 'festival') {
+      for (const offset of [-0.1, 0, 0.1]) {
+        drawGem(jewelX + R * offset, jewelY, Math.max(0.9, R * 0.04), 'rgba(255,214,120,0.58)', 'rgba(255,255,255,0.5)')
+      }
+    } else if (theme === 'spring') {
+      for (let petal = 0; petal < 5; petal++) {
+        const a = (Math.PI * 2 * petal) / 5
+        drawGem(
+          jewelX + Math.cos(a) * R * 0.06,
+          jewelY + Math.sin(a) * R * 0.06,
+          Math.max(0.8, R * 0.03),
+          'rgba(255,182,193,0.82)',
+          'rgba(255,255,255,0.45)',
+        )
+      }
+      drawGem(jewelX, jewelY, Math.max(0.8, R * 0.03), 'rgba(255,231,120,0.9)', 'rgba(255,255,255,0.45)')
+    } else {
+      drawGem(jewelX, jewelY, Math.max(1.2, R * 0.07), 'rgba(255,214,120,0.34)', 'rgba(255,255,255,0.52)')
+    }
   }
 
   for (let i = 0; i < pts.length; i += 4) {
@@ -268,12 +360,33 @@ function drawPremiumBodyOverlays(
     const n = normals[Math.min(i, normals.length - 1)]
     const tasselX = p.x + n.nx * (R * 0.56)
     const tasselY = p.y + n.ny * (R * 0.56)
-    ctx.beginPath()
-    ctx.moveTo(tasselX, tasselY - R * 0.08)
-    ctx.lineTo(tasselX + n.nx * (R * 0.18), tasselY + n.ny * (R * 0.18))
-    ctx.strokeStyle = 'rgba(255,216,120,0.38)'
-    ctx.lineWidth = Math.max(1, R * 0.045)
-    ctx.stroke()
+    if (theme === 'summer' || theme === 'festival') {
+      ctx.save()
+      ctx.translate(tasselX, tasselY)
+      const tangentX = -n.ny
+      const tangentY = n.nx
+      for (const shift of [-0.1, 0.1]) {
+        ctx.beginPath()
+        ctx.moveTo(0, 0)
+        ctx.quadraticCurveTo(
+          tangentX * R * (0.12 + Math.abs(shift) * 0.2),
+          tangentY * R * shift,
+          n.nx * R * 0.18,
+          n.ny * R * 0.18,
+        )
+        ctx.strokeStyle = theme === 'summer' ? 'rgba(255,229,120,0.55)' : 'rgba(198,112,255,0.45)'
+        ctx.lineWidth = Math.max(1, R * 0.038)
+        ctx.stroke()
+      }
+      ctx.restore()
+    } else {
+      ctx.beginPath()
+      ctx.moveTo(tasselX, tasselY - R * 0.08)
+      ctx.lineTo(tasselX + n.nx * (R * 0.18), tasselY + n.ny * (R * 0.18))
+      ctx.strokeStyle = 'rgba(255,216,120,0.38)'
+      ctx.lineWidth = Math.max(1, R * 0.045)
+      ctx.stroke()
+    }
   }
 }
 
@@ -2655,7 +2768,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
       }
 
       if (!isFlag && isPremiumEventBody) {
-        drawPremiumBodyOverlays(ctx, pts, normals, R, minX, minY, maxX, maxY)
+        drawPremiumBodyOverlays(ctx, pts, normals, R, minX, minY, maxX, maxY, bodyTexKey)
       }
 
       ctx.restore()
