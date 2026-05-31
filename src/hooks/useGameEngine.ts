@@ -215,6 +215,39 @@ function drawPremiumBodyOverlays(
     ctx.fill()
   }
 
+  for (let i = 1; i < pts.length - 1; i += 2) {
+    const p = pts[i]
+    const next = pts[Math.min(i + 1, pts.length - 1)]
+    const dx = next.x - p.x
+    const dy = next.y - p.y
+    const angle = Math.atan2(dy, dx)
+    ctx.save()
+    ctx.translate(p.x, p.y)
+    ctx.rotate(angle)
+
+    const beltWidth = Math.max(R * 0.42, 10)
+    const beltHeight = Math.max(R * 2.12, 22)
+    const goldBand = ctx.createLinearGradient(0, -beltHeight / 2, 0, beltHeight / 2)
+    goldBand.addColorStop(0, 'rgba(255,244,200,0.78)')
+    goldBand.addColorStop(0.45, 'rgba(231,187,84,0.52)')
+    goldBand.addColorStop(1, 'rgba(101,58,15,0.38)')
+    ctx.fillStyle = goldBand
+    ctx.fillRect(-beltWidth / 2, -beltHeight / 2, beltWidth, beltHeight)
+
+    ctx.fillStyle = 'rgba(120,62,25,0.22)'
+    ctx.fillRect(-beltWidth * 0.16, -beltHeight / 2, beltWidth * 0.32, beltHeight)
+
+    ctx.beginPath()
+    ctx.arc(0, 0, Math.max(1.6, R * 0.09), 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(255,239,188,0.92)'
+    ctx.fill()
+    ctx.beginPath()
+    ctx.arc(-R * 0.018, -R * 0.018, Math.max(0.8, R * 0.03), 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(255,255,255,0.74)'
+    ctx.fill()
+    ctx.restore()
+  }
+
   for (let i = 2; i < pts.length; i += 3) {
     const p = pts[i]
     const n = normals[Math.min(i, normals.length - 1)]
@@ -228,6 +261,19 @@ function drawPremiumBodyOverlays(
     ctx.arc(jewelX - R * 0.012, jewelY - R * 0.012, Math.max(0.8, R * 0.03), 0, Math.PI * 2)
     ctx.fillStyle = 'rgba(255,255,255,0.52)'
     ctx.fill()
+  }
+
+  for (let i = 0; i < pts.length; i += 4) {
+    const p = pts[i]
+    const n = normals[Math.min(i, normals.length - 1)]
+    const tasselX = p.x + n.nx * (R * 0.56)
+    const tasselY = p.y + n.ny * (R * 0.56)
+    ctx.beginPath()
+    ctx.moveTo(tasselX, tasselY - R * 0.08)
+    ctx.lineTo(tasselX + n.nx * (R * 0.18), tasselY + n.ny * (R * 0.18))
+    ctx.strokeStyle = 'rgba(255,216,120,0.38)'
+    ctx.lineWidth = Math.max(1, R * 0.045)
+    ctx.stroke()
   }
 }
 

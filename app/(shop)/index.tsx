@@ -502,12 +502,25 @@ function ShopWormPreview({
       <View style={styles.previewTubePremiumGlow} />
       <View style={styles.previewTubePremiumRibbon} />
       <View style={styles.previewTubePremiumEdgeShade} />
+      <View style={styles.previewTubePremiumBelts}>
+        {Array.from({ length: 16 }, (_, index) => (
+          <View key={`premium-belt-${index}`} style={styles.previewTubePremiumBeltWrap}>
+            <View style={styles.previewTubePremiumBelt} />
+            <View style={styles.previewTubePremiumBeltGem} />
+          </View>
+        ))}
+      </View>
       <View style={styles.previewTubePremiumJewelsRow}>
         {Array.from({ length: 18 }, (_, index) => (
           <View key={`premium-jewel-${index}`} style={styles.previewTubePremiumJewelWrap}>
             <View style={styles.previewTubePremiumJewel} />
             <View style={styles.previewTubePremiumJewelCore} />
           </View>
+        ))}
+      </View>
+      <View style={styles.previewTubePremiumTassels}>
+        {Array.from({ length: 10 }, (_, index) => (
+          <View key={`premium-tassel-${index}`} style={styles.previewTubePremiumTassel} />
         ))}
       </View>
     </>
@@ -1545,6 +1558,36 @@ const styles = StyleSheet.create({
     height: 28,
     backgroundColor: "rgba(22,10,5,0.08)",
   },
+  previewTubePremiumBelts: {
+    position: "absolute",
+    left: 34,
+    right: 34,
+    top: 6,
+    bottom: 6,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  previewTubePremiumBeltWrap: {
+    width: 20,
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  previewTubePremiumBelt: {
+    width: 10,
+    height: "112%",
+    borderRadius: 6,
+    backgroundColor: "rgba(240,191,92,0.44)",
+  },
+  previewTubePremiumBeltGem: {
+    position: "absolute",
+    width: 7,
+    height: 7,
+    borderRadius: 3.5,
+    backgroundColor: "rgba(255,247,210,0.9)",
+    boxShadow: "0 0 6px rgba(255,225,130,0.45)",
+  },
   previewTubePremiumJewelsRow: {
     position: "absolute",
     left: 32,
@@ -1572,6 +1615,21 @@ const styles = StyleSheet.create({
     height: 3,
     borderRadius: 1.5,
     backgroundColor: "rgba(255,255,255,0.65)",
+  },
+  previewTubePremiumTassels: {
+    position: "absolute",
+    left: 46,
+    right: 46,
+    bottom: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+  },
+  previewTubePremiumTassel: {
+    width: 3,
+    height: 14,
+    borderRadius: 2,
+    backgroundColor: "rgba(255,215,126,0.34)",
   },
   previewHead: {
     position: "absolute",
