@@ -173,8 +173,8 @@ function getPremiumBodyTheme(src?: string | null): PremiumBodyTheme {
   if (normalized.includes('easter')) return 'spring'
   if (normalized.includes('mayday')) return 'worker'
   if (normalized.includes('summer')) return 'summer'
-  if (normalized.includes('bastille') || normalized.includes('july4th') || normalized.includes('thanksgiving')) return 'national'
   if (normalized.includes('thanksgiving')) return 'harvest'
+  if (normalized.includes('bastille') || normalized.includes('july4th')) return 'national'
   if (normalized.includes('santa')) return 'winter'
   return 'default'
 }
@@ -261,6 +261,94 @@ function drawPremiumBodyOverlays(
     ctx.fill()
   }
 
+  const drawRosette = (x: number, y: number, size: number, petal = 'rgba(255,148,196,0.75)', core = 'rgba(255,238,168,0.95)') => {
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI * 2 * i) / 6
+      ctx.beginPath()
+      ctx.arc(x + Math.cos(a) * size * 0.55, y + Math.sin(a) * size * 0.55, size * 0.45, 0, Math.PI * 2)
+      ctx.fillStyle = petal
+      ctx.fill()
+    }
+    drawGem(x, y, size * 0.28, core, 'rgba(255,255,255,0.65)')
+  }
+
+  const drawLantern = (x: number, y: number, size: number) => {
+    ctx.save()
+    ctx.translate(x, y)
+    ctx.fillStyle = 'rgba(241,193,75,0.9)'
+    ctx.fillRect(-size * 0.12, -size * 0.82, size * 0.24, size * 0.18)
+    const body = ctx.createLinearGradient(0, -size * 0.6, 0, size * 0.6)
+    body.addColorStop(0, 'rgba(255,120,76,0.96)')
+    body.addColorStop(1, 'rgba(188,42,34,0.86)')
+    ctx.fillStyle = body
+    ctx.beginPath()
+    ctx.roundRect(-size * 0.44, -size * 0.62, size * 0.88, size * 1.12, size * 0.22)
+    ctx.fill()
+    ctx.fillStyle = 'rgba(255,220,148,0.55)'
+    ctx.fillRect(-size * 0.10, -size * 0.56, size * 0.20, size)
+    ctx.strokeStyle = 'rgba(121,45,16,0.38)'
+    ctx.lineWidth = Math.max(1, size * 0.05)
+    ctx.strokeRect(-size * 0.22, -size * 0.52, size * 0.44, size * 0.86)
+    ctx.beginPath()
+    ctx.moveTo(0, size * 0.50)
+    ctx.lineTo(0, size * 0.88)
+    ctx.strokeStyle = 'rgba(255,220,148,0.72)'
+    ctx.stroke()
+    ctx.restore()
+  }
+
+  const drawShell = (x: number, y: number, size: number) => {
+    ctx.save()
+    ctx.translate(x, y)
+    const shell = ctx.createLinearGradient(0, -size * 0.5, 0, size * 0.5)
+    shell.addColorStop(0, 'rgba(255,240,196,0.96)')
+    shell.addColorStop(1, 'rgba(240,170,116,0.92)')
+    ctx.fillStyle = shell
+    ctx.beginPath()
+    ctx.moveTo(0, -size * 0.52)
+    ctx.quadraticCurveTo(size * 0.52, -size * 0.18, size * 0.44, size * 0.38)
+    ctx.quadraticCurveTo(0, size * 0.62, -size * 0.44, size * 0.38)
+    ctx.quadraticCurveTo(-size * 0.52, -size * 0.18, 0, -size * 0.52)
+    ctx.fill()
+    ctx.strokeStyle = 'rgba(180,104,54,0.35)'
+    ctx.lineWidth = Math.max(1, size * 0.05)
+    for (const t of [-0.22, 0, 0.22]) {
+      ctx.beginPath()
+      ctx.moveTo(t * size, -size * 0.36)
+      ctx.quadraticCurveTo(t * size * 0.45, 0, t * size * 0.8, size * 0.42)
+      ctx.stroke()
+    }
+    ctx.restore()
+  }
+
+  const drawHarlequinDiamond = (x: number, y: number, size: number, fill: string) => {
+    ctx.save()
+    ctx.translate(x, y)
+    ctx.rotate(Math.PI / 4)
+    ctx.fillStyle = fill
+    ctx.fillRect(-size * 0.48, -size * 0.48, size * 0.96, size * 0.96)
+    ctx.strokeStyle = 'rgba(255,235,180,0.32)'
+    ctx.lineWidth = Math.max(1, size * 0.08)
+    ctx.strokeRect(-size * 0.48, -size * 0.48, size * 0.96, size * 0.96)
+    ctx.restore()
+  }
+
+  const drawClover = (x: number, y: number, size: number) => {
+    const leafColor = 'rgba(140,236,164,0.88)'
+    for (const [ox, oy] of [[-0.22, -0.10], [0.22, -0.10], [-0.16, 0.24], [0.16, 0.24]] as const) {
+      ctx.beginPath()
+      ctx.arc(x + size * ox, y + size * oy, size * 0.25, 0, Math.PI * 2)
+      ctx.fillStyle = leafColor
+      ctx.fill()
+    }
+    ctx.beginPath()
+    ctx.moveTo(x, y + size * 0.12)
+    ctx.lineTo(x + size * 0.18, y + size * 0.54)
+    ctx.strokeStyle = 'rgba(255,244,184,0.62)'
+    ctx.lineWidth = Math.max(1, size * 0.08)
+    ctx.stroke()
+  }
+
   for (let i = 1; i < pts.length - 1; i += 2) {
     const p = pts[i]
     const next = pts[Math.min(i + 1, pts.length - 1)]
@@ -286,26 +374,11 @@ function drawPremiumBodyOverlays(
     if (theme === 'worker') {
       ctx.fillStyle = 'rgba(153, 47, 22, 0.38)'
       ctx.fillRect(-beltWidth * 0.5, -beltHeight * 0.08, beltWidth, beltHeight * 0.16)
-      drawGem(0, 0, Math.max(1.8, R * 0.11), 'rgba(247,220,116,0.95)', 'rgba(255,255,255,0.65)')
+      drawRosette(0, 0, Math.max(3, R * 0.16), 'rgba(232,60,72,0.82)', 'rgba(247,220,116,0.98)')
     } else if (theme === 'floral') {
-      drawGem(0, 0, Math.max(1.8, R * 0.1), 'rgba(255,214,226,0.95)', 'rgba(255,255,255,0.8)')
-      for (const side of [-1, 1]) {
-        ctx.beginPath()
-        ctx.arc(side * R * 0.12, 0, Math.max(1, R * 0.05), 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(255,105,180,0.62)'
-        ctx.fill()
-      }
+      drawRosette(0, 0, Math.max(3, R * 0.14), 'rgba(255,132,182,0.84)', 'rgba(255,235,170,0.94)')
     } else if (theme === 'clover') {
-      for (const ox of [-0.08, 0.08]) {
-        for (const oy of [-0.08, 0.08]) {
-          ctx.beginPath()
-          ctx.arc(R * ox, R * oy, Math.max(1.1, R * 0.045), 0, Math.PI * 2)
-          ctx.fillStyle = 'rgba(130, 224, 170, 0.9)'
-          ctx.fill()
-        }
-      }
-      ctx.fillStyle = 'rgba(255,255,255,0.55)'
-      ctx.fillRect(-R * 0.01, R * 0.02, R * 0.02, R * 0.12)
+      drawClover(0, 0, Math.max(6, R * 0.42))
     } else if (theme === 'crescent') {
       ctx.beginPath()
       ctx.arc(0, 0, Math.max(2, R * 0.11), Math.PI * 0.15, Math.PI * 1.85)
@@ -316,17 +389,69 @@ function drawPremiumBodyOverlays(
       ctx.fillStyle = 'rgba(120,62,25,0.40)'
       ctx.fill()
     } else if (theme === 'summer') {
-      ctx.beginPath()
-      ctx.moveTo(0, -R * 0.11)
-      ctx.lineTo(R * 0.12, R * 0.09)
-      ctx.lineTo(-R * 0.12, R * 0.09)
-      ctx.closePath()
-      ctx.fillStyle = 'rgba(255,244,200,0.9)'
-      ctx.fill()
+      drawShell(0, 0, Math.max(5, R * 0.34))
+    } else if (theme === 'lantern') {
+      drawLantern(0, 0, Math.max(5, R * 0.38))
+    } else if (theme === 'festival') {
+      drawHarlequinDiamond(0, 0, Math.max(5, R * 0.35), 'rgba(148,0,211,0.52)')
+      drawGem(0, 0, Math.max(1.8, R * 0.08), 'rgba(255,221,112,0.9)', 'rgba(255,255,255,0.65)')
+    } else if (theme === 'royal' || theme === 'national' || theme === 'harvest' || theme === 'winter') {
+      drawGem(0, 0, Math.max(2.4, R * 0.12), 'rgba(255,239,188,0.96)', 'rgba(255,255,255,0.78)')
     } else {
       drawGem(0, 0, Math.max(1.6, R * 0.09))
     }
     ctx.restore()
+  }
+
+  // Wide center clothing panel so the body reads as a real outfit, not just stripes.
+  if (pts.length > 1) {
+    ctx.beginPath()
+    const topStart = pts[0]
+    const topNorm = normals[0]
+    ctx.moveTo(topStart.x + topNorm.nx * (-R * 0.18), topStart.y + topNorm.ny * (-R * 0.18))
+    for (let i = 1; i < pts.length; i++) {
+      const p = pts[i]
+      const n = normals[i]
+      ctx.lineTo(p.x + n.nx * (-R * 0.18), p.y + n.ny * (-R * 0.18))
+    }
+    for (let i = pts.length - 1; i >= 0; i--) {
+      const p = pts[i]
+      const n = normals[i]
+      ctx.lineTo(p.x + n.nx * (R * 0.36), p.y + n.ny * (R * 0.36))
+    }
+    ctx.closePath()
+    const panel = ctx.createLinearGradient(0, minY, 0, maxY)
+    if (theme === 'worker') {
+      panel.addColorStop(0, 'rgba(255,245,214,0.12)')
+      panel.addColorStop(0.45, 'rgba(166,39,35,0.28)')
+      panel.addColorStop(1, 'rgba(255,225,168,0.16)')
+    } else if (theme === 'floral') {
+      panel.addColorStop(0, 'rgba(255,229,238,0.18)')
+      panel.addColorStop(0.5, 'rgba(255,181,208,0.24)')
+      panel.addColorStop(1, 'rgba(255,243,248,0.10)')
+    } else if (theme === 'crescent') {
+      panel.addColorStop(0, 'rgba(255,241,188,0.16)')
+      panel.addColorStop(0.5, 'rgba(97,57,124,0.26)')
+      panel.addColorStop(1, 'rgba(255,224,148,0.12)')
+    } else if (theme === 'summer') {
+      panel.addColorStop(0, 'rgba(241,255,196,0.16)')
+      panel.addColorStop(0.5, 'rgba(86,174,120,0.22)')
+      panel.addColorStop(1, 'rgba(255,232,172,0.08)')
+    } else if (theme === 'festival') {
+      panel.addColorStop(0, 'rgba(255,226,168,0.15)')
+      panel.addColorStop(0.5, 'rgba(149,66,212,0.22)')
+      panel.addColorStop(1, 'rgba(255,237,196,0.08)')
+    } else if (theme === 'lantern') {
+      panel.addColorStop(0, 'rgba(255,224,162,0.14)')
+      panel.addColorStop(0.5, 'rgba(168,44,36,0.24)')
+      panel.addColorStop(1, 'rgba(255,214,120,0.10)')
+    } else {
+      panel.addColorStop(0, 'rgba(255,244,200,0.12)')
+      panel.addColorStop(0.5, 'rgba(120,62,25,0.18)')
+      panel.addColorStop(1, 'rgba(255,244,200,0.08)')
+    }
+    ctx.fillStyle = panel
+    ctx.fill()
   }
 
   for (let i = 2; i < pts.length; i += 3) {
@@ -350,6 +475,10 @@ function drawPremiumBodyOverlays(
         )
       }
       drawGem(jewelX, jewelY, Math.max(0.8, R * 0.03), 'rgba(255,231,120,0.9)', 'rgba(255,255,255,0.45)')
+    } else if (theme === 'lantern') {
+      drawLantern(jewelX, jewelY, Math.max(3.5, R * 0.26))
+    } else if (theme === 'summer') {
+      drawShell(jewelX, jewelY, Math.max(3.5, R * 0.22))
     } else {
       drawGem(jewelX, jewelY, Math.max(1.2, R * 0.07), 'rgba(255,214,120,0.34)', 'rgba(255,255,255,0.52)')
     }
