@@ -38,6 +38,30 @@ export interface GameEvent {
   winMessage: string
 }
 
+const PREMIUM_EVENT_BODY_IDS = new Set([
+  'newyear', 'newyear2', 'newyear3', 'newyear4',
+  'valentine', 'valentine2', 'valentine3', 'valentine4',
+  'cny', 'cny2', 'cny3',
+  'carnival', 'carnival2', 'carnival3', 'carnival4',
+  'holi', 'holi2', 'holi3',
+  'stpatrick', 'stpatrick2', 'stpatrick3', 'stpatrick4', 'stpatrick5',
+  'ramadan', 'ramadan2', 'ramadan3',
+  'eid', 'eid2', 'eid3',
+  'easter', 'easter2', 'easter3', 'easter4',
+  'mayday', 'mayday2', 'mayday3',
+  'summer', 'summer2', 'summer3', 'summer4',
+  'july4th', 'july4th2',
+  'bastille', 'bastille2', 'bastille3',
+  'halloween', 'halloween2', 'halloween3', 'halloween4',
+  'muertos', 'muertos2', 'muertos3',
+  'diwali', 'diwali2', 'diwali3', 'diwali4', 'diwali5',
+  'thanksgiving', 'thanksgiving2', 'thanksgiving3',
+  'santa', 'santa2', 'santa3', 'santa4',
+  'reveillon', 'reveillon2', 'reveillon3', 'reveillon4', 'reveillon5', 'reveillon6', 'reveillon7',
+])
+
+const premiumEventBodyTexturePath = (id: string) => `/heads/premium-bodies/${id}.svg?v=1`
+
 export const GAME_EVENTS: GameEvent[] = [
   {
     id: 'newyear',
@@ -618,6 +642,13 @@ export const GAME_EVENTS: GameEvent[] = [
     borderColor: 'rgba(205,46,58,0.5)', glowColor: 'rgba(205,46,58,', btnGradient: 'linear-gradient(135deg, #FFF, #003478, #CD2E3A)',
     btnShadow: '0 6px 25px rgba(0,52,120,0.5)', winTitle: '광복절!', winMessage: 'Costume unlocked!' },
 ]
+
+for (const event of GAME_EVENTS) {
+  for (const costume of event.costumes) {
+    if (!PREMIUM_EVENT_BODY_IDS.has(costume.id)) continue
+    costume.bodyTexture = premiumEventBodyTexturePath(costume.id)
+  }
+}
 
 const DEV_MODE = (process.env.VITE_DEV_MODE || process.env.EXPO_PUBLIC_DEV_MODE) === 'true'
 
