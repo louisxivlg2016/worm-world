@@ -223,6 +223,16 @@ function drawPremiumBodyFabric(
 ) {
   const theme = getPremiumBodyTheme(bodyTextureKey)
   const palette = getPremiumThemePalette(theme)
+  const drawTrimPearl = (x: number, y: number, size: number) => {
+    ctx.beginPath()
+    ctx.arc(x, y, size, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(255,250,240,0.95)'
+    ctx.fill()
+    ctx.beginPath()
+    ctx.arc(x - size * 0.18, y - size * 0.18, size * 0.32, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(255,255,255,0.72)'
+    ctx.fill()
+  }
 
   const base = ctx.createLinearGradient(0, minY, 0, maxY)
   base.addColorStop(0, palette.mid)
@@ -246,19 +256,21 @@ function drawPremiumBodyFabric(
   }
 
   if (pts.length > 1) {
+    const panelInner = theme === 'worker' || theme === 'national' ? -R * 0.02 : -R * 0.08
+    const panelOuter = theme === 'worker' || theme === 'national' ? R * 0.58 : R * 0.52
     ctx.beginPath()
     const start = pts[0]
     const startN = normals[0]
-    ctx.moveTo(start.x + startN.nx * (-R * 0.06), start.y + startN.ny * (-R * 0.06))
+    ctx.moveTo(start.x + startN.nx * panelInner, start.y + startN.ny * panelInner)
     for (let i = 1; i < pts.length; i++) {
       const p = pts[i]
       const n = normals[i]
-      ctx.lineTo(p.x + n.nx * (-R * 0.06), p.y + n.ny * (-R * 0.06))
+      ctx.lineTo(p.x + n.nx * panelInner, p.y + n.ny * panelInner)
     }
     for (let i = pts.length - 1; i >= 0; i--) {
       const p = pts[i]
       const n = normals[i]
-      ctx.lineTo(p.x + n.nx * (R * 0.42), p.y + n.ny * (R * 0.42))
+      ctx.lineTo(p.x + n.nx * panelOuter, p.y + n.ny * panelOuter)
     }
     ctx.closePath()
     const panelGrad = ctx.createLinearGradient(0, minY, 0, maxY)
@@ -268,6 +280,28 @@ function drawPremiumBodyFabric(
     panelGrad.addColorStop(1, 'rgba(0,0,0,0.12)')
     ctx.fillStyle = panelGrad
     ctx.fill()
+
+    ctx.beginPath()
+    ctx.moveTo(start.x + startN.nx * (panelInner + R * 0.08), start.y + startN.ny * (panelInner + R * 0.08))
+    for (let i = 1; i < pts.length; i++) {
+      const p = pts[i]
+      const n = normals[i]
+      ctx.lineTo(p.x + n.nx * (panelInner + R * 0.08), p.y + n.ny * (panelInner + R * 0.08))
+    }
+    ctx.strokeStyle = 'rgba(255,245,215,0.55)'
+    ctx.lineWidth = Math.max(1.2, R * 0.1)
+    ctx.stroke()
+
+    ctx.beginPath()
+    ctx.moveTo(start.x + startN.nx * (panelOuter - R * 0.08), start.y + startN.ny * (panelOuter - R * 0.08))
+    for (let i = 1; i < pts.length; i++) {
+      const p = pts[i]
+      const n = normals[i]
+      ctx.lineTo(p.x + n.nx * (panelOuter - R * 0.08), p.y + n.ny * (panelOuter - R * 0.08))
+    }
+    ctx.strokeStyle = 'rgba(92,46,14,0.24)'
+    ctx.lineWidth = Math.max(1, R * 0.08)
+    ctx.stroke()
   }
 
   if (theme === 'worker' || theme === 'national' || theme === 'winter') {
@@ -310,6 +344,34 @@ function drawPremiumBodyFabric(
     ctx.closePath()
     ctx.fillStyle = theme === 'festival' ? 'rgba(255,213,107,0.26)' : `rgba(255,255,255,${theme === 'crescent' ? '0.12' : '0.08'})`
     ctx.fill()
+  }
+
+  for (let i = 2; i < pts.length - 2; i += 4) {
+    const p = pts[i]
+    const n = normals[i]
+    const next = pts[Math.min(i + 1, pts.length - 1)]
+    const angle = Math.atan2(next.y - p.y, next.x - p.x)
+    const sashW = Math.max(R * 0.72, 18)
+    const sashH = Math.max(R * 1.52, 34)
+    ctx.save()
+    ctx.translate(p.x + n.nx * (R * 0.12), p.y + n.ny * (R * 0.12))
+    ctx.rotate(angle)
+    const sash = ctx.createLinearGradient(0, -sashH / 2, 0, sashH / 2)
+    sash.addColorStop(0, 'rgba(255,255,255,0.14)')
+    sash.addColorStop(0.2, palette.panel)
+    sash.addColorStop(0.8, palette.panel)
+    sash.addColorStop(1, 'rgba(0,0,0,0.16)')
+    ctx.fillStyle = sash
+    ctx.beginPath()
+    ctx.roundRect(-sashW / 2, -sashH / 2, sashW, sashH, sashW * 0.28)
+    ctx.fill()
+    ctx.strokeStyle = 'rgba(255,237,190,0.38)'
+    ctx.lineWidth = Math.max(1, R * 0.07)
+    ctx.stroke()
+    ctx.fillStyle = 'rgba(255,236,188,0.18)'
+    ctx.fillRect(-sashW * 0.12, -sashH / 2, sashW * 0.24, sashH)
+    drawTrimPearl(0, 0, Math.max(1.8, R * 0.08))
+    ctx.restore()
   }
 }
 
@@ -483,6 +545,42 @@ function drawPremiumBodyOverlays(
     ctx.stroke()
   }
 
+  const drawTassel = (x: number, y: number, size: number, fill: string) => {
+    ctx.beginPath()
+    ctx.moveTo(x, y - size * 0.48)
+    ctx.lineTo(x, y + size * 0.12)
+    ctx.strokeStyle = 'rgba(255,236,188,0.72)'
+    ctx.lineWidth = Math.max(1, size * 0.08)
+    ctx.stroke()
+    for (const ox of [-0.16, -0.08, 0, 0.08, 0.16]) {
+      ctx.beginPath()
+      ctx.moveTo(x + size * ox, y + size * 0.06)
+      ctx.lineTo(x + size * ox, y + size * 0.5)
+      ctx.strokeStyle = fill
+      ctx.lineWidth = Math.max(1, size * 0.09)
+      ctx.stroke()
+    }
+  }
+
+  const drawLeafPlate = (x: number, y: number, size: number, fill: string) => {
+    ctx.save()
+    ctx.translate(x, y)
+    ctx.fillStyle = fill
+    ctx.beginPath()
+    ctx.moveTo(0, -size * 0.44)
+    ctx.quadraticCurveTo(size * 0.42, -size * 0.1, size * 0.22, size * 0.48)
+    ctx.quadraticCurveTo(0, size * 0.30, -size * 0.22, size * 0.48)
+    ctx.quadraticCurveTo(-size * 0.42, -size * 0.1, 0, -size * 0.44)
+    ctx.fill()
+    ctx.beginPath()
+    ctx.moveTo(0, -size * 0.28)
+    ctx.lineTo(0, size * 0.30)
+    ctx.strokeStyle = 'rgba(255,255,255,0.28)'
+    ctx.lineWidth = Math.max(1, size * 0.06)
+    ctx.stroke()
+    ctx.restore()
+  }
+
   for (let i = 1; i < pts.length - 1; i += 2) {
     const p = pts[i]
     const next = pts[Math.min(i + 1, pts.length - 1)]
@@ -533,6 +631,51 @@ function drawPremiumBodyOverlays(
       drawGem(0, 0, Math.max(2.4, R * 0.12), 'rgba(255,239,188,0.96)', 'rgba(255,255,255,0.78)')
     } else {
       drawGem(0, 0, Math.max(1.6, R * 0.09))
+    }
+    ctx.restore()
+  }
+
+  for (let i = 1; i < pts.length - 1; i += 5) {
+    const p = pts[i]
+    const n = normals[i]
+    const next = pts[Math.min(i + 1, pts.length - 1)]
+    const angle = Math.atan2(next.y - p.y, next.x - p.x)
+    const plateW = Math.max(R * 1.05, 22)
+    const plateH = Math.max(R * 0.86, 18)
+    ctx.save()
+    ctx.translate(p.x + n.nx * (R * 0.34), p.y + n.ny * (R * 0.34))
+    ctx.rotate(angle)
+    const plate = ctx.createLinearGradient(0, -plateH / 2, 0, plateH / 2)
+    plate.addColorStop(0, 'rgba(255,255,255,0.14)')
+    plate.addColorStop(0.18, 'rgba(255,236,188,0.88)')
+    plate.addColorStop(1, 'rgba(156,98,38,0.92)')
+    ctx.fillStyle = plate
+    ctx.beginPath()
+    ctx.roundRect(-plateW / 2, -plateH / 2, plateW, plateH, plateH * 0.48)
+    ctx.fill()
+    ctx.strokeStyle = 'rgba(121,62,25,0.25)'
+    ctx.lineWidth = Math.max(1, R * 0.05)
+    ctx.stroke()
+    if (theme === 'floral') {
+      drawRosette(0, 0, Math.max(4, R * 0.19), 'rgba(255,132,182,0.88)', 'rgba(255,235,170,0.96)')
+    } else if (theme === 'clover') {
+      drawClover(0, 0, Math.max(7, R * 0.54))
+    } else if (theme === 'crescent') {
+      drawLantern(0, 0, Math.max(6, R * 0.42))
+      drawTassel(0, plateH * 0.36, Math.max(5, R * 0.22), 'rgba(255,214,120,0.84)')
+    } else if (theme === 'summer') {
+      drawShell(0, 0, Math.max(6, R * 0.38))
+    } else if (theme === 'festival') {
+      drawHarlequinDiamond(0, 0, Math.max(6, R * 0.42), 'rgba(148,0,211,0.68)')
+      drawTassel(0, plateH * 0.32, Math.max(4.5, R * 0.18), 'rgba(255,185,90,0.84)')
+    } else if (theme === 'spring') {
+      drawLeafPlate(0, 0, Math.max(6, R * 0.34), 'rgba(197,255,180,0.84)')
+    } else if (theme === 'worker') {
+      drawGem(0, 0, Math.max(3.2, R * 0.13), 'rgba(232,60,72,0.94)', 'rgba(255,255,255,0.68)')
+    } else if (theme === 'lantern') {
+      drawLantern(0, 0, Math.max(6, R * 0.44))
+    } else {
+      drawGem(0, 0, Math.max(2.8, R * 0.12), 'rgba(255,239,188,0.96)', 'rgba(255,255,255,0.72)')
     }
     ctx.restore()
   }
