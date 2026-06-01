@@ -179,6 +179,140 @@ function getPremiumBodyTheme(src?: string | null): PremiumBodyTheme {
   return 'default'
 }
 
+function getPremiumThemePalette(theme: PremiumBodyTheme) {
+  switch (theme) {
+    case 'worker':
+      return { base: '#b81d2c', mid: '#f3f0e6', dark: '#24385f', accent: '#d8b24a', panel: '#efe3c8' }
+    case 'floral':
+      return { base: '#d8517f', mid: '#ffd7e7', dark: '#9a3159', accent: '#f6d067', panel: '#fff1f6' }
+    case 'clover':
+      return { base: '#1e8c51', mid: '#d5f3d9', dark: '#0d5b31', accent: '#f4d36b', panel: '#eef9e7' }
+    case 'crescent':
+      return { base: '#4d2c7f', mid: '#efdcb6', dark: '#2a1645', accent: '#f6d78a', panel: '#6e4aa8' }
+    case 'summer':
+      return { base: '#00a3b4', mid: '#ffe8a6', dark: '#0d6375', accent: '#ffb144', panel: '#d5fff2' }
+    case 'festival':
+      return { base: '#8d2ed1', mid: '#ffd56f', dark: '#2a155f', accent: '#2ed6c4', panel: '#ff71c8' }
+    case 'lantern':
+      return { base: '#b41b22', mid: '#f7c44a', dark: '#641017', accent: '#fff0c2', panel: '#d1431f' }
+    case 'spring':
+      return { base: '#f7c6e2', mid: '#fff4d8', dark: '#d07fa4', accent: '#ffc94b', panel: '#f4ffe6' }
+    case 'royal':
+      return { base: '#552483', mid: '#efe0bc', dark: '#2d144a', accent: '#f1c04f', panel: '#7a44b6' }
+    case 'national':
+      return { base: '#204f9e', mid: '#fff3e2', dark: '#a01f2f', accent: '#e7c35f', panel: '#f7efe2' }
+    case 'harvest':
+      return { base: '#8f4f1b', mid: '#f6deb0', dark: '#5b2d0c', accent: '#d9a441', panel: '#cf6f2c' }
+    case 'winter':
+      return { base: '#d94c52', mid: '#fff7f2', dark: '#6e1d26', accent: '#9fd8d0', panel: '#f0f8ff' }
+    default:
+      return { base: '#7a3fb2', mid: '#f6e9ca', dark: '#34184f', accent: '#f2c85c', panel: '#b16ddc' }
+  }
+}
+
+function drawPremiumBodyFabric(
+  ctx: CanvasRenderingContext2D,
+  pts: { x: number; y: number }[],
+  normals: { nx: number; ny: number }[],
+  R: number,
+  minX: number,
+  minY: number,
+  maxX: number,
+  maxY: number,
+  bodyTextureKey?: string | null,
+) {
+  const theme = getPremiumBodyTheme(bodyTextureKey)
+  const palette = getPremiumThemePalette(theme)
+
+  const base = ctx.createLinearGradient(0, minY, 0, maxY)
+  base.addColorStop(0, palette.mid)
+  base.addColorStop(0.24, palette.base)
+  base.addColorStop(0.72, palette.base)
+  base.addColorStop(1, palette.dark)
+  ctx.fillStyle = base
+  ctx.fillRect(minX, minY, maxX - minX, maxY - minY)
+
+  const scaleW = Math.max(R * 0.72, 12)
+  const scaleH = Math.max(R * 0.34, 7)
+  for (let y = minY - scaleH; y < maxY + scaleH; y += scaleH * 0.9) {
+    const row = Math.round((y - minY) / (scaleH * 0.9))
+    const offset = row % 2 === 0 ? 0 : scaleW * 0.5
+    for (let x = minX - scaleW; x < maxX + scaleW; x += scaleW) {
+      ctx.beginPath()
+      ctx.ellipse(x + offset, y, scaleW * 0.56, scaleH, 0, Math.PI, 0, true)
+      ctx.fillStyle = row % 2 === 0 ? 'rgba(255,255,255,0.13)' : 'rgba(0,0,0,0.09)'
+      ctx.fill()
+    }
+  }
+
+  if (pts.length > 1) {
+    ctx.beginPath()
+    const start = pts[0]
+    const startN = normals[0]
+    ctx.moveTo(start.x + startN.nx * (-R * 0.06), start.y + startN.ny * (-R * 0.06))
+    for (let i = 1; i < pts.length; i++) {
+      const p = pts[i]
+      const n = normals[i]
+      ctx.lineTo(p.x + n.nx * (-R * 0.06), p.y + n.ny * (-R * 0.06))
+    }
+    for (let i = pts.length - 1; i >= 0; i--) {
+      const p = pts[i]
+      const n = normals[i]
+      ctx.lineTo(p.x + n.nx * (R * 0.42), p.y + n.ny * (R * 0.42))
+    }
+    ctx.closePath()
+    const panelGrad = ctx.createLinearGradient(0, minY, 0, maxY)
+    panelGrad.addColorStop(0, 'rgba(255,255,255,0.10)')
+    panelGrad.addColorStop(0.2, palette.panel)
+    panelGrad.addColorStop(0.8, palette.panel)
+    panelGrad.addColorStop(1, 'rgba(0,0,0,0.12)')
+    ctx.fillStyle = panelGrad
+    ctx.fill()
+  }
+
+  if (theme === 'worker' || theme === 'national' || theme === 'winter') {
+    for (let i = 0; i < pts.length; i += 3) {
+      const p = pts[i]
+      const n = normals[Math.min(i, normals.length - 1)]
+      ctx.beginPath()
+      ctx.moveTo(p.x + n.nx * (R * 0.02), p.y + n.ny * (R * 0.02))
+      ctx.lineTo(p.x + n.nx * (R * 0.34), p.y + n.ny * (R * 0.34))
+      ctx.strokeStyle = 'rgba(120,62,25,0.18)'
+      ctx.lineWidth = Math.max(1, R * 0.06)
+      ctx.stroke()
+    }
+  }
+
+  const shine = ctx.createLinearGradient(0, minY, 0, maxY)
+  shine.addColorStop(0, 'rgba(255,255,255,0.22)')
+  shine.addColorStop(0.28, 'rgba(255,255,255,0.06)')
+  shine.addColorStop(0.6, 'rgba(255,255,255,0)')
+  shine.addColorStop(1, 'rgba(0,0,0,0.18)')
+  ctx.fillStyle = shine
+  ctx.fillRect(minX, minY, maxX - minX, maxY - minY)
+
+  // Large decorative side trim so it reads as clothing.
+  if (pts.length > 1) {
+    ctx.beginPath()
+    const start = pts[0]
+    const startN = normals[0]
+    ctx.moveTo(start.x + startN.nx * (-R * 0.55), start.y + startN.ny * (-R * 0.55))
+    for (let i = 1; i < pts.length; i++) {
+      const p = pts[i]
+      const n = normals[i]
+      ctx.lineTo(p.x + n.nx * (-R * 0.55), p.y + n.ny * (-R * 0.55))
+    }
+    for (let i = pts.length - 1; i >= 0; i--) {
+      const p = pts[i]
+      const n = normals[i]
+      ctx.lineTo(p.x + n.nx * (-R * 0.22), p.y + n.ny * (-R * 0.22))
+    }
+    ctx.closePath()
+    ctx.fillStyle = theme === 'festival' ? 'rgba(255,213,107,0.26)' : `rgba(255,255,255,${theme === 'crescent' ? '0.12' : '0.08'})`
+    ctx.fill()
+  }
+}
+
 const DEFAULT_FLAG_TEXTURE_SCALE = 1.4
 
 const BODY_TEXTURE_OFFSETS: Record<string, number> = {
@@ -2730,12 +2864,14 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   // Check for body texture (dragon etc.)
   const bodyTexKey = worm.skin.bodyTexture
   const bodyTexImg = bodyTexKey ? (bodyTextureCache.get(bodyTexKey) ?? loadBodyTexture(bodyTexKey)) : null
+  const isPremiumEventBody = isPremiumEventBodyTexture(bodyTexKey)
 
   // Smooth tube body rendering
   const isTube = worm.skin.bodyStyle === 'tube'
   const isFlag = worm.skin.isFlag === true
+  const renderAsTube = isTube || isFlag || isPremiumEventBody
 
-  if (isTube) {
+  if (renderAsTube) {
     // Build screen-space points (skip every other for perf on long worms)
     const step = segments.length > 200 ? 2 : 1
     const pts: { x: number; y: number }[] = []
@@ -2835,8 +2971,6 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
       traceTubePath()
       ctx.clip()
 
-      const isPremiumEventBody = isPremiumEventBodyTexture(bodyTexKey)
-
       if (isFlag && bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0) {
         const lengths = [0]
         for (let i = 1; i < pts.length; i++) {
@@ -2873,6 +3007,8 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
         shine.addColorStop(1, 'rgba(0,0,0,0.18)')
         ctx.fillStyle = shine
         ctx.fillRect(minX, minY, maxX - minX, maxY - minY)
+      } else if (isPremiumEventBody) {
+        drawPremiumBodyFabric(ctx, pts, normals, R, minX, minY, maxX, maxY, bodyTexKey)
       } else {
         // Fill tube with color stripes running across the body
         const stripeCount = colors.length
@@ -2961,7 +3097,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
   }
 
   for (let i = segments.length - 1; i >= 0; i--) {
-    if (isTube) break // already drawn above
+    if (renderAsTube) break // already drawn above
     const seg = segments[i]
     const p = worldToScreen(seg.x, seg.y, camera, w, h)
     if (p.x < -50 || p.x > w + 50 || p.y < -50 || p.y > h + 50) continue
