@@ -3114,7 +3114,13 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
       traceTubePath()
       ctx.clip()
 
-      if (isFlag && bodyTexImg && bodyTexImg.complete && bodyTexImg.naturalWidth > 0) {
+      const useTexturedBody =
+        bodyTexImg &&
+        bodyTexImg.complete &&
+        bodyTexImg.naturalWidth > 0 &&
+        (isFlag || isPremiumEventBody)
+
+      if (useTexturedBody) {
         const lengths = [0]
         for (let i = 1; i < pts.length; i++) {
           const dx = pts[i].x - pts[i - 1].x
@@ -3124,9 +3130,11 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
         const textureAspect = bodyTexImg.naturalWidth / bodyTexImg.naturalHeight
         const repeatScreenWidth = Math.max(R * 2.08 * textureAspect, R * 3.6)
         const repeatTextureWidth = bodyTexImg.naturalWidth
-        flagLengths = lengths
-        flagRepeatScreenWidth = repeatScreenWidth
-        flagRepeatTextureWidth = repeatTextureWidth
+        if (isFlag) {
+          flagLengths = lengths
+          flagRepeatScreenWidth = repeatScreenWidth
+          flagRepeatTextureWidth = repeatTextureWidth
+        }
         for (let i = 0; i < pts.length - 1; i++) {
           const p = pts[i]
           const next = pts[i + 1]
@@ -3144,10 +3152,10 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
         }
 
         const shine = ctx.createLinearGradient(0, minY, 0, maxY)
-        shine.addColorStop(0, 'rgba(255,255,255,0.22)')
+        shine.addColorStop(0, 'rgba(255,255,255,0.18)')
         shine.addColorStop(0.28, 'rgba(255,255,255,0.08)')
         shine.addColorStop(0.55, 'rgba(255,255,255,0)')
-        shine.addColorStop(1, 'rgba(0,0,0,0.18)')
+        shine.addColorStop(1, 'rgba(0,0,0,0.22)')
         ctx.fillStyle = shine
         ctx.fillRect(minX, minY, maxX - minX, maxY - minY)
       } else if (isPremiumEventBody) {
@@ -3175,7 +3183,7 @@ function drawWorm(ctx: CanvasRenderingContext2D, worm: Worm, camera: Camera, w: 
         }
       }
 
-      if (!isFlag && isPremiumEventBody) {
+      if (!isFlag && isPremiumEventBody && !useTexturedBody) {
         drawPremiumBodyOverlays(ctx, pts, normals, R, minX, minY, maxX, maxY, bodyTexKey)
       }
 
