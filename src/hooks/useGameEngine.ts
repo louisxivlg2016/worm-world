@@ -274,10 +274,10 @@ function drawPremiumBodyFabric(
     }
     ctx.closePath()
     const panelGrad = ctx.createLinearGradient(0, minY, 0, maxY)
-    panelGrad.addColorStop(0, 'rgba(255,255,255,0.10)')
+    panelGrad.addColorStop(0, 'rgba(255,255,255,0.18)')
     panelGrad.addColorStop(0.2, palette.panel)
     panelGrad.addColorStop(0.8, palette.panel)
-    panelGrad.addColorStop(1, 'rgba(0,0,0,0.12)')
+    panelGrad.addColorStop(1, 'rgba(0,0,0,0.22)')
     ctx.fillStyle = panelGrad
     ctx.fill()
 
@@ -318,10 +318,10 @@ function drawPremiumBodyFabric(
   }
 
   const shine = ctx.createLinearGradient(0, minY, 0, maxY)
-  shine.addColorStop(0, 'rgba(255,255,255,0.22)')
-  shine.addColorStop(0.28, 'rgba(255,255,255,0.06)')
+  shine.addColorStop(0, 'rgba(255,255,255,0.18)')
+  shine.addColorStop(0.28, 'rgba(255,255,255,0.10)')
   shine.addColorStop(0.6, 'rgba(255,255,255,0)')
-  shine.addColorStop(1, 'rgba(0,0,0,0.18)')
+  shine.addColorStop(1, 'rgba(0,0,0,0.24)')
   ctx.fillStyle = shine
   ctx.fillRect(minX, minY, maxX - minX, maxY - minY)
 
@@ -342,7 +342,7 @@ function drawPremiumBodyFabric(
       ctx.lineTo(p.x + n.nx * (-R * 0.22), p.y + n.ny * (-R * 0.22))
     }
     ctx.closePath()
-    ctx.fillStyle = theme === 'festival' ? 'rgba(255,213,107,0.26)' : `rgba(255,255,255,${theme === 'crescent' ? '0.12' : '0.08'})`
+    ctx.fillStyle = theme === 'festival' ? 'rgba(255,213,107,0.44)' : `rgba(255,255,255,${theme === 'crescent' ? '0.22' : '0.16'})`
     ctx.fill()
   }
 
@@ -357,10 +357,10 @@ function drawPremiumBodyFabric(
     ctx.translate(p.x + n.nx * (R * 0.12), p.y + n.ny * (R * 0.12))
     ctx.rotate(angle)
     const sash = ctx.createLinearGradient(0, -sashH / 2, 0, sashH / 2)
-    sash.addColorStop(0, 'rgba(255,255,255,0.14)')
+    sash.addColorStop(0, 'rgba(255,255,255,0.18)')
     sash.addColorStop(0.2, palette.panel)
     sash.addColorStop(0.8, palette.panel)
-    sash.addColorStop(1, 'rgba(0,0,0,0.16)')
+    sash.addColorStop(1, 'rgba(0,0,0,0.24)')
     ctx.fillStyle = sash
     ctx.beginPath()
     ctx.roundRect(-sashW / 2, -sashH / 2, sashW, sashH, sashW * 0.28)
@@ -368,7 +368,7 @@ function drawPremiumBodyFabric(
     ctx.strokeStyle = 'rgba(255,237,190,0.38)'
     ctx.lineWidth = Math.max(1, R * 0.07)
     ctx.stroke()
-    ctx.fillStyle = 'rgba(255,236,188,0.18)'
+    ctx.fillStyle = 'rgba(255,236,188,0.28)'
     ctx.fillRect(-sashW * 0.12, -sashH / 2, sashW * 0.24, sashH)
     drawTrimPearl(0, 0, Math.max(1.8, R * 0.08))
     ctx.restore()
@@ -415,11 +415,11 @@ function drawPremiumBodyOverlays(
 ) {
   const theme = getPremiumBodyTheme(bodyTextureKey)
   const satin = ctx.createLinearGradient(0, minY, 0, maxY)
-  satin.addColorStop(0, 'rgba(255,255,255,0.30)')
-  satin.addColorStop(0.18, 'rgba(255,245,214,0.18)')
-  satin.addColorStop(0.48, 'rgba(255,255,255,0.05)')
-  satin.addColorStop(0.78, 'rgba(32,12,8,0.08)')
-  satin.addColorStop(1, 'rgba(0,0,0,0.22)')
+  satin.addColorStop(0, 'rgba(255,255,255,0.22)')
+  satin.addColorStop(0.18, 'rgba(255,245,214,0.16)')
+  satin.addColorStop(0.48, 'rgba(255,255,255,0.10)')
+  satin.addColorStop(0.78, 'rgba(32,12,8,0.12)')
+  satin.addColorStop(1, 'rgba(0,0,0,0.24)')
   ctx.fillStyle = satin
   ctx.fillRect(minX, minY, maxX - minX, maxY - minY)
 
@@ -440,7 +440,7 @@ function drawPremiumBodyOverlays(
     }
     ctx.closePath()
     const ribbon = ctx.createLinearGradient(0, minY, 0, maxY)
-    ribbon.addColorStop(0, 'rgba(255,255,255,0.28)')
+    ribbon.addColorStop(0, 'rgba(255,255,255,0.22)')
     ribbon.addColorStop(1, 'rgba(255,255,255,0)')
     ctx.fillStyle = ribbon
     ctx.fill()
@@ -600,7 +600,7 @@ function drawPremiumBodyOverlays(
     ctx.fillStyle = goldBand
     ctx.fillRect(-beltWidth / 2, -beltHeight / 2, beltWidth, beltHeight)
 
-    ctx.fillStyle = 'rgba(120,62,25,0.22)'
+    ctx.fillStyle = 'rgba(120,62,25,0.34)'
     ctx.fillRect(-beltWidth * 0.16, -beltHeight / 2, beltWidth * 0.32, beltHeight)
 
     if (theme === 'worker') {
@@ -646,9 +646,9 @@ function drawPremiumBodyOverlays(
     ctx.translate(p.x + n.nx * (R * 0.34), p.y + n.ny * (R * 0.34))
     ctx.rotate(angle)
     const plate = ctx.createLinearGradient(0, -plateH / 2, 0, plateH / 2)
-    plate.addColorStop(0, 'rgba(255,255,255,0.14)')
-    plate.addColorStop(0.18, 'rgba(255,236,188,0.88)')
-    plate.addColorStop(1, 'rgba(156,98,38,0.92)')
+    plate.addColorStop(0, 'rgba(255,255,255,0.22)')
+    plate.addColorStop(0.18, 'rgba(255,236,188,0.96)')
+    plate.addColorStop(1, 'rgba(156,98,38,0.98)')
     ctx.fillStyle = plate
     ctx.beginPath()
     ctx.roundRect(-plateW / 2, -plateH / 2, plateW, plateH, plateH * 0.48)
@@ -699,33 +699,33 @@ function drawPremiumBodyOverlays(
     ctx.closePath()
     const panel = ctx.createLinearGradient(0, minY, 0, maxY)
     if (theme === 'worker') {
-      panel.addColorStop(0, 'rgba(255,245,214,0.12)')
-      panel.addColorStop(0.45, 'rgba(166,39,35,0.28)')
-      panel.addColorStop(1, 'rgba(255,225,168,0.16)')
+      panel.addColorStop(0, 'rgba(255,245,214,0.22)')
+      panel.addColorStop(0.45, 'rgba(166,39,35,0.44)')
+      panel.addColorStop(1, 'rgba(255,225,168,0.24)')
     } else if (theme === 'floral') {
-      panel.addColorStop(0, 'rgba(255,229,238,0.18)')
-      panel.addColorStop(0.5, 'rgba(255,181,208,0.24)')
-      panel.addColorStop(1, 'rgba(255,243,248,0.10)')
+      panel.addColorStop(0, 'rgba(255,229,238,0.24)')
+      panel.addColorStop(0.5, 'rgba(255,181,208,0.36)')
+      panel.addColorStop(1, 'rgba(255,243,248,0.18)')
     } else if (theme === 'crescent') {
-      panel.addColorStop(0, 'rgba(255,241,188,0.16)')
-      panel.addColorStop(0.5, 'rgba(97,57,124,0.26)')
-      panel.addColorStop(1, 'rgba(255,224,148,0.12)')
+      panel.addColorStop(0, 'rgba(255,241,188,0.24)')
+      panel.addColorStop(0.5, 'rgba(97,57,124,0.42)')
+      panel.addColorStop(1, 'rgba(255,224,148,0.18)')
     } else if (theme === 'summer') {
-      panel.addColorStop(0, 'rgba(241,255,196,0.16)')
-      panel.addColorStop(0.5, 'rgba(86,174,120,0.22)')
-      panel.addColorStop(1, 'rgba(255,232,172,0.08)')
+      panel.addColorStop(0, 'rgba(241,255,196,0.24)')
+      panel.addColorStop(0.5, 'rgba(86,174,120,0.34)')
+      panel.addColorStop(1, 'rgba(255,232,172,0.16)')
     } else if (theme === 'festival') {
-      panel.addColorStop(0, 'rgba(255,226,168,0.15)')
-      panel.addColorStop(0.5, 'rgba(149,66,212,0.22)')
-      panel.addColorStop(1, 'rgba(255,237,196,0.08)')
+      panel.addColorStop(0, 'rgba(255,226,168,0.24)')
+      panel.addColorStop(0.5, 'rgba(149,66,212,0.38)')
+      panel.addColorStop(1, 'rgba(255,237,196,0.16)')
     } else if (theme === 'lantern') {
-      panel.addColorStop(0, 'rgba(255,224,162,0.14)')
-      panel.addColorStop(0.5, 'rgba(168,44,36,0.24)')
-      panel.addColorStop(1, 'rgba(255,214,120,0.10)')
+      panel.addColorStop(0, 'rgba(255,224,162,0.22)')
+      panel.addColorStop(0.5, 'rgba(168,44,36,0.40)')
+      panel.addColorStop(1, 'rgba(255,214,120,0.18)')
     } else {
-      panel.addColorStop(0, 'rgba(255,244,200,0.12)')
-      panel.addColorStop(0.5, 'rgba(120,62,25,0.18)')
-      panel.addColorStop(1, 'rgba(255,244,200,0.08)')
+      panel.addColorStop(0, 'rgba(255,244,200,0.22)')
+      panel.addColorStop(0.5, 'rgba(120,62,25,0.30)')
+      panel.addColorStop(1, 'rgba(255,244,200,0.16)')
     }
     ctx.fillStyle = panel
     ctx.fill()
