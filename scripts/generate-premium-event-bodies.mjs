@@ -453,10 +453,45 @@ function styleBodyLayer(style, palette, motifs) {
     case 'snowman':
     case 'wintermaster':
       return `
-        <rect x="92" y="26" width="536" height="168" rx="56" fill="${light}" opacity="0.22"/>
-        <path d="M 118 30 L 602 30 L 562 190 L 158 190 Z" fill="${base}" opacity="0.28"/>
-        ${repeatAcross(124, (x) => makeMotif(style === 'snowman' ? 'snowflake' : style === 'elf' ? 'bell' : style === 'wintermaster' ? 'crystal' : 'gift', x, 110, 0.34, palette))}
-        ${style === 'snowman' ? scarfBand : repeatAcross(150, (x) => makeMotif('fur', x, 56, 0.30, palette))}
+        <rect x="90" y="24" width="540" height="172" rx="58" fill="${light}" opacity="0.20"/>
+        <path d="M 118 26 L 602 26 L 570 194 L 150 194 Z" fill="${base}" opacity="0.34"/>
+        ${
+          style === 'santa'
+            ? `
+              <rect x="306" y="12" width="108" height="196" rx="34" fill="#fffdf8" opacity="0.82"/>
+              <rect x="0" y="92" width="720" height="40" fill="#1d1d1f" opacity="0.96"/>
+              <rect x="288" y="82" width="144" height="60" rx="14" fill="none" stroke="#e2c067" stroke-width="14"/>
+              <rect x="0" y="24" width="720" height="20" fill="#fffdf8" opacity="0.95"/>
+              <rect x="0" y="176" width="720" height="22" fill="#fffdf8" opacity="0.95"/>
+              ${repeatAcross(128, (x) => makeMotif('button', x, 60, 0.30, palette))}
+              ${repeatAcross(156, (x) => makeMotif('gift', x, 154, 0.26, palette))}
+            `
+            : style === 'elf'
+              ? `
+                <path d="M 0 40 L 720 40 L 680 88 L 720 136 L 680 184 L 0 184 L 40 136 L 0 88 Z" fill="${base}" opacity="0.26"/>
+                <path d="M 0 58 ${Array.from({ length: 14 }, (_, i) => `L ${i * 56 + 28} ${i % 2 === 0 ? 78 : 42}`).join(' ')} L 720 58 L 720 90 ${Array.from({ length: 14 }, (_, i) => `L ${720 - (i * 56 + 28)} ${i % 2 === 0 ? 110 : 74}`).join(' ')} Z" fill="#f5e0a3" opacity="0.88"/>
+                <rect x="0" y="96" width="720" height="28" fill="#b71f32" opacity="0.78"/>
+                ${repeatAcross(120, (x) => makeMotif('bell', x, 60, 0.30, palette))}
+                ${repeatAcross(128, (x) => makeMotif('leaf', x, 156, 0.26, palette))}
+              `
+              : style === 'snowman'
+                ? `
+                  <rect x="120" y="28" width="480" height="164" rx="54" fill="#f9fbff" opacity="0.72"/>
+                  <rect x="0" y="82" width="720" height="22" fill="#ff8b47" opacity="0.95"/>
+                  <rect x="0" y="104" width="720" height="18" fill="#6fa8d6" opacity="0.92"/>
+                  <rect x="0" y="122" width="720" height="18" fill="#ff8b47" opacity="0.95"/>
+                  ${repeatAcross(128, (x) => makeMotif('snowflake', x, 60, 0.30, palette))}
+                  ${repeatAcross(128, (x) => makeMotif('button', x, 154, 0.24, palette))}
+                `
+                : `
+                  <path d="M 126 22 L 594 22 L 626 110 L 594 198 L 126 198 L 94 110 Z" fill="${base}" opacity="0.34"/>
+                  <rect x="292" y="8" width="136" height="204" rx="34" fill="#f6f6fb" opacity="0.18"/>
+                  <rect x="0" y="84" width="720" height="16" fill="#d64953" opacity="0.92"/>
+                  <rect x="0" y="120" width="720" height="16" fill="#d64953" opacity="0.92"/>
+                  ${repeatAcross(122, (x) => makeMotif('crystal', x, 60, 0.30, palette))}
+                  ${repeatAcross(138, (x) => makeMotif('medal', x, 156, 0.28, palette))}
+                `
+        }
       `
     case 'champagne':
     case 'fireworks':
