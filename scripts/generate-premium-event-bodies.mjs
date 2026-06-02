@@ -98,6 +98,7 @@ function makeMotif(kind, x, y, scale, colors) {
       return `<path d="M ${x} ${y + scale * 8} C ${x - scale * 16} ${y - scale * 8}, ${x - scale * 30} ${y + scale * 10}, ${x} ${y + scale * 30} C ${x + scale * 30} ${y + scale * 10}, ${x + scale * 16} ${y - scale * 8}, ${x} ${y + scale * 8} Z" fill="${c2}" stroke="${c4}" stroke-width="${scale * 3}"/>`
     case 'rose':
     case 'flower':
+    case 'flowers':
       return `
         <g transform="translate(${x} ${y})">
           ${Array.from({ length: 8 }, (_, i) => {
@@ -111,6 +112,12 @@ function makeMotif(kind, x, y, scale, colors) {
         </g>`
     case 'seal':
       return `<g transform="translate(${x} ${y})"><circle r="${scale * 20}" fill="${c2}" stroke="${c4}" stroke-width="${scale * 4}"/><path d="M ${-scale * 6} ${-scale * 8} L ${scale * 8} 0 L ${-scale * 6} ${scale * 8}" fill="${c3}"/></g>`
+    case 'lace':
+      return `<g transform="translate(${x} ${y})">${[-18, 0, 18].map((dx) => `<path d="M ${dx - scale * 10} 0 Q ${dx} ${-scale * 10} ${dx + scale * 10} 0" stroke="${c3}" stroke-width="${scale * 3}" fill="none" stroke-linecap="round"/>`).join('')}</g>`
+    case 'bead':
+      return `<g transform="translate(${x} ${y})">${[-16, 0, 16].map((dx) => `<circle cx="${dx * scale}" cy="0" r="${scale * 5}" fill="${c3}" stroke="${c4}" stroke-width="${scale * 1.5}"/>`).join('')}</g>`
+    case 'arch':
+      return `<g transform="translate(${x} ${y})"><path d="M ${-scale * 20} ${scale * 18} L ${-scale * 20} ${-scale * 2} Q 0 ${-scale * 22} ${scale * 20} ${-scale * 2} L ${scale * 20} ${scale * 18}" stroke="${c4}" stroke-width="${scale * 4}" fill="none" stroke-linecap="round"/></g>`
     case 'wing':
       return `<g transform="translate(${x} ${y})"><path d="M ${-scale * 18} 0 C ${-scale * 28} ${-scale * 12}, ${-scale * 28} ${scale * 16}, ${-scale * 10} ${scale * 14} C ${-scale * 2} ${scale * 18}, ${scale * 8} ${scale * 8}, ${scale * 4} 0 C ${scale * 2} ${-scale * 10}, ${-scale * 10} ${-scale * 8}, ${-scale * 18} 0 Z" fill="${c3}" stroke="${c4}" stroke-width="${scale * 2.5}"/></g>`
     case 'arrow':
@@ -139,10 +146,14 @@ function makeMotif(kind, x, y, scale, colors) {
       return `<g transform="translate(${x} ${y}) rotate(45)"><rect x="${-scale * 14}" y="${-scale * 14}" width="${scale * 28}" height="${scale * 28}" fill="${c2}" stroke="${c4}" stroke-width="${scale * 3}"/></g>`
     case 'splash':
       return `<g transform="translate(${x} ${y})"><path d="M ${-scale * 24} ${scale * 6} C ${-scale * 28} ${-scale * 10}, ${-scale * 10} ${-scale * 18}, 0 ${-scale * 10} C ${scale * 6} ${-scale * 24}, ${scale * 24} ${-scale * 18}, ${scale * 20} 0 C ${scale * 34} ${scale * 8}, ${scale * 18} ${scale * 24}, 0 ${scale * 18} C ${-scale * 8} ${scale * 30}, ${-scale * 26} ${scale * 20}, ${-scale * 24} ${scale * 6} Z" fill="${c2}" opacity="0.95"/></g>`
+    case 'balloon':
+      return `<g transform="translate(${x} ${y})"><ellipse rx="${scale * 14}" ry="${scale * 18}" fill="${c2}" stroke="${c4}" stroke-width="${scale * 2.5}"/><path d="M 0 ${scale * 18} L ${scale * 2} ${scale * 34}" stroke="${c4}" stroke-width="${scale * 2}" fill="none"/></g>`
     case 'sun':
       return `<g transform="translate(${x} ${y})"><circle r="${scale * 16}" fill="${c4}"/>${Array.from({ length: 8 }, (_, i) => { const a = (Math.PI * 2 * i) / 8; return `<line x1="${Math.cos(a) * scale * 22}" y1="${Math.sin(a) * scale * 22}" x2="${Math.cos(a) * scale * 32}" y2="${Math.sin(a) * scale * 32}" stroke="${c4}" stroke-width="${scale * 4}" stroke-linecap="round"/>` }).join('')}</g>`
     case 'shell':
       return `<g transform="translate(${x} ${y})"><path d="M 0 ${-scale * 18} C ${scale * 18} ${-scale * 12}, ${scale * 20} ${scale * 18}, 0 ${scale * 24} C ${-scale * 20} ${scale * 18}, ${-scale * 18} ${-scale * 12}, 0 ${-scale * 18} Z" fill="${c3}" stroke="${c4}" stroke-width="${scale * 3}"/><path d="M 0 ${-scale * 12} L 0 ${scale * 18}" stroke="${c4}" stroke-width="${scale * 2}"/></g>`
+    case 'wave':
+      return `<g transform="translate(${x} ${y})"><path d="M ${-scale * 22} ${scale * 4} Q ${-scale * 10} ${-scale * 12} 0 ${scale * 4} T ${scale * 22} ${scale * 4}" stroke="${c4}" stroke-width="${scale * 4}" fill="none" stroke-linecap="round"/></g>`
     case 'anchor':
       return `<g transform="translate(${x} ${y})"><circle cy="${-scale * 18}" r="${scale * 6}" fill="none" stroke="${c4}" stroke-width="${scale * 3}"/><path d="M 0 ${-scale * 12} L 0 ${scale * 18} M ${-scale * 16} ${scale * 8} Q 0 ${scale * 30} ${scale * 16} ${scale * 8}" stroke="${c4}" stroke-width="${scale * 4}" fill="none" stroke-linecap="round"/></g>`
     case 'rope':
@@ -151,6 +162,18 @@ function makeMotif(kind, x, y, scale, colors) {
       return `<g transform="translate(${x} ${y})"><circle r="${scale * 16}" fill="${c4}"/><circle cx="${scale * 7}" cy="${-scale * 2}" r="${scale * 14}" fill="${c1}"/></g>`
     case 'clover':
       return `<g transform="translate(${x} ${y})">${[-1, 1].flatMap(sx => [-1, 1].map(sy => `<circle cx="${sx * scale * 7}" cy="${sy * scale * 6}" r="${scale * 8}" fill="${c2}"/>`)).join('')}<path d="M 0 ${scale * 4} L ${scale * 7} ${scale * 26}" stroke="${c4}" stroke-width="${scale * 2.5}"/></g>`
+    case 'cockade':
+    case 'rosette':
+      return `
+        <g transform="translate(${x} ${y})">
+          ${Array.from({ length: 10 }, (_, i) => {
+            const a = (Math.PI * 2 * i) / 10
+            const px = Math.cos(a) * scale * 12
+            const py = Math.sin(a) * scale * 12
+            return `<ellipse cx="${px}" cy="${py}" rx="${scale * 6}" ry="${scale * 10}" fill="${c2}" transform="rotate(${(a * 180) / Math.PI} ${px} ${py})"/>`
+          }).join('')}
+          <circle r="${scale * 10}" fill="${c3}" stroke="${c4}" stroke-width="${scale * 2.5}"/>
+        </g>`
     case 'buckle':
       return `<g transform="translate(${x} ${y})"><rect x="${-scale * 20}" y="${-scale * 14}" width="${scale * 40}" height="${scale * 28}" rx="${scale * 4}" fill="${c4}"/><rect x="${-scale * 8}" y="${-scale * 10}" width="${scale * 16}" height="${scale * 20}" rx="${scale * 3}" fill="${c1}"/></g>`
     case 'button':
@@ -162,6 +185,7 @@ function makeMotif(kind, x, y, scale, colors) {
     case 'bubbles':
       return `<g transform="translate(${x} ${y})"><circle r="${scale * 12}" fill="${c3}" opacity="0.8"/><circle cx="${scale * 18}" cy="${-scale * 12}" r="${scale * 8}" fill="${c3}" opacity="0.65"/><circle cx="${-scale * 16}" cy="${scale * 8}" r="${scale * 6}" fill="${c3}" opacity="0.58"/></g>`
     case 'ribbon':
+    case 'banner':
       return `<g transform="translate(${x} ${y})"><path d="M ${-scale * 20} ${-scale * 10} L ${scale * 20} ${-scale * 10} L ${scale * 12} ${scale * 10} L ${-scale * 12} ${scale * 10} Z" fill="${c2}" stroke="${c4}" stroke-width="${scale * 2.5}"/></g>`
     case 'pearl':
       return `<g transform="translate(${x} ${y})"><circle r="${scale * 12}" fill="${c3}" stroke="${c4}" stroke-width="${scale * 2}"/><circle cx="${-scale * 3}" cy="${-scale * 3}" r="${scale * 4}" fill="#fff"/></g>`
@@ -169,6 +193,8 @@ function makeMotif(kind, x, y, scale, colors) {
       return `<g transform="translate(${x} ${y})"><path d="M 0 ${-scale * 18} C ${scale * 10} ${-scale * 8}, ${scale * 10} ${scale * 8}, 0 ${scale * 18} C ${-scale * 10} ${scale * 8}, ${-scale * 10} ${-scale * 8}, 0 ${-scale * 18} Z" fill="${c4}" opacity="0.85"/><circle r="${scale * 4}" fill="${c3}"/></g>`
     case 'dot':
       return `<circle cx="${x}" cy="${y}" r="${scale * 10}" fill="${c2}" stroke="${c4}" stroke-width="${scale * 2}"/>`
+    case 'icecream':
+      return `<g transform="translate(${x} ${y})"><path d="M ${-scale * 10} ${scale * 14} L 0 ${-scale * 18} L ${scale * 10} ${scale * 14} Z" fill="${c4}" stroke="${c3}" stroke-width="${scale * 2}"/><circle cx="${-scale * 8}" cy="${-scale * 6}" r="${scale * 9}" fill="${c2}"/><circle cx="${scale * 1}" cy="${-scale * 10}" r="${scale * 10}" fill="${c3}"/><circle cx="${scale * 10}" cy="${-scale * 5}" r="${scale * 8}" fill="${c1}"/></g>`
     case 'powder':
       return `<g transform="translate(${x} ${y})">${[-18, -6, 8, 20].map((dx, i) => `<circle cx="${dx * scale}" cy="${(i % 2 === 0 ? -6 : 8) * scale}" r="${scale * (6 + i)}" fill="${[c2, c3, c4, c1][i]}" opacity="0.78"/>`).join('')}</g>`
     case 'hat':
@@ -214,11 +240,252 @@ function makeMotif(kind, x, y, scale, colors) {
   }
 }
 
+function repeatAcross(step, renderer) {
+  const parts = []
+  for (let x = step / 2; x < WIDTH; x += step) parts.push(renderer(x))
+  return parts.join('\n')
+}
+
+function styleBodyLayer(style, palette, motifs) {
+  const [base, mid, accent, light] = palette
+  const gemBand = repeatAcross(86, (x) => makeMotif('gem', x, 110, 0.42, palette))
+  const floralBand = repeatAcross(120, (x) => makeMotif('flower', x, 110, 0.58, palette))
+  const scaleBand = repeatAcross(62, (x) => makeMotif('scale', x, 132, 0.52, palette))
+  const chainBand = repeatAcross(94, (x) => makeMotif('chain', x, 108, 0.46, palette))
+  const buttonBand = repeatAcross(84, (x) => makeMotif('button', x, 110, 0.5, palette))
+  const cloverBand = repeatAcross(110, (x) => makeMotif('clover', x, 110, 0.55, palette))
+  const heartBand = repeatAcross(110, (x) => makeMotif('heart', x, 110, 0.56, palette))
+  const shellBand = repeatAcross(112, (x) => makeMotif('shell', x, 112, 0.6, palette))
+  const lanternBand = repeatAcross(112, (x) => makeMotif('lantern', x, 112, 0.55, palette))
+  const starBand = repeatAcross(96, (x) => makeMotif('star', x, 110, 0.5, palette))
+  const fireworkBand = repeatAcross(142, (x) => makeMotif('firework', x, 110, 0.55, palette))
+  const scarfBand = repeatAcross(126, (x) => makeMotif('scarf', x, 110, 0.45, palette))
+
+  switch (style) {
+    case 'heart':
+      return `
+        <rect x="98" y="28" width="524" height="164" rx="54" fill="${mid}" opacity="0.28"/>
+        <path d="M 150 36 C 260 120, 260 120, 150 184 L 570 184 C 460 120, 460 120, 570 36 Z" fill="${base}" opacity="0.38"/>
+        <path d="M 230 30 L 490 30 L 530 110 L 490 190 L 230 190 L 190 110 Z" fill="${light}" opacity="0.24"/>
+        ${heartBand}
+        ${repeatAcross(120, (x) => makeMotif('pearl', x, 54, 0.34, palette))}
+      `
+    case 'rose':
+      return `
+        <rect x="104" y="28" width="512" height="164" rx="52" fill="${light}" opacity="0.22"/>
+        <path d="M 140 42 Q 360 -6 580 42 L 558 178 Q 360 212 162 178 Z" fill="${base}" opacity="0.40"/>
+        <path d="M 224 24 L 496 24 L 544 110 L 496 196 L 224 196 L 176 110 Z" fill="${mid}" opacity="0.18"/>
+        ${floralBand}
+        ${repeatAcross(116, (x) => makeMotif('lace', x, 48, 0.34, palette))}
+      `
+    case 'letter':
+      return `
+        <rect x="82" y="28" width="556" height="164" rx="56" fill="${light}" opacity="0.28"/>
+        <path d="M 84 36 L 636 36 L 360 132 Z" fill="${mid}" opacity="0.34"/>
+        <path d="M 84 184 L 636 184 L 360 88 Z" fill="${base}" opacity="0.22"/>
+        <rect x="150" y="48" width="420" height="124" rx="26" fill="${accent}" opacity="0.16"/>
+        ${repeatAcross(150, (x) => makeMotif('seal', x, 110, 0.52, palette))}
+        ${repeatAcross(110, (x) => makeMotif('heart', x, 60, 0.28, palette))}
+      `
+    case 'cupid':
+      return `
+        <rect x="100" y="30" width="520" height="160" rx="54" fill="${light}" opacity="0.36"/>
+        <path d="M 170 36 C 240 88, 240 132, 170 184 L 550 184 C 480 132, 480 88, 550 36 Z" fill="${mid}" opacity="0.26"/>
+        ${repeatAcross(124, (x) => makeMotif('wing', x, 114, 0.5, palette))}
+        ${repeatAcross(150, (x) => makeMotif('arrow', x, 64, 0.34, palette))}
+      `
+    case 'dragon':
+      return `
+        <rect x="92" y="24" width="536" height="172" rx="58" fill="${base}" opacity="0.38"/>
+        ${repeatAcross(52, (x) => makeMotif('scale', x, 150, 0.68, palette))}
+        ${repeatAcross(86, (x) => makeMotif('coin', x, 78, 0.30, palette))}
+        <path d="M 90 62 Q 360 10 630 62" stroke="${light}" stroke-width="10" opacity="0.28" fill="none"/>
+      `
+    case 'emperor':
+      return `
+        <rect x="90" y="22" width="540" height="176" rx="56" fill="${base}" opacity="0.30"/>
+        <path d="M 120 34 L 600 34 L 560 186 L 160 186 Z" fill="${mid}" opacity="0.16"/>
+        <rect x="314" y="0" width="92" height="220" rx="28" fill="${light}" opacity="0.20"/>
+        ${repeatAcross(142, (x) => makeMotif('crest', x, 76, 0.42, palette))}
+        ${repeatAcross(108, (x) => makeMotif('brocade', x, 144, 0.5, palette))}
+      `
+    case 'lantern':
+    case 'fanous':
+    case 'guardianmoon':
+    case 'eidcrescent':
+    case 'eidfanous':
+    case 'eidprince':
+      return `
+        <rect x="92" y="26" width="536" height="168" rx="54" fill="${mid}" opacity="0.16"/>
+        <path d="M 150 20 L 570 20 L 610 110 L 570 200 L 150 200 L 110 110 Z" fill="${base}" opacity="0.28"/>
+        ${lanternBand}
+        ${repeatAcross(116, (x) => makeMotif('crescent', x, 60, 0.30, palette))}
+        ${repeatAcross(102, (x) => makeMotif('tassel', x, 170, 0.26, palette))}
+      `
+    case 'mask':
+      return `
+        <rect x="98" y="26" width="524" height="168" rx="56" fill="${light}" opacity="0.18"/>
+        <path d="M 110 50 C 240 8, 480 8, 610 50 L 610 170 C 480 212, 240 212, 110 170 Z" fill="${base}" opacity="0.34"/>
+        ${repeatAcross(138, (x) => makeMotif('mask', x, 110, 0.44, palette))}
+        ${repeatAcross(138, (x) => makeMotif('feather', x + 24, 56, 0.28, palette))}
+      `
+    case 'clown':
+      return `
+        <rect x="100" y="30" width="520" height="160" rx="54" fill="${light}" opacity="0.24"/>
+        ${repeatAcross(82, (x) => makeMotif('dot', x, 110, 0.52, palette))}
+        ${repeatAcross(132, (x) => makeMotif('bell', x, 60, 0.34, palette))}
+        <path d="M 100 156 Q 360 122 620 156" stroke="${base}" stroke-width="18" opacity="0.24" fill="none"/>
+      `
+    case 'jester':
+    case 'royalharlequin':
+      return `
+        <rect x="96" y="28" width="528" height="164" rx="54" fill="${base}" opacity="0.20"/>
+        ${repeatAcross(74, (x) => makeMotif('diamond', x, 110, 0.5, palette))}
+        ${repeatAcross(128, (x) => makeMotif('bell', x, 60, 0.32, palette))}
+        ${repeatAcross(128, (x) => makeMotif('gem', x, 160, 0.24, palette))}
+      `
+    case 'paint':
+    case 'balloon':
+    case 'rainbowmaster':
+      return `
+        <rect x="92" y="28" width="536" height="164" rx="54" fill="${light}" opacity="0.16"/>
+        ${repeatAcross(88, (x) => makeMotif('splash', x, 110, 0.46, palette))}
+        ${repeatAcross(150, (x) => makeMotif(style === 'balloon' ? 'balloon' : 'powder', x, 64, 0.36, palette))}
+      `
+    case 'leprechaun':
+    case 'gentleman':
+    case 'queenclover':
+    case 'lordluck':
+    case 'potgold':
+      return `
+        <rect x="94" y="28" width="532" height="164" rx="56" fill="${light}" opacity="0.20"/>
+        <rect x="160" y="36" width="400" height="148" rx="44" fill="${base}" opacity="0.30"/>
+        <rect x="320" y="0" width="80" height="220" rx="24" fill="${mid}" opacity="0.22"/>
+        <rect x="0" y="92" width="720" height="36" fill="${accent}" opacity="0.34"/>
+        ${cloverBand}
+        ${repeatAcross(120, (x) => makeMotif('buckle', x, 110, 0.34, palette))}
+      `
+    case 'bunny':
+    case 'chick':
+    case 'egg':
+    case 'dandy':
+      return `
+        <rect x="88" y="26" width="544" height="168" rx="58" fill="${light}" opacity="0.26"/>
+        <path d="M 120 34 L 600 34 L 560 186 L 160 186 Z" fill="${mid}" opacity="0.18"/>
+        ${repeatAcross(128, (x) => makeMotif('egg', x, 110, 0.40, palette))}
+        ${repeatAcross(110, (x) => makeMotif(style === 'dandy' ? 'button' : 'flower', x, 60, 0.28, palette))}
+      `
+    case 'workerfloral':
+    case 'springcrown':
+    case 'rosesherald':
+      return `
+        <rect x="92" y="28" width="536" height="164" rx="54" fill="${light}" opacity="0.18"/>
+        <path d="M 130 30 L 590 30 L 550 190 L 170 190 Z" fill="${base}" opacity="0.26"/>
+        <rect x="0" y="94" width="720" height="34" fill="${accent}" opacity="0.30"/>
+        ${repeatAcross(122, (x) => makeMotif('medal', x, 110, 0.34, palette))}
+        ${repeatAcross(142, (x) => makeMotif(style === 'springcrown' ? 'flower' : 'rosette', x, 62, 0.34, palette))}
+      `
+    case 'sunbeach':
+    case 'sorbet':
+    case 'tiki':
+    case 'captain':
+      return `
+        <rect x="96" y="30" width="528" height="160" rx="54" fill="${light}" opacity="0.18"/>
+        <path d="M 88 168 Q 360 118 632 168 L 632 188 L 88 188 Z" fill="${base}" opacity="0.24"/>
+        ${style === 'captain' ? repeatAcross(116, (x) => makeMotif('anchor', x, 110, 0.38, palette)) : shellBand}
+        ${repeatAcross(140, (x) => makeMotif(style === 'sorbet' ? 'dot' : style === 'tiki' ? 'leaf' : 'sun', x, 62, 0.32, palette))}
+      `
+    case 'star':
+    case 'unclesam':
+    case 'cockade':
+    case 'beret':
+    case 'patriot':
+      return `
+        <rect x="92" y="26" width="536" height="168" rx="56" fill="${light}" opacity="0.18"/>
+        <rect x="0" y="68" width="720" height="26" fill="${mid}" opacity="0.46"/>
+        <rect x="0" y="98" width="720" height="26" fill="${accent}" opacity="0.46"/>
+        <rect x="0" y="128" width="720" height="26" fill="${mid}" opacity="0.46"/>
+        ${repeatAcross(130, (x) => makeMotif(style === 'cockade' ? 'cockade' : 'star', x, 54, 0.28, palette))}
+        ${repeatAcross(140, (x) => makeMotif('medal', x, 166, 0.30, palette))}
+      `
+    case 'pumpkin':
+    case 'ghost':
+    case 'witch':
+    case 'lordpumpkin':
+      return `
+        <rect x="96" y="28" width="528" height="164" rx="56" fill="${light}" opacity="0.10"/>
+        <path d="M 100 40 C 210 4, 510 4, 620 40 L 620 180 C 510 216, 210 216, 100 180 Z" fill="${base}" opacity="0.30"/>
+        ${repeatAcross(132, (x) => makeMotif(style === 'ghost' ? 'mist' : 'pumpkin', x, 112, 0.34, palette))}
+        ${repeatAcross(146, (x) => makeMotif(style === 'witch' ? 'hat' : 'moon', x, 56, 0.30, palette))}
+      `
+    case 'skull':
+    case 'marigold':
+    case 'catrina':
+      return `
+        <rect x="92" y="26" width="536" height="168" rx="56" fill="${light}" opacity="0.20"/>
+        <path d="M 130 34 L 590 34 L 550 186 L 170 186 Z" fill="${base}" opacity="0.24"/>
+        ${repeatAcross(126, (x) => makeMotif(style === 'marigold' ? 'flower' : 'skull', x, 110, 0.34, palette))}
+        ${repeatAcross(112, (x) => makeMotif('lace', x, 58, 0.28, palette))}
+      `
+    case 'sapphire':
+    case 'rangoli':
+    case 'rajah':
+    case 'guardian':
+    case 'peacock':
+      return `
+        <rect x="94" y="28" width="532" height="164" rx="56" fill="${light}" opacity="0.18"/>
+        <path d="M 140 24 L 580 24 L 610 110 L 580 196 L 140 196 L 110 110 Z" fill="${base}" opacity="0.28"/>
+        ${repeatAcross(124, (x) => makeMotif(style === 'rangoli' ? 'rangoli' : style === 'peacock' ? 'feather' : 'diya', x, 110, 0.34, palette))}
+        ${repeatAcross(110, (x) => makeMotif('chain', x, 60, 0.26, palette))}
+      `
+    case 'turkey':
+    case 'pilgrim':
+    case 'honor':
+      return `
+        <rect x="92" y="28" width="536" height="164" rx="56" fill="${light}" opacity="0.18"/>
+        <rect x="170" y="38" width="380" height="144" rx="40" fill="${base}" opacity="0.30"/>
+        <rect x="0" y="96" width="720" height="30" fill="${accent}" opacity="0.26"/>
+        ${repeatAcross(134, (x) => makeMotif(style === 'pilgrim' ? 'buckle' : 'grain', x, 112, 0.34, palette))}
+        ${repeatAcross(138, (x) => makeMotif('leaf', x, 60, 0.28, palette))}
+      `
+    case 'santa':
+    case 'elf':
+    case 'snowman':
+    case 'wintermaster':
+      return `
+        <rect x="92" y="26" width="536" height="168" rx="56" fill="${light}" opacity="0.22"/>
+        <path d="M 118 30 L 602 30 L 562 190 L 158 190 Z" fill="${base}" opacity="0.28"/>
+        ${repeatAcross(124, (x) => makeMotif(style === 'snowman' ? 'snowflake' : style === 'elf' ? 'bell' : style === 'wintermaster' ? 'crystal' : 'gift', x, 110, 0.34, palette))}
+        ${style === 'snowman' ? scarfBand : repeatAcross(150, (x) => makeMotif('fur', x, 56, 0.30, palette))}
+      `
+    case 'champagne':
+    case 'fireworks':
+    case 'masterchampagne':
+    case 'goldmidnight':
+    case 'queenchampagne':
+    case 'musemidnight':
+    case 'divadisco':
+      return `
+        <rect x="92" y="26" width="536" height="168" rx="56" fill="${light}" opacity="0.16"/>
+        <path d="M 130 24 L 590 24 L 622 110 L 590 196 L 130 196 L 98 110 Z" fill="${base}" opacity="0.26"/>
+        ${style === 'champagne' || style === 'masterchampagne' || style === 'queenchampagne' ? repeatAcross(126, (x) => makeMotif('bubble', x, 110, 0.34, palette)) : fireworkBand}
+        ${repeatAcross(132, (x) => makeMotif(style === 'goldmidnight' ? 'clock' : style === 'divadisco' ? 'disc' : 'star', x, 60, 0.28, palette))}
+      `
+    default:
+      return `
+        <rect x="98" y="28" width="524" height="164" rx="54" fill="${light}" opacity="0.18"/>
+        <rect x="160" y="34" width="400" height="152" rx="44" fill="${base}" opacity="0.26"/>
+        ${gemBand}
+      `
+  }
+}
+
 function makeBodySvg(id, style, palette, motifs) {
   const [base, mid, accent, light] = palette
-  const motifXs = [90, 230, 370, 510, 650]
-  const motifLayer = motifXs.map((x, idx) => makeMotif(motifs[idx % motifs.length], x, 110, 1, [base, mid, accent, light])).join('\n')
-  const smallMotifs = motifXs.map((x, idx) => makeMotif(motifs[(idx + 1) % motifs.length], x - 55, 54, 0.6, [base, mid, accent, light])).join('\n')
+  const motifXs = [94, 230, 360, 490, 626]
+  const motifLayer = motifXs.map((x, idx) => makeMotif(motifs[idx % motifs.length], x, 112, 0.72, [base, mid, accent, light])).join('\n')
+  const smallMotifs = motifXs.map((x, idx) => makeMotif(motifs[(idx + 1) % motifs.length], x - 52, 58, 0.42, [base, mid, accent, light])).join('\n')
+  const bodyLayer = styleBodyLayer(style, [base, mid, accent, light], motifs)
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}">
   <defs>
@@ -244,15 +511,11 @@ function makeBodySvg(id, style, palette, motifs) {
   </defs>
   <rect width="${WIDTH}" height="${HEIGHT}" rx="70" fill="url(#bg)"/>
   <rect x="0" y="0" width="${WIDTH}" height="${HEIGHT}" rx="70" fill="url(#brocade-${esc(id)})"/>
-  <rect x="0" y="18" width="${WIDTH}" height="24" fill="url(#trim-${esc(id)})" opacity="0.95"/>
-  <rect x="0" y="${HEIGHT - 42}" width="${WIDTH}" height="24" fill="url(#trim-${esc(id)})" opacity="0.95"/>
-  <rect x="68" y="26" width="${WIDTH - 136}" height="${HEIGHT - 52}" rx="52" fill="${light}" opacity="0.18"/>
-  <rect x="118" y="18" width="${WIDTH - 236}" height="${HEIGHT - 36}" rx="44" fill="${base}" opacity="0.22"/>
-  <rect x="155" y="0" width="22" height="${HEIGHT}" fill="${accent}" opacity="0.85"/>
-  <rect x="543" y="0" width="22" height="${HEIGHT}" fill="${accent}" opacity="0.85"/>
-  <rect x="334" y="0" width="52" height="${HEIGHT}" fill="${light}" opacity="0.18"/>
-  <g opacity="0.98">${motifLayer}</g>
-  <g opacity="0.82">${smallMotifs}</g>
+  <rect x="0" y="14" width="${WIDTH}" height="22" fill="url(#trim-${esc(id)})" opacity="0.90"/>
+  <rect x="0" y="${HEIGHT - 36}" width="${WIDTH}" height="22" fill="url(#trim-${esc(id)})" opacity="0.90"/>
+  ${bodyLayer}
+  <g opacity="0.74">${smallMotifs}</g>
+  <g opacity="0.88">${motifLayer}</g>
   <g opacity="0.82">
     ${Array.from({ length: 10 }, (_, i) => `<circle cx="${48 + i * 68}" cy="38" r="6" fill="${light}" opacity="0.72"/>`).join('\n')}
   </g>

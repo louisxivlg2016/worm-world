@@ -23,23 +23,35 @@
   </defs>
   <rect width="720" height="220" rx="70" fill="url(#bg)"/>
   <rect x="0" y="0" width="720" height="220" rx="70" fill="url(#brocade-easter4)"/>
-  <rect x="0" y="18" width="720" height="24" fill="url(#trim-easter4)" opacity="0.95"/>
-  <rect x="0" y="178" width="720" height="24" fill="url(#trim-easter4)" opacity="0.95"/>
-  <rect x="68" y="26" width="584" height="168" rx="52" fill="#fbf5ea" opacity="0.18"/>
-  <rect x="118" y="18" width="484" height="184" rx="44" fill="#b2d3ff" opacity="0.22"/>
-  <rect x="155" y="0" width="22" height="220" fill="#f2d071" opacity="0.85"/>
-  <rect x="543" y="0" width="22" height="220" fill="#f2d071" opacity="0.85"/>
-  <rect x="334" y="0" width="52" height="220" fill="#fbf5ea" opacity="0.18"/>
-  <g opacity="0.98"><circle cx="90" cy="110" r="8" fill="#fbf5ea"/>
-<circle cx="230" cy="110" r="8" fill="#fbf5ea"/>
-<g transform="translate(370 110)"><circle r="12" fill="#fbf5ea" stroke="#f2d071" stroke-width="3"/><circle r="4" fill="#f2d071"/></g>
-<circle cx="510" cy="110" r="8" fill="#fbf5ea"/>
-<circle cx="650" cy="110" r="8" fill="#fbf5ea"/></g>
-  <g opacity="0.82"><circle cx="35" cy="54" r="4.8" fill="#fbf5ea"/>
-<g transform="translate(175 54)"><circle r="7.199999999999999" fill="#fbf5ea" stroke="#f2d071" stroke-width="1.7999999999999998"/><circle r="2.4" fill="#f2d071"/></g>
-<circle cx="315" cy="54" r="4.8" fill="#fbf5ea"/>
-<circle cx="455" cy="54" r="4.8" fill="#fbf5ea"/>
-<g transform="translate(595 54)"><circle r="7.199999999999999" fill="#fbf5ea" stroke="#f2d071" stroke-width="1.7999999999999998"/><circle r="2.4" fill="#f2d071"/></g></g>
+  <rect x="0" y="14" width="720" height="22" fill="url(#trim-easter4)" opacity="0.90"/>
+  <rect x="0" y="184" width="720" height="22" fill="url(#trim-easter4)" opacity="0.90"/>
+  
+        <rect x="88" y="26" width="544" height="168" rx="58" fill="#fbf5ea" opacity="0.26"/>
+        <path d="M 120 34 L 600 34 L 560 186 L 160 186 Z" fill="#e7d4ff" opacity="0.18"/>
+        <circle cx="64" cy="110" r="3.2" fill="#fbf5ea"/>
+<circle cx="192" cy="110" r="3.2" fill="#fbf5ea"/>
+<circle cx="320" cy="110" r="3.2" fill="#fbf5ea"/>
+<circle cx="448" cy="110" r="3.2" fill="#fbf5ea"/>
+<circle cx="576" cy="110" r="3.2" fill="#fbf5ea"/>
+<circle cx="704" cy="110" r="3.2" fill="#fbf5ea"/>
+        <g transform="translate(55 60)"><circle r="3.3600000000000003" fill="#fbf5ea" stroke="#f2d071" stroke-width="0.8400000000000001"/><circle r="1.12" fill="#f2d071"/></g>
+<g transform="translate(165 60)"><circle r="3.3600000000000003" fill="#fbf5ea" stroke="#f2d071" stroke-width="0.8400000000000001"/><circle r="1.12" fill="#f2d071"/></g>
+<g transform="translate(275 60)"><circle r="3.3600000000000003" fill="#fbf5ea" stroke="#f2d071" stroke-width="0.8400000000000001"/><circle r="1.12" fill="#f2d071"/></g>
+<g transform="translate(385 60)"><circle r="3.3600000000000003" fill="#fbf5ea" stroke="#f2d071" stroke-width="0.8400000000000001"/><circle r="1.12" fill="#f2d071"/></g>
+<g transform="translate(495 60)"><circle r="3.3600000000000003" fill="#fbf5ea" stroke="#f2d071" stroke-width="0.8400000000000001"/><circle r="1.12" fill="#f2d071"/></g>
+<g transform="translate(605 60)"><circle r="3.3600000000000003" fill="#fbf5ea" stroke="#f2d071" stroke-width="0.8400000000000001"/><circle r="1.12" fill="#f2d071"/></g>
+<g transform="translate(715 60)"><circle r="3.3600000000000003" fill="#fbf5ea" stroke="#f2d071" stroke-width="0.8400000000000001"/><circle r="1.12" fill="#f2d071"/></g>
+      
+  <g opacity="0.74"><circle cx="42" cy="58" r="3.36" fill="#fbf5ea"/>
+<g transform="translate(178 58)"><circle r="5.04" fill="#fbf5ea" stroke="#f2d071" stroke-width="1.26"/><circle r="1.68" fill="#f2d071"/></g>
+<circle cx="308" cy="58" r="3.36" fill="#fbf5ea"/>
+<circle cx="438" cy="58" r="3.36" fill="#fbf5ea"/>
+<g transform="translate(574 58)"><circle r="5.04" fill="#fbf5ea" stroke="#f2d071" stroke-width="1.26"/><circle r="1.68" fill="#f2d071"/></g></g>
+  <g opacity="0.88"><circle cx="94" cy="112" r="5.76" fill="#fbf5ea"/>
+<circle cx="230" cy="112" r="5.76" fill="#fbf5ea"/>
+<g transform="translate(360 112)"><circle r="8.64" fill="#fbf5ea" stroke="#f2d071" stroke-width="2.16"/><circle r="2.88" fill="#f2d071"/></g>
+<circle cx="490" cy="112" r="5.76" fill="#fbf5ea"/>
+<circle cx="626" cy="112" r="5.76" fill="#fbf5ea"/></g>
   <g opacity="0.82">
     <circle cx="48" cy="38" r="6" fill="#fbf5ea" opacity="0.72"/>
 <circle cx="116" cy="38" r="6" fill="#fbf5ea" opacity="0.72"/>
