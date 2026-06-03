@@ -545,9 +545,9 @@ function styleBodyLayer(style, palette, motifs) {
 
 function makeBodySvg(id, style, palette, motifs) {
   const [base, mid, accent, light] = palette
-  const motifXs = [94, 230, 360, 490, 626]
-  const motifLayer = motifXs.map((x, idx) => makeMotif(motifs[idx % motifs.length], x, 112, 0.72, [base, mid, accent, light])).join('\n')
-  const smallMotifs = motifXs.map((x, idx) => makeMotif(motifs[(idx + 1) % motifs.length], x - 52, 58, 0.42, [base, mid, accent, light])).join('\n')
+  const motifXs = [112, 280, 440, 608]
+  const motifLayer = motifXs.map((x, idx) => makeMotif(motifs[idx % motifs.length], x, 114, 0.96, [base, mid, accent, light])).join('\n')
+  const smallMotifs = motifXs.map((x, idx) => makeMotif(motifs[(idx + 1) % motifs.length], x - 62, 56, 0.58, [base, mid, accent, light])).join('\n')
   const bodyLayer = styleBodyLayer(style, [base, mid, accent, light], motifs)
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}">
@@ -567,9 +567,9 @@ function makeBodySvg(id, style, palette, motifs) {
       <path d="M 40 8 C 56 22, 56 58, 40 72 C 24 58, 24 22, 40 8 Z" fill="${light}" opacity="0.10"/>
       <path d="M 8 40 C 22 26, 58 26, 72 40 C 58 54, 22 54, 8 40 Z" fill="${accent}" opacity="0.10"/>
     </pattern>
-    <pattern id="trim-${esc(id)}" width="46" height="34" patternUnits="userSpaceOnUse">
-      <path d="M 0 28 Q 11 6 23 28 T 46 28" stroke="${accent}" stroke-width="4" fill="none" opacity="0.85"/>
-      <circle cx="23" cy="18" r="4" fill="${light}" opacity="0.8"/>
+    <pattern id="trim-${esc(id)}" width="72" height="42" patternUnits="userSpaceOnUse">
+      <path d="M 0 34 Q 18 8 36 34 T 72 34" stroke="${accent}" stroke-width="6" fill="none" opacity="0.92"/>
+      <circle cx="36" cy="20" r="6" fill="${light}" opacity="0.86"/>
     </pattern>
   </defs>
   <rect width="${WIDTH}" height="${HEIGHT}" rx="70" fill="url(#bg)"/>
@@ -580,14 +580,14 @@ function makeBodySvg(id, style, palette, motifs) {
   <g opacity="0.74">${smallMotifs}</g>
   <g opacity="0.88">${motifLayer}</g>
   <g opacity="0.82">
-    ${Array.from({ length: 10 }, (_, i) => `<circle cx="${48 + i * 68}" cy="38" r="6" fill="${light}" opacity="0.72"/>`).join('\n')}
+    ${Array.from({ length: 8 }, (_, i) => `<circle cx="${66 + i * 84}" cy="38" r="8" fill="${light}" opacity="0.78"/>`).join('\n')}
   </g>
   <g opacity="0.72">
-    ${Array.from({ length: 9 }, (_, i) => `<circle cx="${82 + i * 72}" cy="${HEIGHT - 32}" r="7" fill="${accent}" opacity="0.65"/>`).join('\n')}
+    ${Array.from({ length: 7 }, (_, i) => `<circle cx="${100 + i * 92}" cy="${HEIGHT - 34}" r="9" fill="${accent}" opacity="0.68"/>`).join('\n')}
   </g>
   <rect x="0" y="0" width="${WIDTH}" height="${HEIGHT}" rx="70" fill="url(#satin)"/>
-  <path d="M 40 34 C 160 8, 560 8, 680 34" stroke="rgba(255,255,255,0.28)" stroke-width="12" stroke-linecap="round" fill="none"/>
-  <path d="M 48 168 C 184 194, 536 194, 672 168" stroke="rgba(0,0,0,0.16)" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <path d="M 40 34 C 160 8, 560 8, 680 34" stroke="rgba(255,255,255,0.28)" stroke-width="14" stroke-linecap="round" fill="none"/>
+  <path d="M 48 168 C 184 194, 536 194, 672 168" stroke="rgba(0,0,0,0.16)" stroke-width="14" stroke-linecap="round" fill="none"/>
 </svg>`
 }
 
