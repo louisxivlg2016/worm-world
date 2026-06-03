@@ -805,6 +805,7 @@ function ShopWormPreview({
                   resizeMode={isFlagPreview ? "repeat" : "stretch"}
                   imageStyle={[
                     styles.previewTubeImage,
+                    isPremiumEventBodyPreview && styles.previewTubeImagePremium,
                     isFlagPreview && styles.previewTubeRepeatImage,
                     isFlagPreview && {
                       transform: [{ scale: flagTextureScale }, { translateX: flagTextureOffset * 100 }],
@@ -815,7 +816,7 @@ function ShopWormPreview({
               ) : renderTubePaletteFill(styles.previewTubeImage)}
               <View style={styles.previewTubeShade} />
               <View style={styles.previewTubeHighlight} />
-              {isPremiumEventBodyPreview ? renderPremiumTubeDecor() : null}
+              {isPremiumEventBodyPreview ? <View style={styles.previewTubePremiumFrame} /> : null}
             </View>
           </>
         ) : !flagPreviewUri ? (
@@ -1581,6 +1582,9 @@ const styles = StyleSheet.create({
   previewTubeImage: {
     borderRadius: 25,
   },
+  previewTubeImagePremium: {
+    transform: [{ scale: 1.16 }],
+  },
   previewTubeRepeatImage: {
     borderRadius: 25,
   },
@@ -1710,6 +1714,16 @@ const styles = StyleSheet.create({
     height: 14,
     borderRadius: 2,
     backgroundColor: "rgba(255,215,126,0.34)",
+  },
+  previewTubePremiumFrame: {
+    position: "absolute",
+    left: 10,
+    right: 10,
+    top: 10,
+    bottom: 10,
+    borderRadius: 999,
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.10)",
   },
   previewTubeFloralRow: {
     position: "absolute",
