@@ -477,43 +477,41 @@ function styleBodyLayer(style, palette, motifs) {
         ${
           style === 'santa'
             ? `
-              <rect x="306" y="12" width="108" height="196" rx="34" fill="#fffdf8" opacity="0.82"/>
-              <rect x="0" y="92" width="720" height="40" fill="#1d1d1f" opacity="0.96"/>
-              <rect x="288" y="82" width="144" height="60" rx="14" fill="none" stroke="#e2c067" stroke-width="14"/>
-              <rect x="0" y="58" width="720" height="12" fill="#fffdf8" opacity="0.88"/>
-              <rect x="0" y="24" width="720" height="20" fill="#fffdf8" opacity="0.95"/>
-              <rect x="0" y="176" width="720" height="22" fill="#fffdf8" opacity="0.95"/>
-              <path d="M 232 28 L 488 28 L 528 76 L 470 96 L 250 96 L 192 76 Z" fill="#ffffff" opacity="0.22"/>
-              <path d="M 214 182 Q 360 144 506 182" stroke="#fffdf8" stroke-width="18" fill="none" stroke-linecap="round" opacity="0.54"/>
-              ${repeatAcross(128, (x) => makeMotif('button', x, 60, 0.30, palette))}
-              ${repeatAcross(156, (x) => makeMotif('gift', x, 154, 0.26, palette))}
+              <rect x="182" y="20" width="356" height="180" rx="56" fill="#c8333d" opacity="0.62"/>
+              <rect x="302" y="8" width="116" height="202" rx="36" fill="#fffdf8" opacity="0.92"/>
+              <rect x="0" y="86" width="720" height="46" fill="#1d1d1f" opacity="0.98"/>
+              <rect x="286" y="76" width="148" height="66" rx="16" fill="none" stroke="#e2c067" stroke-width="16"/>
+              <rect x="0" y="22" width="720" height="24" fill="#fffdf8" opacity="0.98"/>
+              <rect x="0" y="174" width="720" height="26" fill="#fffdf8" opacity="0.98"/>
+              <path d="M 216 26 L 504 26 L 544 82 L 476 102 L 244 102 L 176 82 Z" fill="#ffffff" opacity="0.26"/>
+              <path d="M 206 182 Q 360 138 514 182" stroke="#fffdf8" stroke-width="20" fill="none" stroke-linecap="round" opacity="0.64"/>
+              ${repeatAcross(180, (x) => makeMotif('button', x, 60, 0.34, palette))}
             `
             : style === 'elf'
               ? `
-                <path d="M 110 28 L 610 28 L 560 80 L 610 132 L 560 192 L 110 192 L 160 132 L 110 80 Z" fill="${base}" opacity="0.30"/>
-                <path d="M 180 38 L 540 38 L 512 190 L 208 190 Z" fill="#f5e0a3" opacity="0.24"/>
-                <path d="M 0 58 ${Array.from({ length: 14 }, (_, i) => `L ${i * 56 + 28} ${i % 2 === 0 ? 78 : 42}`).join(' ')} L 720 58 L 720 90 ${Array.from({ length: 14 }, (_, i) => `L ${720 - (i * 56 + 28)} ${i % 2 === 0 ? 110 : 74}`).join(' ')} Z" fill="#f5e0a3" opacity="0.88"/>
-                <rect x="0" y="96" width="720" height="28" fill="#b71f32" opacity="0.78"/>
-                <rect x="304" y="0" width="112" height="220" rx="28" fill="#ffffff" opacity="0.16"/>
-                ${repeatAcross(120, (x) => makeMotif('bell', x, 60, 0.30, palette))}
-                ${repeatAcross(128, (x) => makeMotif('leaf', x, 156, 0.26, palette))}
+                <path d="M 126 20 L 594 20 L 552 88 L 594 156 L 540 198 L 180 198 L 126 156 L 168 88 Z" fill="${base}" opacity="0.36"/>
+                <rect x="284" y="6" width="152" height="206" rx="42" fill="#f5e0a3" opacity="0.30"/>
+                <path d="M 0 54 ${Array.from({ length: 12 }, (_, i) => `L ${i * 60 + 30} ${i % 2 === 0 ? 84 : 40}`).join(' ')} L 720 54 L 720 92 ${Array.from({ length: 12 }, (_, i) => `L ${720 - (i * 60 + 30)} ${i % 2 === 0 ? 118 : 74}`).join(' ')} Z" fill="#f5e0a3" opacity="0.92"/>
+                <rect x="0" y="94" width="720" height="32" fill="#b71f32" opacity="0.82"/>
+                <path d="M 210 178 Q 360 144 510 178" stroke="#f5e0a3" stroke-width="18" fill="none" stroke-linecap="round" opacity="0.58"/>
+                ${repeatAcross(168, (x) => makeMotif('bell', x, 58, 0.34, palette))}
               `
               : style === 'snowman'
                 ? `
-                  <rect x="120" y="28" width="480" height="164" rx="54" fill="#f9fbff" opacity="0.72"/>
-                  <rect x="0" y="82" width="720" height="22" fill="#ff8b47" opacity="0.95"/>
-                  <rect x="0" y="104" width="720" height="18" fill="#6fa8d6" opacity="0.92"/>
-                  <rect x="0" y="122" width="720" height="18" fill="#ff8b47" opacity="0.95"/>
-                  ${repeatAcross(128, (x) => makeMotif('snowflake', x, 60, 0.30, palette))}
-                  ${repeatAcross(128, (x) => makeMotif('button', x, 154, 0.24, palette))}
+                  <rect x="118" y="24" width="484" height="172" rx="56" fill="#f9fbff" opacity="0.82"/>
+                  <rect x="0" y="80" width="720" height="24" fill="#ff8b47" opacity="0.98"/>
+                  <rect x="0" y="104" width="720" height="20" fill="#6fa8d6" opacity="0.96"/>
+                  <rect x="0" y="124" width="720" height="20" fill="#ff8b47" opacity="0.98"/>
+                  <path d="M 236 30 L 484 30 L 520 64 L 484 92 L 236 92 L 200 64 Z" fill="#ffffff" opacity="0.34"/>
+                  ${repeatAcross(170, (x) => makeMotif('button', x, 154, 0.28, palette))}
                 `
                 : `
-                  <path d="M 126 22 L 594 22 L 626 110 L 594 198 L 126 198 L 94 110 Z" fill="${base}" opacity="0.34"/>
-                  <rect x="292" y="8" width="136" height="204" rx="34" fill="#f6f6fb" opacity="0.18"/>
-                  <rect x="0" y="84" width="720" height="16" fill="#d64953" opacity="0.92"/>
-                  <rect x="0" y="120" width="720" height="16" fill="#d64953" opacity="0.92"/>
-                  ${repeatAcross(122, (x) => makeMotif('crystal', x, 60, 0.30, palette))}
-                  ${repeatAcross(138, (x) => makeMotif('medal', x, 156, 0.28, palette))}
+                  <path d="M 126 22 L 594 22 L 626 110 L 594 198 L 126 198 L 94 110 Z" fill="${base}" opacity="0.38"/>
+                  <rect x="272" y="8" width="176" height="204" rx="38" fill="#f6f6fb" opacity="0.22"/>
+                  <rect x="0" y="82" width="720" height="18" fill="#d64953" opacity="0.94"/>
+                  <rect x="0" y="120" width="720" height="18" fill="#d64953" opacity="0.94"/>
+                  <path d="M 214 42 Q 360 8 506 42" stroke="#f6f6fb" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.56"/>
+                  ${repeatAcross(176, (x) => makeMotif('medal', x, 154, 0.32, palette))}
                 `
         }
       `
@@ -545,9 +543,9 @@ function styleBodyLayer(style, palette, motifs) {
 
 function makeBodySvg(id, style, palette, motifs) {
   const [base, mid, accent, light] = palette
-  const motifXs = [132, 360, 588]
-  const motifLayer = motifXs.map((x, idx) => makeMotif(motifs[idx % motifs.length], x, 116, 1.42, [base, mid, accent, light])).join('\n')
-  const smallMotifs = motifXs.map((x, idx) => makeMotif(motifs[(idx + 1) % motifs.length], x - 78, 54, 0.88, [base, mid, accent, light])).join('\n')
+  const motifXs = [130, 360, 590]
+  const motifLayer = motifXs.map((x, idx) => makeMotif(motifs[idx % motifs.length], x, 116, 0.84, [base, mid, accent, light])).join('\n')
+  const smallMotifs = motifXs.map((x, idx) => makeMotif(motifs[(idx + 1) % motifs.length], x - 70, 56, 0.44, [base, mid, accent, light])).join('\n')
   const bodyLayer = styleBodyLayer(style, [base, mid, accent, light], motifs)
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}">
@@ -567,9 +565,9 @@ function makeBodySvg(id, style, palette, motifs) {
       <path d="M 40 8 C 56 22, 56 58, 40 72 C 24 58, 24 22, 40 8 Z" fill="${light}" opacity="0.10"/>
       <path d="M 8 40 C 22 26, 58 26, 72 40 C 58 54, 22 54, 8 40 Z" fill="${accent}" opacity="0.10"/>
     </pattern>
-    <pattern id="trim-${esc(id)}" width="96" height="50" patternUnits="userSpaceOnUse">
-      <path d="M 0 40 Q 24 8 48 40 T 96 40" stroke="${accent}" stroke-width="8" fill="none" opacity="0.94"/>
-      <circle cx="48" cy="24" r="8" fill="${light}" opacity="0.9"/>
+    <pattern id="trim-${esc(id)}" width="72" height="42" patternUnits="userSpaceOnUse">
+      <path d="M 0 34 Q 18 8 36 34 T 72 34" stroke="${accent}" stroke-width="6" fill="none" opacity="0.9"/>
+      <circle cx="36" cy="20" r="6" fill="${light}" opacity="0.84"/>
     </pattern>
   </defs>
   <rect width="${WIDTH}" height="${HEIGHT}" rx="70" fill="url(#bg)"/>
@@ -579,11 +577,11 @@ function makeBodySvg(id, style, palette, motifs) {
   ${bodyLayer}
   <g opacity="0.74">${smallMotifs}</g>
   <g opacity="0.88">${motifLayer}</g>
-  <g opacity="0.82">
-    ${Array.from({ length: 6 }, (_, i) => `<circle cx="${90 + i * 108}" cy="38" r="11" fill="${light}" opacity="0.82"/>`).join('\n')}
+  <g opacity="0.74">
+    ${Array.from({ length: 8 }, (_, i) => `<circle cx="${64 + i * 84}" cy="38" r="7" fill="${light}" opacity="0.7"/>`).join('\n')}
   </g>
-  <g opacity="0.72">
-    ${Array.from({ length: 5 }, (_, i) => `<circle cx="${126 + i * 126}" cy="${HEIGHT - 34}" r="13" fill="${accent}" opacity="0.72"/>`).join('\n')}
+  <g opacity="0.64">
+    ${Array.from({ length: 7 }, (_, i) => `<circle cx="${94 + i * 92}" cy="${HEIGHT - 34}" r="8" fill="${accent}" opacity="0.62"/>`).join('\n')}
   </g>
   <rect x="0" y="0" width="${WIDTH}" height="${HEIGHT}" rx="70" fill="url(#satin)"/>
   <path d="M 40 34 C 160 8, 560 8, 680 34" stroke="rgba(255,255,255,0.28)" stroke-width="14" stroke-linecap="round" fill="none"/>

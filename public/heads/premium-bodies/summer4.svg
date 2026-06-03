@@ -16,9 +16,9 @@
       <path d="M 40 8 C 56 22, 56 58, 40 72 C 24 58, 24 22, 40 8 Z" fill="#24456d" opacity="0.10"/>
       <path d="M 8 40 C 22 26, 58 26, 72 40 C 58 54, 22 54, 8 40 Z" fill="#d9b45a" opacity="0.10"/>
     </pattern>
-    <pattern id="trim-summer4" width="96" height="50" patternUnits="userSpaceOnUse">
-      <path d="M 0 40 Q 24 8 48 40 T 96 40" stroke="#d9b45a" stroke-width="8" fill="none" opacity="0.94"/>
-      <circle cx="48" cy="24" r="8" fill="#24456d" opacity="0.9"/>
+    <pattern id="trim-summer4" width="72" height="42" patternUnits="userSpaceOnUse">
+      <path d="M 0 34 Q 18 8 36 34 T 72 34" stroke="#d9b45a" stroke-width="6" fill="none" opacity="0.9"/>
+      <circle cx="36" cy="20" r="6" fill="#24456d" opacity="0.84"/>
     </pattern>
   </defs>
   <rect width="720" height="220" rx="70" fill="url(#bg)"/>
@@ -44,26 +44,30 @@
 <g transform="translate(462 152)"><circle r="3.12" fill="#24456d" stroke="#d9b45a" stroke-width="0.78"/><circle r="1.04" fill="#d9b45a"/></g>
 <g transform="translate(594 152)"><circle r="3.12" fill="#24456d" stroke="#d9b45a" stroke-width="0.78"/><circle r="1.04" fill="#d9b45a"/></g>
       
-  <g opacity="0.74"><g transform="translate(54 54)"><path d="M -21.12 -3.52 Q -10.56 7.04 0 -3.52 T 21.12 -3.52" stroke="#24456d" stroke-width="3.52" fill="none" stroke-linecap="round"/></g>
-<g transform="translate(282 54)"><circle r="10.56" fill="#24456d" stroke="#d9b45a" stroke-width="2.64"/><circle r="3.52" fill="#d9b45a"/></g>
-<g transform="translate(510 54)"><circle cy="-15.84" r="5.28" fill="none" stroke="#24456d" stroke-width="2.64"/><path d="M 0 -10.56 L 0 15.84 M -14.08 7.04 Q 0 26.4 14.08 7.04" stroke="#24456d" stroke-width="3.52" fill="none" stroke-linecap="round"/></g></g>
-  <g opacity="0.88"><g transform="translate(132 116)"><circle cy="-25.56" r="8.52" fill="none" stroke="#24456d" stroke-width="4.26"/><path d="M 0 -17.04 L 0 25.56 M -22.72 11.36 Q 0 42.599999999999994 22.72 11.36" stroke="#24456d" stroke-width="5.68" fill="none" stroke-linecap="round"/></g>
-<g transform="translate(360 116)"><path d="M -34.08 -5.68 Q -17.04 11.36 0 -5.68 T 34.08 -5.68" stroke="#24456d" stroke-width="5.68" fill="none" stroke-linecap="round"/></g>
-<g transform="translate(588 116)"><circle r="17.04" fill="#24456d" stroke="#d9b45a" stroke-width="4.26"/><circle r="5.68" fill="#d9b45a"/></g></g>
-  <g opacity="0.82">
-    <circle cx="90" cy="38" r="11" fill="#24456d" opacity="0.82"/>
-<circle cx="198" cy="38" r="11" fill="#24456d" opacity="0.82"/>
-<circle cx="306" cy="38" r="11" fill="#24456d" opacity="0.82"/>
-<circle cx="414" cy="38" r="11" fill="#24456d" opacity="0.82"/>
-<circle cx="522" cy="38" r="11" fill="#24456d" opacity="0.82"/>
-<circle cx="630" cy="38" r="11" fill="#24456d" opacity="0.82"/>
+  <g opacity="0.74"><g transform="translate(60 56)"><path d="M -10.56 -1.76 Q -5.28 3.52 0 -1.76 T 10.56 -1.76" stroke="#24456d" stroke-width="1.76" fill="none" stroke-linecap="round"/></g>
+<g transform="translate(290 56)"><circle r="5.28" fill="#24456d" stroke="#d9b45a" stroke-width="1.32"/><circle r="1.76" fill="#d9b45a"/></g>
+<g transform="translate(520 56)"><circle cy="-7.92" r="2.64" fill="none" stroke="#24456d" stroke-width="1.32"/><path d="M 0 -5.28 L 0 7.92 M -7.04 3.52 Q 0 13.2 7.04 3.52" stroke="#24456d" stroke-width="1.76" fill="none" stroke-linecap="round"/></g></g>
+  <g opacity="0.88"><g transform="translate(130 116)"><circle cy="-15.12" r="5.04" fill="none" stroke="#24456d" stroke-width="2.52"/><path d="M 0 -10.08 L 0 15.12 M -13.44 6.72 Q 0 25.2 13.44 6.72" stroke="#24456d" stroke-width="3.36" fill="none" stroke-linecap="round"/></g>
+<g transform="translate(360 116)"><path d="M -20.16 -3.36 Q -10.08 6.72 0 -3.36 T 20.16 -3.36" stroke="#24456d" stroke-width="3.36" fill="none" stroke-linecap="round"/></g>
+<g transform="translate(590 116)"><circle r="10.08" fill="#24456d" stroke="#d9b45a" stroke-width="2.52"/><circle r="3.36" fill="#d9b45a"/></g></g>
+  <g opacity="0.74">
+    <circle cx="64" cy="38" r="7" fill="#24456d" opacity="0.7"/>
+<circle cx="148" cy="38" r="7" fill="#24456d" opacity="0.7"/>
+<circle cx="232" cy="38" r="7" fill="#24456d" opacity="0.7"/>
+<circle cx="316" cy="38" r="7" fill="#24456d" opacity="0.7"/>
+<circle cx="400" cy="38" r="7" fill="#24456d" opacity="0.7"/>
+<circle cx="484" cy="38" r="7" fill="#24456d" opacity="0.7"/>
+<circle cx="568" cy="38" r="7" fill="#24456d" opacity="0.7"/>
+<circle cx="652" cy="38" r="7" fill="#24456d" opacity="0.7"/>
   </g>
-  <g opacity="0.72">
-    <circle cx="126" cy="186" r="13" fill="#d9b45a" opacity="0.72"/>
-<circle cx="252" cy="186" r="13" fill="#d9b45a" opacity="0.72"/>
-<circle cx="378" cy="186" r="13" fill="#d9b45a" opacity="0.72"/>
-<circle cx="504" cy="186" r="13" fill="#d9b45a" opacity="0.72"/>
-<circle cx="630" cy="186" r="13" fill="#d9b45a" opacity="0.72"/>
+  <g opacity="0.64">
+    <circle cx="94" cy="186" r="8" fill="#d9b45a" opacity="0.62"/>
+<circle cx="186" cy="186" r="8" fill="#d9b45a" opacity="0.62"/>
+<circle cx="278" cy="186" r="8" fill="#d9b45a" opacity="0.62"/>
+<circle cx="370" cy="186" r="8" fill="#d9b45a" opacity="0.62"/>
+<circle cx="462" cy="186" r="8" fill="#d9b45a" opacity="0.62"/>
+<circle cx="554" cy="186" r="8" fill="#d9b45a" opacity="0.62"/>
+<circle cx="646" cy="186" r="8" fill="#d9b45a" opacity="0.62"/>
   </g>
   <rect x="0" y="0" width="720" height="220" rx="70" fill="url(#satin)"/>
   <path d="M 40 34 C 160 8, 560 8, 680 34" stroke="rgba(255,255,255,0.28)" stroke-width="14" stroke-linecap="round" fill="none"/>
