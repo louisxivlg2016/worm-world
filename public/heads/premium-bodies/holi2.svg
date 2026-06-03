@@ -16,9 +16,9 @@
       <path d="M 40 8 C 56 22, 56 58, 40 72 C 24 58, 24 22, 40 8 Z" fill="#ff4a8e" opacity="0.10"/>
       <path d="M 8 40 C 22 26, 58 26, 72 40 C 58 54, 22 54, 8 40 Z" fill="#38d66b" opacity="0.10"/>
     </pattern>
-    <pattern id="trim-holi2" width="72" height="42" patternUnits="userSpaceOnUse">
-      <path d="M 0 34 Q 18 8 36 34 T 72 34" stroke="#38d66b" stroke-width="6" fill="none" opacity="0.92"/>
-      <circle cx="36" cy="20" r="6" fill="#ff4a8e" opacity="0.86"/>
+    <pattern id="trim-holi2" width="96" height="50" patternUnits="userSpaceOnUse">
+      <path d="M 0 40 Q 24 8 48 40 T 96 40" stroke="#38d66b" stroke-width="8" fill="none" opacity="0.94"/>
+      <circle cx="48" cy="24" r="8" fill="#ff4a8e" opacity="0.9"/>
     </pattern>
   </defs>
   <rect width="720" height="220" rx="70" fill="url(#bg)"/>
@@ -41,32 +41,26 @@
 <g transform="translate(525 64)"><ellipse rx="5.04" ry="6.4799999999999995" fill="#ffb03d" stroke="#ff4a8e" stroke-width="0.8999999999999999"/><path d="M 0 6.4799999999999995 L 0.72 12.24" stroke="#ff4a8e" stroke-width="0.72" fill="none"/></g>
 <g transform="translate(675 64)"><ellipse rx="5.04" ry="6.4799999999999995" fill="#ffb03d" stroke="#ff4a8e" stroke-width="0.8999999999999999"/><path d="M 0 6.4799999999999995 L 0.72 12.24" stroke="#ff4a8e" stroke-width="0.72" fill="none"/></g>
       
-  <g opacity="0.74"><g transform="translate(50 56)"><path d="M -13.919999999999998 3.4799999999999995 C -16.24 -5.8, -5.8 -10.44, 0 -5.8 C 3.4799999999999995 -13.919999999999998, 13.919999999999998 -10.44, 11.6 0 C 19.72 4.64, 10.44 13.919999999999998, 0 10.44 C -4.64 17.4, -15.079999999999998 11.6, -13.919999999999998 3.4799999999999995 Z" fill="#ffb03d" opacity="0.95"/></g>
-<circle cx="218" cy="56" r="5.8" fill="#ffb03d" stroke="#ff4a8e" stroke-width="1.16"/>
-<g transform="translate(378 56)"><ellipse rx="8.12" ry="10.44" fill="#ffb03d" stroke="#ff4a8e" stroke-width="1.45"/><path d="M 0 10.44 L 1.16 19.72" stroke="#ff4a8e" stroke-width="1.16" fill="none"/></g>
-<g transform="translate(546 56)"><path d="M -13.919999999999998 3.4799999999999995 C -16.24 -5.8, -5.8 -10.44, 0 -5.8 C 3.4799999999999995 -13.919999999999998, 13.919999999999998 -10.44, 11.6 0 C 19.72 4.64, 10.44 13.919999999999998, 0 10.44 C -4.64 17.4, -15.079999999999998 11.6, -13.919999999999998 3.4799999999999995 Z" fill="#ffb03d" opacity="0.95"/></g></g>
-  <g opacity="0.88"><g transform="translate(112 114)"><ellipse rx="13.44" ry="17.28" fill="#ffb03d" stroke="#ff4a8e" stroke-width="2.4"/><path d="M 0 17.28 L 1.92 32.64" stroke="#ff4a8e" stroke-width="1.92" fill="none"/></g>
-<g transform="translate(280 114)"><path d="M -23.04 5.76 C -26.88 -9.6, -9.6 -17.28, 0 -9.6 C 5.76 -23.04, 23.04 -17.28, 19.2 0 C 32.64 7.68, 17.28 23.04, 0 17.28 C -7.68 28.799999999999997, -24.96 19.2, -23.04 5.76 Z" fill="#ffb03d" opacity="0.95"/></g>
-<circle cx="440" cy="114" r="9.6" fill="#ffb03d" stroke="#ff4a8e" stroke-width="1.92"/>
-<g transform="translate(608 114)"><ellipse rx="13.44" ry="17.28" fill="#ffb03d" stroke="#ff4a8e" stroke-width="2.4"/><path d="M 0 17.28 L 1.92 32.64" stroke="#ff4a8e" stroke-width="1.92" fill="none"/></g></g>
+  <g opacity="0.74"><g transform="translate(54 54)"><path d="M -21.12 5.28 C -24.64 -8.8, -8.8 -15.84, 0 -8.8 C 5.28 -21.12, 21.12 -15.84, 17.6 0 C 29.92 7.04, 15.84 21.12, 0 15.84 C -7.04 26.4, -22.88 17.6, -21.12 5.28 Z" fill="#ffb03d" opacity="0.95"/></g>
+<circle cx="282" cy="54" r="8.8" fill="#ffb03d" stroke="#ff4a8e" stroke-width="1.76"/>
+<g transform="translate(510 54)"><ellipse rx="12.32" ry="15.84" fill="#ffb03d" stroke="#ff4a8e" stroke-width="2.2"/><path d="M 0 15.84 L 1.76 29.92" stroke="#ff4a8e" stroke-width="1.76" fill="none"/></g></g>
+  <g opacity="0.88"><g transform="translate(132 116)"><ellipse rx="19.88" ry="25.56" fill="#ffb03d" stroke="#ff4a8e" stroke-width="3.55"/><path d="M 0 25.56 L 2.84 48.28" stroke="#ff4a8e" stroke-width="2.84" fill="none"/></g>
+<g transform="translate(360 116)"><path d="M -34.08 8.52 C -39.76 -14.2, -14.2 -25.56, 0 -14.2 C 8.52 -34.08, 34.08 -25.56, 28.4 0 C 48.28 11.36, 25.56 34.08, 0 25.56 C -11.36 42.599999999999994, -36.92 28.4, -34.08 8.52 Z" fill="#ffb03d" opacity="0.95"/></g>
+<circle cx="588" cy="116" r="14.2" fill="#ffb03d" stroke="#ff4a8e" stroke-width="2.84"/></g>
   <g opacity="0.82">
-    <circle cx="66" cy="38" r="8" fill="#ff4a8e" opacity="0.78"/>
-<circle cx="150" cy="38" r="8" fill="#ff4a8e" opacity="0.78"/>
-<circle cx="234" cy="38" r="8" fill="#ff4a8e" opacity="0.78"/>
-<circle cx="318" cy="38" r="8" fill="#ff4a8e" opacity="0.78"/>
-<circle cx="402" cy="38" r="8" fill="#ff4a8e" opacity="0.78"/>
-<circle cx="486" cy="38" r="8" fill="#ff4a8e" opacity="0.78"/>
-<circle cx="570" cy="38" r="8" fill="#ff4a8e" opacity="0.78"/>
-<circle cx="654" cy="38" r="8" fill="#ff4a8e" opacity="0.78"/>
+    <circle cx="90" cy="38" r="11" fill="#ff4a8e" opacity="0.82"/>
+<circle cx="198" cy="38" r="11" fill="#ff4a8e" opacity="0.82"/>
+<circle cx="306" cy="38" r="11" fill="#ff4a8e" opacity="0.82"/>
+<circle cx="414" cy="38" r="11" fill="#ff4a8e" opacity="0.82"/>
+<circle cx="522" cy="38" r="11" fill="#ff4a8e" opacity="0.82"/>
+<circle cx="630" cy="38" r="11" fill="#ff4a8e" opacity="0.82"/>
   </g>
   <g opacity="0.72">
-    <circle cx="100" cy="186" r="9" fill="#38d66b" opacity="0.68"/>
-<circle cx="192" cy="186" r="9" fill="#38d66b" opacity="0.68"/>
-<circle cx="284" cy="186" r="9" fill="#38d66b" opacity="0.68"/>
-<circle cx="376" cy="186" r="9" fill="#38d66b" opacity="0.68"/>
-<circle cx="468" cy="186" r="9" fill="#38d66b" opacity="0.68"/>
-<circle cx="560" cy="186" r="9" fill="#38d66b" opacity="0.68"/>
-<circle cx="652" cy="186" r="9" fill="#38d66b" opacity="0.68"/>
+    <circle cx="126" cy="186" r="13" fill="#38d66b" opacity="0.72"/>
+<circle cx="252" cy="186" r="13" fill="#38d66b" opacity="0.72"/>
+<circle cx="378" cy="186" r="13" fill="#38d66b" opacity="0.72"/>
+<circle cx="504" cy="186" r="13" fill="#38d66b" opacity="0.72"/>
+<circle cx="630" cy="186" r="13" fill="#38d66b" opacity="0.72"/>
   </g>
   <rect x="0" y="0" width="720" height="220" rx="70" fill="url(#satin)"/>
   <path d="M 40 34 C 160 8, 560 8, 680 34" stroke="rgba(255,255,255,0.28)" stroke-width="14" stroke-linecap="round" fill="none"/>
