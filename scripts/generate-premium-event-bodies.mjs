@@ -358,12 +358,15 @@ function styleBodyLayer(style, palette, motifs) {
     case 'lordluck':
     case 'potgold':
       return `
-        <rect x="94" y="28" width="532" height="164" rx="56" fill="${light}" opacity="0.20"/>
-        <rect x="160" y="36" width="400" height="148" rx="44" fill="${base}" opacity="0.30"/>
-        <rect x="320" y="0" width="80" height="220" rx="24" fill="${mid}" opacity="0.22"/>
-        <rect x="0" y="92" width="720" height="36" fill="${accent}" opacity="0.34"/>
-        ${cloverBand}
-        ${repeatAcross(120, (x) => makeMotif('buckle', x, 110, 0.34, palette))}
+        <rect x="94" y="28" width="532" height="164" rx="56" fill="${light}" opacity="0.14"/>
+        <rect x="150" y="28" width="420" height="164" rx="48" fill="${base}" opacity="0.28"/>
+        <rect x="282" y="14" width="156" height="192" rx="44" fill="${style === 'queenclover' ? light : mid}" opacity="0.42"/>
+        <rect x="0" y="92" width="720" height="34" fill="#151515" opacity="0.94"/>
+        <rect x="296" y="78" width="128" height="62" rx="16" fill="none" stroke="${accent}" stroke-width="14"/>
+        <path d="M 190 40 L 530 40 L 566 78 L 528 106 L 192 106 L 154 78 Z" fill="${light}" opacity="0.24"/>
+        <path d="M 188 176 Q 360 136 532 176" stroke="${accent}" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.64"/>
+        ${repeatAcross(120, (x) => makeMotif('clover', x, 58, 0.30, palette))}
+        ${repeatAcross(132, (x) => makeMotif(style === 'potgold' ? 'coin' : 'button', x, 156, 0.26, palette))}
       `
     case 'bunny':
     case 'chick':
@@ -379,21 +382,32 @@ function styleBodyLayer(style, palette, motifs) {
     case 'springcrown':
     case 'rosesherald':
       return `
-        <rect x="92" y="28" width="536" height="164" rx="54" fill="${light}" opacity="0.18"/>
-        <path d="M 130 30 L 590 30 L 550 190 L 170 190 Z" fill="${base}" opacity="0.26"/>
-        <rect x="0" y="94" width="720" height="34" fill="${accent}" opacity="0.30"/>
-        ${repeatAcross(122, (x) => makeMotif('medal', x, 110, 0.34, palette))}
-        ${repeatAcross(142, (x) => makeMotif(style === 'springcrown' ? 'flower' : 'rosette', x, 62, 0.34, palette))}
+        <rect x="92" y="28" width="536" height="164" rx="54" fill="${light}" opacity="0.14"/>
+        <path d="M 116 34 L 604 34 L 572 188 L 148 188 Z" fill="${base}" opacity="0.20"/>
+        <rect x="214" y="18" width="292" height="184" rx="58" fill="${light}" opacity="0.62"/>
+        <path d="M 260 22 L 460 22 L 516 110 L 460 198 L 260 198 L 204 110 Z" fill="${mid}" opacity="0.28"/>
+        <rect x="306" y="8" width="108" height="202" rx="34" fill="${accent}" opacity="0.22"/>
+        <rect x="0" y="78" width="720" height="18" fill="${style === 'springcrown' ? light : accent}" opacity="0.82"/>
+        <rect x="0" y="126" width="720" height="18" fill="${style === 'rosesherald' ? accent : base}" opacity="0.62"/>
+        <path d="M 160 56 C 220 36, 282 36, 332 64 C 360 78, 388 78, 418 64 C 470 36, 530 36, 590 56" stroke="${style === 'springcrown' ? accent : light}" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.92"/>
+        <path d="M 214 182 Q 360 146 506 182" stroke="${style === 'workerfloral' ? accent : base}" stroke-width="16" fill="none" stroke-linecap="round" opacity="0.58"/>
+        ${repeatAcross(118, (x) => makeMotif(style === 'springcrown' ? 'flower' : 'rosette', x, 58, 0.34, palette))}
+        ${repeatAcross(126, (x) => makeMotif(style === 'rosesherald' ? 'rose' : 'medal', x, 110, 0.32, palette))}
+        ${repeatAcross(140, (x) => makeMotif('ribbon', x, 158, 0.24, palette))}
       `
     case 'sunbeach':
     case 'sorbet':
     case 'tiki':
     case 'captain':
       return `
-        <rect x="96" y="30" width="528" height="160" rx="54" fill="${light}" opacity="0.18"/>
-        <path d="M 88 168 Q 360 118 632 168 L 632 188 L 88 188 Z" fill="${base}" opacity="0.24"/>
-        ${style === 'captain' ? repeatAcross(116, (x) => makeMotif('anchor', x, 110, 0.38, palette)) : shellBand}
-        ${repeatAcross(140, (x) => makeMotif(style === 'sorbet' ? 'dot' : style === 'tiki' ? 'leaf' : 'sun', x, 62, 0.32, palette))}
+        <rect x="96" y="30" width="528" height="160" rx="54" fill="${light}" opacity="0.16"/>
+        <path d="M 120 30 L 600 30 L 560 190 L 160 190 Z" fill="${base}" opacity="0.24"/>
+        <rect x="260" y="18" width="200" height="180" rx="56" fill="${style === 'captain' ? light : mid}" opacity="0.32"/>
+        <path d="M 188 52 Q 360 20 532 52" stroke="${accent}" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.82"/>
+        <path d="M 176 170 Q 360 130 544 170" stroke="${style === 'captain' ? light : accent}" stroke-width="16" fill="none" stroke-linecap="round" opacity="0.56"/>
+        <rect x="0" y="96" width="720" height="20" fill="${style === 'captain' ? '#ffffff' : light}" opacity="0.56"/>
+        ${style === 'captain' ? repeatAcross(120, (x) => makeMotif('anchor', x, 62, 0.30, palette)) : repeatAcross(122, (x) => makeMotif(style === 'tiki' ? 'leaf' : style === 'sorbet' ? 'icecream' : 'sun', x, 60, 0.28, palette))}
+        ${style === 'captain' ? repeatAcross(132, (x) => makeMotif('button', x, 152, 0.26, palette)) : shellBand}
       `
     case 'star':
     case 'unclesam':
@@ -433,10 +447,15 @@ function styleBodyLayer(style, palette, motifs) {
     case 'guardian':
     case 'peacock':
       return `
-        <rect x="94" y="28" width="532" height="164" rx="56" fill="${light}" opacity="0.18"/>
-        <path d="M 140 24 L 580 24 L 610 110 L 580 196 L 140 196 L 110 110 Z" fill="${base}" opacity="0.28"/>
-        ${repeatAcross(124, (x) => makeMotif(style === 'rangoli' ? 'rangoli' : style === 'peacock' ? 'feather' : 'diya', x, 110, 0.34, palette))}
-        ${repeatAcross(110, (x) => makeMotif('chain', x, 60, 0.26, palette))}
+        <rect x="94" y="28" width="532" height="164" rx="56" fill="${light}" opacity="0.12"/>
+        <path d="M 140 24 L 580 24 L 610 110 L 580 196 L 140 196 L 110 110 Z" fill="${base}" opacity="0.24"/>
+        <rect x="244" y="16" width="232" height="188" rx="48" fill="${mid}" opacity="0.28"/>
+        <path d="M 300 18 L 420 18 L 462 110 L 420 202 L 300 202 L 258 110 Z" fill="${light}" opacity="0.16"/>
+        <path d="M 178 60 C 250 28, 300 28, 360 64 C 420 28, 470 28, 542 60" stroke="${accent}" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.78"/>
+        <path d="M 176 168 Q 360 138 544 168" stroke="${accent}" stroke-width="16" fill="none" stroke-linecap="round" opacity="0.48"/>
+        ${repeatAcross(126, (x) => makeMotif(style === 'rangoli' ? 'rangoli' : style === 'peacock' ? 'feather' : 'diya', x, 60, 0.28, palette))}
+        ${repeatAcross(116, (x) => makeMotif(style === 'guardian' ? 'lantern' : 'chain', x, 112, 0.26, palette))}
+        ${repeatAcross(140, (x) => makeMotif('gem', x, 158, 0.22, palette))}
       `
     case 'turkey':
     case 'pilgrim':
@@ -461,16 +480,21 @@ function styleBodyLayer(style, palette, motifs) {
               <rect x="306" y="12" width="108" height="196" rx="34" fill="#fffdf8" opacity="0.82"/>
               <rect x="0" y="92" width="720" height="40" fill="#1d1d1f" opacity="0.96"/>
               <rect x="288" y="82" width="144" height="60" rx="14" fill="none" stroke="#e2c067" stroke-width="14"/>
+              <rect x="0" y="58" width="720" height="12" fill="#fffdf8" opacity="0.88"/>
               <rect x="0" y="24" width="720" height="20" fill="#fffdf8" opacity="0.95"/>
               <rect x="0" y="176" width="720" height="22" fill="#fffdf8" opacity="0.95"/>
+              <path d="M 232 28 L 488 28 L 528 76 L 470 96 L 250 96 L 192 76 Z" fill="#ffffff" opacity="0.22"/>
+              <path d="M 214 182 Q 360 144 506 182" stroke="#fffdf8" stroke-width="18" fill="none" stroke-linecap="round" opacity="0.54"/>
               ${repeatAcross(128, (x) => makeMotif('button', x, 60, 0.30, palette))}
               ${repeatAcross(156, (x) => makeMotif('gift', x, 154, 0.26, palette))}
             `
             : style === 'elf'
               ? `
-                <path d="M 0 40 L 720 40 L 680 88 L 720 136 L 680 184 L 0 184 L 40 136 L 0 88 Z" fill="${base}" opacity="0.26"/>
+                <path d="M 110 28 L 610 28 L 560 80 L 610 132 L 560 192 L 110 192 L 160 132 L 110 80 Z" fill="${base}" opacity="0.30"/>
+                <path d="M 180 38 L 540 38 L 512 190 L 208 190 Z" fill="#f5e0a3" opacity="0.24"/>
                 <path d="M 0 58 ${Array.from({ length: 14 }, (_, i) => `L ${i * 56 + 28} ${i % 2 === 0 ? 78 : 42}`).join(' ')} L 720 58 L 720 90 ${Array.from({ length: 14 }, (_, i) => `L ${720 - (i * 56 + 28)} ${i % 2 === 0 ? 110 : 74}`).join(' ')} Z" fill="#f5e0a3" opacity="0.88"/>
                 <rect x="0" y="96" width="720" height="28" fill="#b71f32" opacity="0.78"/>
+                <rect x="304" y="0" width="112" height="220" rx="28" fill="#ffffff" opacity="0.16"/>
                 ${repeatAcross(120, (x) => makeMotif('bell', x, 60, 0.30, palette))}
                 ${repeatAcross(128, (x) => makeMotif('leaf', x, 156, 0.26, palette))}
               `
@@ -501,10 +525,14 @@ function styleBodyLayer(style, palette, motifs) {
     case 'musemidnight':
     case 'divadisco':
       return `
-        <rect x="92" y="26" width="536" height="168" rx="56" fill="${light}" opacity="0.16"/>
-        <path d="M 130 24 L 590 24 L 622 110 L 590 196 L 130 196 L 98 110 Z" fill="${base}" opacity="0.26"/>
-        ${style === 'champagne' || style === 'masterchampagne' || style === 'queenchampagne' ? repeatAcross(126, (x) => makeMotif('bubble', x, 110, 0.34, palette)) : fireworkBand}
-        ${repeatAcross(132, (x) => makeMotif(style === 'goldmidnight' ? 'clock' : style === 'divadisco' ? 'disc' : 'star', x, 60, 0.28, palette))}
+        <rect x="92" y="26" width="536" height="168" rx="56" fill="${light}" opacity="0.14"/>
+        <path d="M 130 24 L 590 24 L 622 110 L 590 196 L 130 196 L 98 110 Z" fill="${base}" opacity="0.22"/>
+        <rect x="246" y="14" width="228" height="192" rx="56" fill="${mid}" opacity="0.24"/>
+        <path d="M 194 42 Q 360 4 526 42" stroke="${accent}" stroke-width="12" fill="none" stroke-linecap="round" opacity="0.82"/>
+        <path d="M 180 174 Q 360 138 540 174" stroke="${light}" stroke-width="14" fill="none" stroke-linecap="round" opacity="0.46"/>
+        ${style === 'champagne' || style === 'masterchampagne' || style === 'queenchampagne' ? repeatAcross(126, (x) => makeMotif('bubble', x, 110, 0.30, palette)) : fireworkBand}
+        ${repeatAcross(132, (x) => makeMotif(style === 'goldmidnight' ? 'clock' : style === 'divadisco' ? 'disc' : 'star', x, 60, 0.26, palette))}
+        ${repeatAcross(150, (x) => makeMotif('gem', x, 156, 0.22, palette))}
       `
     default:
       return `
