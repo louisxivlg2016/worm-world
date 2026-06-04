@@ -479,7 +479,8 @@ function styleBodyLayer(style, palette, motifs) {
             ? `
               <rect x="150" y="18" width="420" height="184" rx="58" fill="#c8333d" opacity="0.76"/>
               <rect x="300" y="6" width="120" height="208" rx="34" fill="#fffdf8" opacity="0.94"/>
-              <rect x="0" y="64" width="720" height="92" fill="#161719" opacity="0.99"/>
+              <rect x="0" y="64" width="720" height="92" fill="#c8333d" opacity="0.98"/>
+              <rect x="228" y="64" width="264" height="92" rx="22" fill="#161719" opacity="0.99"/>
               <rect x="260" y="48" width="200" height="124" rx="22" fill="none" stroke="#f1c84d" stroke-width="28"/>
               <rect x="306" y="76" width="108" height="68" rx="14" fill="#161719" opacity="0.98"/>
               <rect x="-20" y="16" width="760" height="34" fill="#fffdf8" opacity="0.98"/>
