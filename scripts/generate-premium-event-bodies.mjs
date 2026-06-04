@@ -477,15 +477,17 @@ function styleBodyLayer(style, palette, motifs) {
         ${
           style === 'santa'
             ? `
-              <rect x="182" y="20" width="356" height="180" rx="56" fill="#c8333d" opacity="0.62"/>
-              <rect x="302" y="8" width="116" height="202" rx="36" fill="#fffdf8" opacity="0.92"/>
-              <rect x="0" y="86" width="720" height="46" fill="#1d1d1f" opacity="0.98"/>
-              <rect x="286" y="76" width="148" height="66" rx="16" fill="none" stroke="#e2c067" stroke-width="16"/>
-              <rect x="0" y="22" width="720" height="24" fill="#fffdf8" opacity="0.98"/>
-              <rect x="0" y="174" width="720" height="26" fill="#fffdf8" opacity="0.98"/>
-              <path d="M 216 26 L 504 26 L 544 82 L 476 102 L 244 102 L 176 82 Z" fill="#ffffff" opacity="0.26"/>
-              <path d="M 206 182 Q 360 138 514 182" stroke="#fffdf8" stroke-width="20" fill="none" stroke-linecap="round" opacity="0.64"/>
-              ${repeatAcross(180, (x) => makeMotif('button', x, 60, 0.34, palette))}
+              <rect x="150" y="18" width="420" height="184" rx="58" fill="#c8333d" opacity="0.76"/>
+              <rect x="300" y="6" width="120" height="208" rx="34" fill="#fffdf8" opacity="0.94"/>
+              <rect x="0" y="64" width="720" height="92" fill="#161719" opacity="0.99"/>
+              <rect x="260" y="48" width="200" height="124" rx="22" fill="none" stroke="#f1c84d" stroke-width="28"/>
+              <rect x="306" y="76" width="108" height="68" rx="14" fill="#161719" opacity="0.98"/>
+              <rect x="-20" y="16" width="760" height="34" fill="#fffdf8" opacity="0.98"/>
+              <rect x="-20" y="170" width="760" height="34" fill="#fffdf8" opacity="0.98"/>
+              <path d="M 178 24 L 542 24 L 594 78 L 520 108 L 200 108 L 126 78 Z" fill="#ffffff" opacity="0.30"/>
+              <path d="M 176 184 Q 360 132 544 184" stroke="#fffdf8" stroke-width="28" fill="none" stroke-linecap="round" opacity="0.74"/>
+              <circle cx="196" cy="110" r="18" fill="#f1c84d" opacity="0.92"/>
+              <circle cx="524" cy="110" r="18" fill="#f1c84d" opacity="0.92"/>
             `
             : style === 'elf'
               ? `
