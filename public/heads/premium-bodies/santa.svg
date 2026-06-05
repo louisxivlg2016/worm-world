@@ -43,6 +43,7 @@
               <circle cx="524" cy="110" r="18" fill="#f1c84d" opacity="0.92"/>
             
       
+  
   <g opacity="0.74"><g transform="translate(60 56)"><circle r="5.28" fill="#e7c15f" stroke="#1f7a6d" stroke-width="1.32"/><circle r="1.76" fill="#1f7a6d"/></g>
 <g transform="translate(290 56)"><rect x="-7.92" y="-6.16" width="15.84" height="12.32" rx="1.76" fill="#f6f5f0" stroke="#e7c15f" stroke-width="1.32"/><path d="M 0 -6.16 L 0 6.16 M -7.92 0 L 7.92 0" stroke="#1f7a6d" stroke-width="1.32"/></g>
 <g transform="translate(520 56)"><path d="M -10.56 4.4 Q -7.04 -5.28 -2.64 3.52 T 6.16 3.52 T 10.56 4.4" fill="#1f7a6d" stroke="#e7c15f" stroke-width="0.88"/></g></g>

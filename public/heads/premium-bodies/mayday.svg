@@ -77,6 +77,21 @@
 <g transform="translate(490 158)"><path d="M -4.8 -2.4 L 4.8 -2.4 L 2.88 2.4 L -2.88 2.4 Z" fill="#f7f0df" stroke="#e1bb53" stroke-width="0.6"/></g>
 <g transform="translate(630 158)"><path d="M -4.8 -2.4 L 4.8 -2.4 L 2.88 2.4 L -2.88 2.4 Z" fill="#f7f0df" stroke="#e1bb53" stroke-width="0.6"/></g>
       
+  
+    <path d="M 112 30 L 608 30 L 566 190 L 154 190 Z" fill="#b82031" opacity="0.40"/>
+    <path d="M 182 32 L 334 110 L 182 188 Z" fill="#f7f0df" opacity="0.56"/>
+    <path d="M 538 32 L 386 110 L 538 188 Z" fill="#214a8f" opacity="0.50"/>
+    <rect x="328" y="8" width="64" height="204" rx="24" fill="#e1bb53" opacity="0.84"/>
+    <rect x="0" y="88" width="720" height="46" fill="rgba(16,16,18,0.78)"/>
+    <rect x="294" y="74" width="132" height="72" rx="16" fill="none" stroke="#e1bb53" stroke-width="18"/>
+    <g opacity="0.90"><g transform="translate(54 112)"><circle r="4.32" fill="#e1bb53" stroke="#214a8f" stroke-width="1.08"/><circle r="1.44" fill="#214a8f"/></g>
+<g transform="translate(162 112)"><circle r="4.32" fill="#e1bb53" stroke="#214a8f" stroke-width="1.08"/><circle r="1.44" fill="#214a8f"/></g>
+<g transform="translate(270 112)"><circle r="4.32" fill="#e1bb53" stroke="#214a8f" stroke-width="1.08"/><circle r="1.44" fill="#214a8f"/></g>
+<g transform="translate(378 112)"><circle r="4.32" fill="#e1bb53" stroke="#214a8f" stroke-width="1.08"/><circle r="1.44" fill="#214a8f"/></g>
+<g transform="translate(486 112)"><circle r="4.32" fill="#e1bb53" stroke="#214a8f" stroke-width="1.08"/><circle r="1.44" fill="#214a8f"/></g>
+<g transform="translate(594 112)"><circle r="4.32" fill="#e1bb53" stroke="#214a8f" stroke-width="1.08"/><circle r="1.44" fill="#214a8f"/></g>
+<g transform="translate(702 112)"><circle r="4.32" fill="#e1bb53" stroke="#214a8f" stroke-width="1.08"/><circle r="1.44" fill="#214a8f"/></g></g>
+  
   <g opacity="0.74"><g transform="translate(60 56)"><path d="M -8.8 -4.4 L 8.8 -4.4 L 5.28 4.4 L -5.28 4.4 Z" fill="#f7f0df" stroke="#e1bb53" stroke-width="1.1"/></g>
 <g transform="translate(290 56)"><circle r="5.28" fill="#e1bb53" stroke="#214a8f" stroke-width="1.32"/><circle r="1.76" fill="#214a8f"/></g>
 

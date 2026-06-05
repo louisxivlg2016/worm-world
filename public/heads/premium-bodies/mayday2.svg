@@ -83,6 +83,21 @@
 <g transform="translate(490 158)"><path d="M -4.8 -2.4 L 4.8 -2.4 L 2.88 2.4 L -2.88 2.4 Z" fill="#e05674" stroke="#d8b14c" stroke-width="0.6"/></g>
 <g transform="translate(630 158)"><path d="M -4.8 -2.4 L 4.8 -2.4 L 2.88 2.4 L -2.88 2.4 Z" fill="#e05674" stroke="#d8b14c" stroke-width="0.6"/></g>
       
+  
+    <path d="M 112 30 L 608 30 L 566 190 L 154 190 Z" fill="#f2efe3" opacity="0.40"/>
+    <path d="M 182 32 L 334 110 L 182 188 Z" fill="#e05674" opacity="0.56"/>
+    <path d="M 538 32 L 386 110 L 538 188 Z" fill="#4276b7" opacity="0.50"/>
+    <rect x="328" y="8" width="64" height="204" rx="24" fill="#d8b14c" opacity="0.84"/>
+    <rect x="0" y="88" width="720" height="46" fill="rgba(16,16,18,0.78)"/>
+    <rect x="294" y="74" width="132" height="72" rx="16" fill="none" stroke="#d8b14c" stroke-width="18"/>
+    <g opacity="0.90"><g transform="translate(54 112)"><circle r="4.32" fill="#d8b14c" stroke="#4276b7" stroke-width="1.08"/><circle r="1.44" fill="#4276b7"/></g>
+<g transform="translate(162 112)"><circle r="4.32" fill="#d8b14c" stroke="#4276b7" stroke-width="1.08"/><circle r="1.44" fill="#4276b7"/></g>
+<g transform="translate(270 112)"><circle r="4.32" fill="#d8b14c" stroke="#4276b7" stroke-width="1.08"/><circle r="1.44" fill="#4276b7"/></g>
+<g transform="translate(378 112)"><circle r="4.32" fill="#d8b14c" stroke="#4276b7" stroke-width="1.08"/><circle r="1.44" fill="#4276b7"/></g>
+<g transform="translate(486 112)"><circle r="4.32" fill="#d8b14c" stroke="#4276b7" stroke-width="1.08"/><circle r="1.44" fill="#4276b7"/></g>
+<g transform="translate(594 112)"><circle r="4.32" fill="#d8b14c" stroke="#4276b7" stroke-width="1.08"/><circle r="1.44" fill="#4276b7"/></g>
+<g transform="translate(702 112)"><circle r="4.32" fill="#d8b14c" stroke="#4276b7" stroke-width="1.08"/><circle r="1.44" fill="#4276b7"/></g></g>
+  
   <g opacity="0.74"><g transform="translate(60 56)"><path d="M -4.4 -10.56 L -0.88 -1.76 L -6.16 -1.76 Z M 4.4 -10.56 L 0.88 -1.76 L 6.16 -1.76 Z" fill="#e05674"/><circle r="7.04" fill="#d8b14c" stroke="#4276b7" stroke-width="1.32"/><circle r="3.08" fill="#4276b7"/></g>
 <g transform="translate(290 56)"><path d="M -8.8 -4.4 L 8.8 -4.4 L 5.28 4.4 L -5.28 4.4 Z" fill="#e05674" stroke="#d8b14c" stroke-width="1.1"/></g>
 

@@ -45,6 +45,21 @@
 <g transform="translate(462 156)"><circle r="3.12" fill="#efc45d" stroke="#f8f3cf" stroke-width="0.78"/><circle r="1.04" fill="#f8f3cf"/></g>
 <g transform="translate(594 156)"><circle r="3.12" fill="#efc45d" stroke="#f8f3cf" stroke-width="0.78"/><circle r="1.04" fill="#f8f3cf"/></g>
       
+  
+    <path d="M 112 30 L 608 30 L 566 190 L 154 190 Z" fill="#2a8a52" opacity="0.40"/>
+    <path d="M 182 32 L 334 110 L 182 188 Z" fill="#7ed98b" opacity="0.56"/>
+    <path d="M 538 32 L 386 110 L 538 188 Z" fill="#f8f3cf" opacity="0.50"/>
+    <rect x="328" y="8" width="64" height="204" rx="24" fill="#efc45d" opacity="0.84"/>
+    <rect x="0" y="88" width="720" height="46" fill="rgba(16,16,18,0.78)"/>
+    <rect x="294" y="74" width="132" height="72" rx="16" fill="none" stroke="#efc45d" stroke-width="18"/>
+    <g opacity="0.90"><g transform="translate(54 112)"><circle r="4.32" fill="#efc45d" stroke="#f8f3cf" stroke-width="1.08"/><circle r="1.44" fill="#f8f3cf"/></g>
+<g transform="translate(162 112)"><circle r="4.32" fill="#efc45d" stroke="#f8f3cf" stroke-width="1.08"/><circle r="1.44" fill="#f8f3cf"/></g>
+<g transform="translate(270 112)"><circle r="4.32" fill="#efc45d" stroke="#f8f3cf" stroke-width="1.08"/><circle r="1.44" fill="#f8f3cf"/></g>
+<g transform="translate(378 112)"><circle r="4.32" fill="#efc45d" stroke="#f8f3cf" stroke-width="1.08"/><circle r="1.44" fill="#f8f3cf"/></g>
+<g transform="translate(486 112)"><circle r="4.32" fill="#efc45d" stroke="#f8f3cf" stroke-width="1.08"/><circle r="1.44" fill="#f8f3cf"/></g>
+<g transform="translate(594 112)"><circle r="4.32" fill="#efc45d" stroke="#f8f3cf" stroke-width="1.08"/><circle r="1.44" fill="#f8f3cf"/></g>
+<g transform="translate(702 112)"><circle r="4.32" fill="#efc45d" stroke="#f8f3cf" stroke-width="1.08"/><circle r="1.44" fill="#f8f3cf"/></g></g>
+  
   <g opacity="0.74"><g transform="translate(60 56)"><path d="M -9.68 6.16 L -7.04 -3.52 L 0 0.88 L 7.04 -3.52 L 9.68 6.16 Z" fill="#efc45d" stroke="#f8f3cf" stroke-width="1.32"/><rect x="-9.68" y="5.28" width="19.36" height="4.4" rx="1.76" fill="#7ed98b"/></g>
 <g transform="translate(290 56)"><circle r="5.28" fill="#f8f3cf" stroke="#efc45d" stroke-width="0.88"/><circle cx="-1.32" cy="-1.32" r="1.76" fill="#fff"/></g>
 <g transform="translate(520 56)"><circle cx="-3.08" cy="-2.64" r="3.52" fill="#7ed98b"/><circle cx="-3.08" cy="2.64" r="3.52" fill="#7ed98b"/><circle cx="3.08" cy="-2.64" r="3.52" fill="#7ed98b"/><circle cx="3.08" cy="2.64" r="3.52" fill="#7ed98b"/><path d="M 0 1.76 L 3.08 11.44" stroke="#efc45d" stroke-width="1.1"/></g></g>

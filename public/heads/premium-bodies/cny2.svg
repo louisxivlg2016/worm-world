@@ -51,6 +51,22 @@
 <g transform="translate(645 78)"><circle r="5.3999999999999995" fill="#e53c2c" stroke="#d9c15a" stroke-width="1.2"/><circle r="3" fill="none" stroke="#d9c15a" stroke-width="0.75"/></g>
         <path d="M 90 62 Q 360 10 630 62" stroke="#e53c2c" stroke-width="10" opacity="0.28" fill="none"/>
       
+  
+    <path d="M 92 34 L 628 34 L 586 188 L 134 188 Z" fill="#124c36" opacity="0.38"/>
+    <rect x="272" y="8" width="176" height="204" rx="48" fill="#e53c2c" opacity="0.34"/>
+    <rect x="310" y="0" width="100" height="220" rx="34" fill="#d9c15a" opacity="0.48"/>
+    <path d="M 160 48 Q 360 8 560 48" stroke="#e53c2c" stroke-width="18" stroke-linecap="round" fill="none" opacity="0.78"/>
+    <path d="M 170 174 Q 360 132 550 174" stroke="#d9c15a" stroke-width="20" stroke-linecap="round" fill="none" opacity="0.60"/>
+    <rect x="0" y="90" width="720" height="40" fill="#2d8d56" opacity="0.36"/>
+    <g opacity="0.92"><circle cx="46" cy="112" r="2.72" fill="#e53c2c"/>
+<circle cx="138" cy="112" r="2.72" fill="#e53c2c"/>
+<circle cx="230" cy="112" r="2.72" fill="#e53c2c"/>
+<circle cx="322" cy="112" r="2.72" fill="#e53c2c"/>
+<circle cx="414" cy="112" r="2.72" fill="#e53c2c"/>
+<circle cx="506" cy="112" r="2.72" fill="#e53c2c"/>
+<circle cx="598" cy="112" r="2.72" fill="#e53c2c"/>
+<circle cx="690" cy="112" r="2.72" fill="#e53c2c"/></g>
+  
   <g opacity="0.74"><g transform="translate(60 56)"><circle r="7.92" fill="#e53c2c" stroke="#d9c15a" stroke-width="1.76"/><circle r="4.4" fill="none" stroke="#d9c15a" stroke-width="1.1"/></g>
 <g transform="translate(290 56)"><circle cx="-5.28" cy="0" r="4.4" fill="#d9c15a"/><circle cx="0" cy="-2.64" r="5.28" fill="#d9c15a"/><circle cx="6.16" cy="0" r="4.4" fill="#d9c15a"/></g>
 <g transform="translate(520 56)"><path d="M -7.92 1.76 C -7.92 -6.16, 7.92 -6.16, 7.92 1.76 C 6.16 7.92, -6.16 7.92, -7.92 1.76 Z" fill="#2d8d56" stroke="#e53c2c" stroke-width="1.32"/></g></g>

@@ -41,6 +41,21 @@
 <g transform="translate(525 64)"><ellipse rx="5.04" ry="6.4799999999999995" fill="#ffb03d" stroke="#ff4a8e" stroke-width="0.8999999999999999"/><path d="M 0 6.4799999999999995 L 0.72 12.24" stroke="#ff4a8e" stroke-width="0.72" fill="none"/></g>
 <g transform="translate(675 64)"><ellipse rx="5.04" ry="6.4799999999999995" fill="#ffb03d" stroke="#ff4a8e" stroke-width="0.8999999999999999"/><path d="M 0 6.4799999999999995 L 0.72 12.24" stroke="#ff4a8e" stroke-width="0.72" fill="none"/></g>
       
+  
+    <rect x="100" y="26" width="520" height="168" rx="58" fill="#8c42ff" opacity="0.36"/>
+    <path d="M 128 42 C 234 16, 486 16, 592 42 L 560 104 L 592 178 C 486 204, 234 204, 128 178 L 160 104 Z" fill="#ffb03d" opacity="0.42"/>
+    <rect x="0" y="72" width="720" height="28" fill="#ff4a8e" opacity="0.72"/>
+    <rect x="0" y="118" width="720" height="28" fill="#38d66b" opacity="0.70"/>
+    <path d="M 176 54 Q 360 18 544 54" stroke="#38d66b" stroke-width="18" stroke-linecap="round" fill="none" opacity="0.84"/>
+    <path d="M 180 172 Q 360 134 540 172" stroke="#ff4a8e" stroke-width="18" stroke-linecap="round" fill="none" opacity="0.56"/>
+  <g opacity="0.88"><circle cx="46" cy="112" r="2.72" fill="#ff4a8e"/>
+<circle cx="138" cy="112" r="2.72" fill="#ff4a8e"/>
+<circle cx="230" cy="112" r="2.72" fill="#ff4a8e"/>
+<circle cx="322" cy="112" r="2.72" fill="#ff4a8e"/>
+<circle cx="414" cy="112" r="2.72" fill="#ff4a8e"/>
+<circle cx="506" cy="112" r="2.72" fill="#ff4a8e"/>
+<circle cx="598" cy="112" r="2.72" fill="#ff4a8e"/>
+<circle cx="690" cy="112" r="2.72" fill="#ff4a8e"/></g>
   <g opacity="0.74"><g transform="translate(60 56)"><path d="M -10.56 2.64 C -12.32 -4.4, -4.4 -7.92, 0 -4.4 C 2.64 -10.56, 10.56 -7.92, 8.8 0 C 14.96 3.52, 7.92 10.56, 0 7.92 C -3.52 13.2, -11.44 8.8, -10.56 2.64 Z" fill="#ffb03d" opacity="0.95"/></g>
 <circle cx="290" cy="56" r="4.4" fill="#ffb03d" stroke="#ff4a8e" stroke-width="0.88"/>
 <g transform="translate(520 56)"><ellipse rx="6.16" ry="7.92" fill="#ffb03d" stroke="#ff4a8e" stroke-width="1.1"/><path d="M 0 7.92 L 0.88 14.96" stroke="#ff4a8e" stroke-width="0.88" fill="none"/></g></g>

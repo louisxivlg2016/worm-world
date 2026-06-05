@@ -42,6 +42,25 @@
 <g transform="translate(490 166)"><path d="M -3 -7.199999999999999 L -0.6 -1.2 L -4.2 -1.2 Z M 3 -7.199999999999999 L 0.6 -1.2 L 4.2 -1.2 Z" fill="#c52a39"/><circle r="4.8" fill="#d9b763" stroke="#f5f5ef" stroke-width="0.8999999999999999"/><circle r="2.1" fill="#f5f5ef"/></g>
 <g transform="translate(630 166)"><path d="M -3 -7.199999999999999 L -0.6 -1.2 L -4.2 -1.2 Z M 3 -7.199999999999999 L 0.6 -1.2 L 4.2 -1.2 Z" fill="#c52a39"/><circle r="4.8" fill="#d9b763" stroke="#f5f5ef" stroke-width="0.8999999999999999"/><circle r="2.1" fill="#f5f5ef"/></g>
       
+  
+    <rect x="104" y="30" width="512" height="160" rx="58" fill="#0f2b66" opacity="0.40"/>
+    <path d="M 150 34 L 330 110 L 150 186 Z" fill="#d9b763" opacity="0.46"/>
+    <path d="M 570 34 L 390 110 L 570 186 Z" fill="#d9b763" opacity="0.46"/>
+    <rect x="316" y="20" width="88" height="180" rx="30" fill="#c52a39" opacity="0.72"/>
+    <rect x="0" y="94" width="720" height="34" fill="#f5f5ef" opacity="0.62"/>
+    <g opacity="0.92"><g transform="translate(62 112)"><path d="M -3.2 -7.68 L -0.64 -1.28 L -4.48 -1.28 Z M 3.2 -7.68 L 0.64 -1.28 L 4.48 -1.28 Z" fill="#c52a39"/><circle r="5.12" fill="#d9b763" stroke="#f5f5ef" stroke-width="0.96"/><circle r="2.24" fill="#f5f5ef"/></g>
+<g transform="translate(186 112)"><path d="M -3.2 -7.68 L -0.64 -1.28 L -4.48 -1.28 Z M 3.2 -7.68 L 0.64 -1.28 L 4.48 -1.28 Z" fill="#c52a39"/><circle r="5.12" fill="#d9b763" stroke="#f5f5ef" stroke-width="0.96"/><circle r="2.24" fill="#f5f5ef"/></g>
+<g transform="translate(310 112)"><path d="M -3.2 -7.68 L -0.64 -1.28 L -4.48 -1.28 Z M 3.2 -7.68 L 0.64 -1.28 L 4.48 -1.28 Z" fill="#c52a39"/><circle r="5.12" fill="#d9b763" stroke="#f5f5ef" stroke-width="0.96"/><circle r="2.24" fill="#f5f5ef"/></g>
+<g transform="translate(434 112)"><path d="M -3.2 -7.68 L -0.64 -1.28 L -4.48 -1.28 Z M 3.2 -7.68 L 0.64 -1.28 L 4.48 -1.28 Z" fill="#c52a39"/><circle r="5.12" fill="#d9b763" stroke="#f5f5ef" stroke-width="0.96"/><circle r="2.24" fill="#f5f5ef"/></g>
+<g transform="translate(558 112)"><path d="M -3.2 -7.68 L -0.64 -1.28 L -4.48 -1.28 Z M 3.2 -7.68 L 0.64 -1.28 L 4.48 -1.28 Z" fill="#c52a39"/><circle r="5.12" fill="#d9b763" stroke="#f5f5ef" stroke-width="0.96"/><circle r="2.24" fill="#f5f5ef"/></g>
+<g transform="translate(682 112)"><path d="M -3.2 -7.68 L -0.64 -1.28 L -4.48 -1.28 Z M 3.2 -7.68 L 0.64 -1.28 L 4.48 -1.28 Z" fill="#c52a39"/><circle r="5.12" fill="#d9b763" stroke="#f5f5ef" stroke-width="0.96"/><circle r="2.24" fill="#f5f5ef"/></g></g>
+  <g opacity="0.90"><g transform="translate(55 112)"><path d="M 0 -5.76 L 1.6 -1.6 L 5.76 -1.6 L 2.56 1.28 L 3.84 5.76 L 0 3.2 L -3.84 5.76 L -2.56 1.28 L -5.76 -1.6 L -1.6 -1.6 Z" fill="#d9b763" stroke="#f5f5ef" stroke-width="0.8"/></g>
+<g transform="translate(165 112)"><path d="M 0 -5.76 L 1.6 -1.6 L 5.76 -1.6 L 2.56 1.28 L 3.84 5.76 L 0 3.2 L -3.84 5.76 L -2.56 1.28 L -5.76 -1.6 L -1.6 -1.6 Z" fill="#d9b763" stroke="#f5f5ef" stroke-width="0.8"/></g>
+<g transform="translate(275 112)"><path d="M 0 -5.76 L 1.6 -1.6 L 5.76 -1.6 L 2.56 1.28 L 3.84 5.76 L 0 3.2 L -3.84 5.76 L -2.56 1.28 L -5.76 -1.6 L -1.6 -1.6 Z" fill="#d9b763" stroke="#f5f5ef" stroke-width="0.8"/></g>
+<g transform="translate(385 112)"><path d="M 0 -5.76 L 1.6 -1.6 L 5.76 -1.6 L 2.56 1.28 L 3.84 5.76 L 0 3.2 L -3.84 5.76 L -2.56 1.28 L -5.76 -1.6 L -1.6 -1.6 Z" fill="#d9b763" stroke="#f5f5ef" stroke-width="0.8"/></g>
+<g transform="translate(495 112)"><path d="M 0 -5.76 L 1.6 -1.6 L 5.76 -1.6 L 2.56 1.28 L 3.84 5.76 L 0 3.2 L -3.84 5.76 L -2.56 1.28 L -5.76 -1.6 L -1.6 -1.6 Z" fill="#d9b763" stroke="#f5f5ef" stroke-width="0.8"/></g>
+<g transform="translate(605 112)"><path d="M 0 -5.76 L 1.6 -1.6 L 5.76 -1.6 L 2.56 1.28 L 3.84 5.76 L 0 3.2 L -3.84 5.76 L -2.56 1.28 L -5.76 -1.6 L -1.6 -1.6 Z" fill="#d9b763" stroke="#f5f5ef" stroke-width="0.8"/></g>
+<g transform="translate(715 112)"><path d="M 0 -5.76 L 1.6 -1.6 L 5.76 -1.6 L 2.56 1.28 L 3.84 5.76 L 0 3.2 L -3.84 5.76 L -2.56 1.28 L -5.76 -1.6 L -1.6 -1.6 Z" fill="#d9b763" stroke="#f5f5ef" stroke-width="0.8"/></g></g>
   <g opacity="0.74"><g transform="translate(60 56)"><path d="M -8.8 -4.4 L 8.8 -4.4 L 5.28 4.4 L -5.28 4.4 Z" fill="#c52a39" stroke="#d9b763" stroke-width="1.1"/></g>
 <g transform="translate(290 56)"><circle r="5.28" fill="#d9b763" stroke="#f5f5ef" stroke-width="1.32"/><circle r="1.76" fill="#f5f5ef"/></g>
 <g transform="translate(520 56)"><path d="M 0 -7.92 L 2.2 -2.2 L 7.92 -2.2 L 3.52 1.76 L 5.28 7.92 L 0 4.4 L -5.28 7.92 L -3.52 1.76 L -7.92 -2.2 L -2.2 -2.2 Z" fill="#d9b763" stroke="#f5f5ef" stroke-width="1.1"/></g></g>

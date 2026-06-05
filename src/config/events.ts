@@ -60,7 +60,7 @@ const PREMIUM_EVENT_BODY_IDS = new Set([
   'reveillon', 'reveillon2', 'reveillon3', 'reveillon4', 'reveillon5', 'reveillon6', 'reveillon7',
 ])
 
-const premiumEventBodyTexturePath = (id: string) => `/heads/premium-bodies/${id}.svg?v=2`
+const premiumEventBodyTexturePath = (id: string) => `/heads/premium-bodies/${id}.svg?v=3`
 
 export const GAME_EVENTS: GameEvent[] = [
   {

@@ -544,12 +544,116 @@ function styleBodyLayer(style, palette, motifs) {
   }
 }
 
+function premiumGarmentLayer(style, palette) {
+  const [base, mid, accent, light] = palette
+  const jewelRow = repeatAcross(92, (x) => makeMotif('gem', x, 112, 0.34, palette))
+  const buttonRow = repeatAcross(108, (x) => makeMotif('button', x, 112, 0.36, palette))
+  const medalRow = repeatAcross(124, (x) => makeMotif('medal', x, 112, 0.32, palette))
+  const flowerRow = repeatAcross(118, (x) => makeMotif('flower', x, 112, 0.36, palette))
+  const starRow = repeatAcross(110, (x) => makeMotif('star', x, 112, 0.32, palette))
+
+  const robe = `
+    <path d="M 92 34 L 628 34 L 586 188 L 134 188 Z" fill="${base}" opacity="0.38"/>
+    <rect x="272" y="8" width="176" height="204" rx="48" fill="${light}" opacity="0.34"/>
+    <rect x="310" y="0" width="100" height="220" rx="34" fill="${accent}" opacity="0.48"/>
+    <path d="M 160 48 Q 360 8 560 48" stroke="${light}" stroke-width="18" stroke-linecap="round" fill="none" opacity="0.78"/>
+    <path d="M 170 174 Q 360 132 550 174" stroke="${accent}" stroke-width="20" stroke-linecap="round" fill="none" opacity="0.60"/>
+    <rect x="0" y="90" width="720" height="40" fill="${mid}" opacity="0.36"/>
+    <g opacity="0.92">${jewelRow}</g>
+  `
+
+  const jacket = `
+    <path d="M 112 30 L 608 30 L 566 190 L 154 190 Z" fill="${base}" opacity="0.40"/>
+    <path d="M 182 32 L 334 110 L 182 188 Z" fill="${mid}" opacity="0.56"/>
+    <path d="M 538 32 L 386 110 L 538 188 Z" fill="${accent}" opacity="0.50"/>
+    <rect x="328" y="8" width="64" height="204" rx="24" fill="${light}" opacity="0.84"/>
+    <rect x="0" y="88" width="720" height="46" fill="rgba(16,16,18,0.78)"/>
+    <rect x="294" y="74" width="132" height="72" rx="16" fill="none" stroke="${light}" stroke-width="18"/>
+    <g opacity="0.90">${buttonRow}</g>
+  `
+
+  const festivalCoat = `
+    <rect x="100" y="26" width="520" height="168" rx="58" fill="${base}" opacity="0.36"/>
+    <path d="M 128 42 C 234 16, 486 16, 592 42 L 560 104 L 592 178 C 486 204, 234 204, 128 178 L 160 104 Z" fill="${mid}" opacity="0.42"/>
+    <rect x="0" y="72" width="720" height="28" fill="${light}" opacity="0.72"/>
+    <rect x="0" y="118" width="720" height="28" fill="${accent}" opacity="0.70"/>
+    <path d="M 176 54 Q 360 18 544 54" stroke="${accent}" stroke-width="18" stroke-linecap="round" fill="none" opacity="0.84"/>
+    <path d="M 180 172 Q 360 134 540 172" stroke="${light}" stroke-width="18" stroke-linecap="round" fill="none" opacity="0.56"/>
+  `
+
+  const stitchedSuit = `
+    <rect x="98" y="28" width="524" height="164" rx="58" fill="${base}" opacity="0.42"/>
+    <path d="M 150 34 L 570 34 L 606 110 L 570 186 L 150 186 L 114 110 Z" fill="${mid}" opacity="0.36"/>
+    <rect x="0" y="88" width="720" height="44" fill="rgba(10,10,12,0.68)"/>
+    <path d="M 136 62 Q 360 18 584 62" stroke="${accent}" stroke-width="18" stroke-linecap="round" fill="none" opacity="0.80"/>
+    <path d="M 140 164 Q 360 206 580 164" stroke="${light}" stroke-width="14" stroke-linecap="round" fill="none" opacity="0.58"/>
+    ${repeatAcross(88, (x) => `<g transform="translate(${x} 110) rotate(45)"><line x1="-14" y1="-14" x2="14" y2="14" stroke="${light}" stroke-width="6" stroke-linecap="round"/><line x1="-14" y1="14" x2="14" y2="-14" stroke="${light}" stroke-width="6" stroke-linecap="round"/></g>`)}
+  `
+
+  const beachWear = `
+    <rect x="94" y="30" width="532" height="160" rx="58" fill="${base}" opacity="0.34"/>
+    <path d="M 112 54 Q 360 -4 608 54 L 584 92 Q 360 46 136 92 Z" fill="${light}" opacity="0.62"/>
+    <path d="M 124 164 Q 360 210 596 164 L 566 196 L 154 196 Z" fill="${accent}" opacity="0.54"/>
+    <rect x="0" y="96" width="720" height="36" fill="${mid}" opacity="0.70"/>
+    ${repeatAcross(110, (x) => makeMotif('shell', x, 112, 0.34, palette))}
+  `
+
+  const formal = `
+    <rect x="104" y="30" width="512" height="160" rx="58" fill="${base}" opacity="0.40"/>
+    <path d="M 150 34 L 330 110 L 150 186 Z" fill="${light}" opacity="0.46"/>
+    <path d="M 570 34 L 390 110 L 570 186 Z" fill="${light}" opacity="0.46"/>
+    <rect x="316" y="20" width="88" height="180" rx="30" fill="${mid}" opacity="0.72"/>
+    <rect x="0" y="94" width="720" height="34" fill="${accent}" opacity="0.62"/>
+    <g opacity="0.92">${medalRow}</g>
+  `
+
+  if (['lantern', 'fanous', 'guardianmoon', 'eidcrescent', 'eidfanous', 'eidprince', 'sapphire', 'rangoli', 'rajah', 'guardian', 'peacock', 'emperor', 'dragon'].includes(style)) {
+    return robe
+  }
+
+  if (['workerfloral', 'springcrown', 'rosesherald', 'leprechaun', 'gentleman', 'queenclover', 'lordluck', 'potgold', 'turkey', 'pilgrim', 'honor'].includes(style)) {
+    return jacket
+  }
+
+  if (['mask', 'clown', 'jester', 'royalharlequin', 'paint', 'balloon', 'rainbowmaster', 'bunny', 'chick', 'egg', 'dandy'].includes(style)) {
+    return festivalCoat + `<g opacity="0.88">${style === 'bunny' || style === 'chick' || style === 'egg' || style === 'dandy' ? flowerRow : jewelRow}</g>`
+  }
+
+  if (['pumpkin', 'ghost', 'witch', 'lordpumpkin', 'skull', 'marigold', 'catrina'].includes(style)) {
+    return stitchedSuit
+  }
+
+  if (['sunbeach', 'sorbet', 'tiki', 'captain'].includes(style)) {
+    return beachWear
+  }
+
+  if (['heart', 'rose', 'letter', 'cupid'].includes(style)) {
+    return `
+      ${festivalCoat}
+      <rect x="280" y="10" width="160" height="200" rx="46" fill="${light}" opacity="0.42"/>
+      <path d="M 192 52 Q 360 18 528 52" stroke="${accent}" stroke-width="20" stroke-linecap="round" fill="none" opacity="0.82"/>
+      <g opacity="0.92">${style === 'rose' ? flowerRow : repeatAcross(112, (x) => makeMotif('heart', x, 112, 0.36, palette))}</g>
+    `
+  }
+
+  if (['star', 'unclesam', 'cockade', 'beret', 'patriot'].includes(style)) {
+    return formal + `<g opacity="0.90">${starRow}</g>`
+  }
+
+  if (['santa', 'elf', 'snowman', 'wintermaster'].includes(style)) {
+    return ''
+  }
+
+  return formal
+}
+
 function makeBodySvg(id, style, palette, motifs) {
   const [base, mid, accent, light] = palette
   const motifXs = [130, 360, 590]
   const motifLayer = motifXs.map((x, idx) => makeMotif(motifs[idx % motifs.length], x, 116, 0.84, [base, mid, accent, light])).join('\n')
   const smallMotifs = motifXs.map((x, idx) => makeMotif(motifs[(idx + 1) % motifs.length], x - 70, 56, 0.44, [base, mid, accent, light])).join('\n')
   const bodyLayer = styleBodyLayer(style, [base, mid, accent, light], motifs)
+  const garmentLayer = premiumGarmentLayer(style, [base, mid, accent, light])
   return `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}">
   <defs>
@@ -578,6 +682,7 @@ function makeBodySvg(id, style, palette, motifs) {
   <rect x="0" y="14" width="${WIDTH}" height="22" fill="url(#trim-${esc(id)})" opacity="0.90"/>
   <rect x="0" y="${HEIGHT - 36}" width="${WIDTH}" height="22" fill="url(#trim-${esc(id)})" opacity="0.90"/>
   ${bodyLayer}
+  ${garmentLayer}
   <g opacity="0.74">${smallMotifs}</g>
   <g opacity="0.88">${motifLayer}</g>
   <g opacity="0.74">
