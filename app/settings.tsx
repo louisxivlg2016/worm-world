@@ -464,16 +464,15 @@ const FOOD_PACKS = [
     name: "Chinoise",
     icon: "🥟",
     items: [
-      "/food/youtiao.png", "/food/baozi.png", "/food/tangyuan.png", "/food/fermented-tofu.png",
-      "/food/gong-bao-jiding.png", "/food/yangzhou-fried-rice.png", "/food/cashew-chicken.png", "/food/peking-duck.png",
-      "/food/xiaolongbao.png", "/food/stir-fried-eggplant-with-garlic.png", "/food/jianbing.png", "/food/zongzi.png",
-      "/food/ma-po-tofu.png", "/food/dim-sum-chicken-feet.png", "/food/cantonese-roast-chicken.png", "/food/dongpo-rou.png",
-      "/food/egg-tart.png", "/food/wonton-soup.png", "/food/hot-and-sour-soup.png", "/food/sesame-balls.png",
-      "/food/sweet-tofu-with-goji-berries.png", "/food/mango-pudding.png", "/food/lanzhou-beef-noodle-soup.png", "/food/yu-xiang-rou-si.png",
-      "/food/egg-tart-alt.png", "/food/pineapple-bun.png", "/food/chinese-mochi.png", "/food/mooncake.png",
-      "/food/red-bean-cake.png", "/food/nian-gao.png", "/food/chinese-fruit-salad.png", "/food/fortune-cookies.png",
-      "/food/chinese-sausage-platter.png", "/food/century-egg-tofu.png", "/food/preserved-egg-box.png", "/food/oyster-platter.png",
-      "/food/hot-pot.png", "/food/lo-mein.png", "/food/dumpling-greens-soup.png", "/food/sweet-and-sour-dish.png",
+      "/food/chinoise/3.png", "/food/chinoise/4.png", "/food/chinoise/5.png", "/food/chinoise/6.png",
+      "/food/chinoise/7.png", "/food/chinoise/8.png", "/food/chinoise/9.png", "/food/chinoise/10.png",
+      "/food/chinoise/11.png", "/food/chinoise/12.png", "/food/chinoise/13.png", "/food/chinoise/14.png",
+      "/food/chinoise/15.png", "/food/chinoise/16.png", "/food/chinoise/17.png", "/food/chinoise/18.png",
+      "/food/chinoise/19.png", "/food/chinoise/20.png", "/food/chinoise/21.png", "/food/chinoise/22.png",
+      "/food/chinoise/23.png", "/food/chinoise/24.png", "/food/chinoise/25.png", "/food/chinoise/26.png",
+      "/food/chinoise/27.png", "/food/chinoise/28.png", "/food/chinoise/29.png", "/food/chinoise/30.png",
+      "/food/chinoise/31.png", "/food/chinoise/32.png", "/food/chinoise/33.png", "/food/chinoise/34.png",
+      "/food/chinoise/35.png",
     ],
     price: 2300,
   },
@@ -1377,7 +1376,7 @@ export default function SettingsPage() {
                 <Image source={{ uri: "/food/americaine-donut.png" }} style={{ width: 80, height: 80 }} resizeMode="contain" />
               </Pressable>
               <Pressable onPress={() => setPreviewPack(previewPack === "chinoise" ? null : "chinoise")}>
-                <Image source={{ uri: "/food/baozi.png" }} style={{ width: 80, height: 80 }} resizeMode="contain" />
+                <Image source={{ uri: "/food/chinoise/3.png" }} style={{ width: 80, height: 80 }} resizeMode="contain" />
               </Pressable>
             </View>
 
