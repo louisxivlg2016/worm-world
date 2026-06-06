@@ -1363,21 +1363,30 @@ export default function SettingsPage() {
 
             {/* Pack buttons - left side */}
             <View style={{ position: "absolute", left: 20, top: "25%", gap: 12 } as any}>
-              <Pressable onPress={() => setPreviewPack(previewPack === "classic" ? null : "classic")}>
-                <Image source={{ uri: "/food/burger.png" }} style={{ width: 80, height: 80 }} resizeMode="contain" />
-              </Pressable>
-              <Pressable onPress={() => setPreviewPack(previewPack === "francaise" ? null : "francaise")}>
-                <Image source={{ uri: "/food/croissant.png" }} style={{ width: 80, height: 80 }} resizeMode="contain" />
-              </Pressable>
-              <Pressable onPress={() => setPreviewPack(previewPack === "italienne" ? null : "italienne")}>
-                <Image source={{ uri: "/food/pizza-margherita.png" }} style={{ width: 80, height: 80 }} resizeMode="contain" />
-              </Pressable>
-              <Pressable onPress={() => setPreviewPack(previewPack === "americaine" ? null : "americaine")}>
-                <Image source={{ uri: "/food/americaine-donut.png" }} style={{ width: 80, height: 80 }} resizeMode="contain" />
-              </Pressable>
-              <Pressable onPress={() => setPreviewPack(previewPack === "chinoise" ? null : "chinoise")}>
-                <Image source={{ uri: "/food/chinoise/3.png" }} style={{ width: 80, height: 80 }} resizeMode="contain" />
-              </Pressable>
+              {([
+                { id: "classic", uri: "/food/burger.png" },
+                { id: "francaise", uri: "/food/croissant.png" },
+                { id: "italienne", uri: "/food/pizza-margherita.png" },
+                { id: "americaine", uri: "/food/americaine-donut.png" },
+                { id: "chinoise", uri: "/food/chinoise/3.png" },
+              ] as const).map((p) => {
+                const active = (previewPack || foodStyle) === p.id;
+                return (
+                  <Pressable
+                    key={p.id}
+                    onPress={() => setPreviewPack(previewPack === p.id ? null : p.id)}
+                    style={{
+                      width: 88, height: 88, borderRadius: 14,
+                      borderWidth: active ? 3 : 2,
+                      borderColor: active ? "#ffd700" : "rgba(255,255,255,0.2)",
+                      backgroundColor: "rgba(0,0,0,0.4)",
+                      alignItems: "center", justifyContent: "center",
+                    }}
+                  >
+                    <Image source={{ uri: p.uri }} style={{ width: 70, height: 70 }} resizeMode="contain" />
+                  </Pressable>
+                );
+              })}
             </View>
 
             {/* Sparkle decoration */}
