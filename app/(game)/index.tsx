@@ -232,7 +232,7 @@ export default function HomeScreen() {
               key={event.id}
               onPress={() => playEvent(event.id)}
               style={{
-                paddingHorizontal: 16, paddingVertical: 10, borderRadius: 10, borderCurve: "continuous",
+                paddingHorizontal: 16, paddingVertical: 18, borderRadius: 10, borderCurve: "continuous",
                 background: event.btnGradient as any, backgroundColor: event.aiColors[0],
                 boxShadow: event.btnShadow,
               }}
