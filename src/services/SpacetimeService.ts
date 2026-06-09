@@ -218,13 +218,17 @@ class SpacetimeService {
       console.log('[SpacetimeDB] conn state:', { connected: this.connected, identity: this.identity?.toHexString?.() })
       console.log('[SpacetimeDB] rooms in cache:', Array.from(this.conn!.db.room.iter()).length)
 
-      try {
-        this.conn!.reducers.createRoom({ name, isPublic, gameMode, maxPlayers })
-        console.log('[SpacetimeDB] createRoom reducer called successfully')
-      } catch (e) {
-        console.error('[SpacetimeDB] createRoom reducer THREW:', e)
-        resolve(null)
-      }
+      Promise.resolve(this.conn!.reducers.createRoom({ name, isPublic, gameMode, maxPlayers }))
+        .then(() => {
+          console.log('[SpacetimeDB] createRoom reducer committed on server')
+        })
+        .catch((e) => {
+          console.error('[SpacetimeDB] createRoom reducer REJECTED:', e)
+          if (this.pendingCreateResolve === resolve) {
+            this.pendingCreateResolve = null
+            resolve(null)
+          }
+        })
     })
   }
 
