@@ -3727,7 +3727,9 @@ export function useGameEngine(
 
     s.usedAINames = []
     s.aiWorms = []
-    for (let i = 0; i < AI_WORM_COUNT; i++) spawnAIWorm()
+    if (!roomSlug) {
+      for (let i = 0; i < AI_WORM_COUNT; i++) spawnAIWorm()
+    }
 
     s.foods = []
     if (isCoinsMode) {
@@ -4091,7 +4093,7 @@ export function useGameEngine(
             const idx = s.aiWorms.indexOf(_worm)
             if (idx >= 0) {
               s.aiWorms.splice(idx, 1)
-              spawnAIWorm(true)
+              if (!s.roomSlug) spawnAIWorm(true)
             }
           }, 3000)
         },
@@ -4214,7 +4216,7 @@ export function useGameEngine(
       s.spawnTimer++
       if (s.spawnTimer >= 7200) {
         s.spawnTimer = 0
-        spawnAIWorm(Math.random() < 0.5)
+        if (!s.roomSlug) spawnAIWorm(Math.random() < 0.5)
       }
     }
 
